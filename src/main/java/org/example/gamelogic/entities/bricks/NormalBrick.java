@@ -1,5 +1,5 @@
 package org.example.gamelogic.entities.bricks;
 
-public class NormalBrick implements Brick {
+public class NormalBrick extends AbstractBrick {
 
 }

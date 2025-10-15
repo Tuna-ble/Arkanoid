@@ -11,5 +11,5 @@ public class BrickFactory {
         this.registry = registry;
     }
 
-    //public Brick createBrick() {}
+    //public Brick createBrick(...) {}
 }

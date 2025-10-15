@@ -1,14 +1,20 @@
 package org.example.gamelogic.core;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
+import org.example.data.FileLevelRepository;
+import org.example.data.ILevel;
 import org.example.gamelogic.states.GameState;
 import org.example.gamelogic.states.PlayingState;
 
+import java.util.List;
+
 //singleton (co dung Bill Pugh Idiom de xu li multithreading)
 public final class GameManager {
-    private AnimationTimer gameLoop;
+    private final AnimationTimer gameLoop;
     private StateManager stateManager;
     private GraphicsContext gc;
+    private ILevel levelRepository;
+
 
     public GameManager() {
         this.gameLoop = new AnimationTimer() {
@@ -45,6 +51,7 @@ public final class GameManager {
         stateManager = new StateManager();
         GameState currentState = new PlayingState();
         this.stateManager.setState(currentState);
+        this.levelRepository = new FileLevelRepository();
     }
 
     public void update(double deltaTime) {

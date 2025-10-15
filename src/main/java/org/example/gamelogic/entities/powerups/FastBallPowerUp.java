@@ -1,7 +1,7 @@
 package org.example.gamelogic.entities.powerups;
 
-import org.example.gamelogic.entities.PowerUp;
+import org.example.gamelogic.entities.MovableObject;
 
-public class FastBallPowerUp extends PowerUp {
+public class FastBallPowerUp extends MovableObject implements PowerUp {
 
 }
