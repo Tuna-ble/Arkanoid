@@ -2,6 +2,12 @@ package org.example.gamelogic.entities.powerups;
 
 import org.example.gamelogic.entities.MovableObject;
 
-public class ExpandPaddlePowerUp extends MovableObject implements PowerUp {
+import javafx.scene.canvas.GraphicsContext;
 
+public class ExpandPaddlePowerUp extends MovableObject implements PowerUp {
+    public ExpandPaddlePowerUp(double x, double y, double width, double height, double dx, double dy) {
+        super(x, y, width, height, dx, dy);
+    }
+    public void update() {}
+    public void render(GraphicsContext gc) {}
 }

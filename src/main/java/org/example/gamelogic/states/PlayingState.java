@@ -1,10 +1,20 @@
 package org.example.gamelogic.states;
 
 import javafx.scene.paint.Color;
+import org.example.gamelogic.core.BrickManager;
+import org.example.gamelogic.core.GameManager;
 
 public final class PlayingState implements GameState {
+    BrickManager brickManager;
+
+    public PlayingState(GameManager gameManager, int levelNumber) {
+        this.brickManager = gameManager.getBrickManager();
+        this.brickManager.loadLevel(levelNumber);
+    }
+
     @Override
     public void update(double deltaTime) {
+        brickManager.update(deltaTime);
     }
 
     @Override

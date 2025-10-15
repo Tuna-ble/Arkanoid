@@ -1,22 +1,19 @@
 package org.example.gamelogic.core;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
-import org.example.data.FileLevelRepository;
-import org.example.data.ILevel;
+import org.example.data.ILevelRepository;
 import org.example.gamelogic.states.GameState;
 import org.example.gamelogic.states.PlayingState;
-
-import java.util.List;
 
 //singleton (co dung Bill Pugh Idiom de xu li multithreading)
 public final class GameManager {
     private final AnimationTimer gameLoop;
     private StateManager stateManager;
+    private BrickManager brickManager;
     private GraphicsContext gc;
-    private ILevel levelRepository;
+    private ILevelRepository levelRepository;
 
-
-    public GameManager() {
+    private GameManager() {
         this.gameLoop = new AnimationTimer() {
             private long lastUpdate = 0;
 
@@ -47,11 +44,15 @@ public final class GameManager {
         this.gc = gc;
     }
 
+    public void setLevelRepository(ILevelRepository repo) {
+        this.levelRepository = repo;
+    }
+
     public void init() {
-        stateManager = new StateManager();
-        GameState currentState = new PlayingState();
+        this.stateManager = new StateManager();
+        this.brickManager = new BrickManager(levelRepository);
+        GameState currentState = new PlayingState(this, 1);
         this.stateManager.setState(currentState);
-        this.levelRepository = new FileLevelRepository();
     }
 
     public void update(double deltaTime) {
@@ -61,7 +62,11 @@ public final class GameManager {
     }
 
     public void render() {
-        this.stateManager.getState().render(gc);
+        GameState currentState = stateManager.getState();
+        if (currentState != null && gc != null) {
+            currentState.render(gc);
+        }
+        brickManager.render(gc);
     }
 
     public void startGameLoop() {
@@ -70,5 +75,9 @@ public final class GameManager {
 
     public void stopGameLoop() {
         gameLoop.stop();
+    }
+
+    public BrickManager getBrickManager() {
+        return this.brickManager;
     }
 }

@@ -1,5 +1,7 @@
 package org.example.gamelogic.entities.bricks;
 
+import javafx.scene.canvas.GraphicsContext;
+
 public interface Brick {
     void takeDamage();
     boolean isDestroyed();
@@ -9,4 +11,6 @@ public interface Brick {
     double getY();
     Brick clone();
 
+    void update();
+    void render(GraphicsContext gc);
 }

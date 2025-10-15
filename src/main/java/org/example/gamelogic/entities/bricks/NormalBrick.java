@@ -1,6 +1,7 @@
 package org.example.gamelogic.entities.bricks;
 
-import java.awt.*;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 public class NormalBrick extends AbstractBrick {
     public void takeDamage() {
@@ -15,8 +16,15 @@ public class NormalBrick extends AbstractBrick {
 
     }
 
-    public void render(Graphics2D g) {
-
+    @Override
+    public void render(GraphicsContext gc) {
+        if (!isDestroyed()) {
+            gc.setFill(Color.AQUAMARINE);
+            gc.fillRect(x, y, width, height);
+            //duong vien
+            gc.setStroke(Color.BLACK);
+            gc.strokeRect(x, y, width, height);
+        }
     }
 
     public NormalBrick(double x, double y, double width, double height) {

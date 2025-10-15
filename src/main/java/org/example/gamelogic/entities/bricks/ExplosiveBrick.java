@@ -1,10 +1,12 @@
 package org.example.gamelogic.entities.bricks;
 
-import java.awt.*;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 public class ExplosiveBrick extends AbstractBrick {
-    public void render(Graphics2D g) {
-        g.setColor(Color.RED);
+    @Override
+    public void render(GraphicsContext g) {
+        g.setFill(Color.RED);
     }
     public void takeDamage() {
 

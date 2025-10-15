@@ -6,6 +6,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.example.data.FileLevelRepository;
+import org.example.data.ILevelRepository;
 import org.example.gamelogic.core.GameManager;
 
 
@@ -15,6 +17,9 @@ public class GameApplication extends Application {
 
     public void start(Stage primaryStage) throws Exception {
         GameManager gameManager = GameManager.getInstance();
+        ILevelRepository repo = new FileLevelRepository();
+
+        gameManager.setLevelRepository(repo);
         gameManager.init();
 
         Canvas canvas = new Canvas((double) WIDTH, (double) HEIGHT);

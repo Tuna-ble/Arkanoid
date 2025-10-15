@@ -1,10 +1,9 @@
 package org.example.gamelogic.entities;
 
-import java.awt.*;
+import javafx.scene.canvas.GraphicsContext;
 
 public abstract class GameObject {
     protected double x, y, width, height;
-    protected double dx, dy;
     protected boolean isActive;
     public GameObject(double x, double y, double width, double height) {
         this.x = x;
@@ -12,12 +11,10 @@ public abstract class GameObject {
         this.width = width;
         this.height = height;
         this.isActive = true;
-        this.dx = 0;
-        this.dy = 0;
     }
 
     public abstract void update();
-    public abstract void render(Graphics2D g);
+    public abstract void render(GraphicsContext gc);
 
 
     public boolean isActive() {
@@ -35,12 +32,6 @@ public abstract class GameObject {
 
     public double getHeight() { return height; }
     public void setHeight(double height) { this.height = height; }
-
-    public double getDx() { return dx; }
-    public void setDx(double dx) { this.dx = dx; }
-
-    public double getDy() { return dy; }
-    public void setDy(double dy) { this.dy = dy; }
 
     public boolean isAlive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
