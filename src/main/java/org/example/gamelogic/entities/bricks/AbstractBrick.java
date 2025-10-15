@@ -15,7 +15,7 @@ public abstract class AbstractBrick extends GameObject implements Brick {
     public abstract Brick clone();
 
     @Override
-    public void setPosition(int x, int y) {
+    public void setPosition(double x, double y) {
         this.x = x;
         this.y = y;
     }

@@ -33,4 +33,5 @@ public class ExplosiveBrick extends AbstractBrick {
         return new ExplosiveBrick(0,0,this.width,this.height);
     }
 
+
 }

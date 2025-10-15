@@ -1,4 +1,7 @@
 package org.example.presentation;
 
-public class InputHandler {
+import org.example.gamelogic.I_InputReceiver;
+
+public class InputHandler implements I_InputReceiver {
+
 }
