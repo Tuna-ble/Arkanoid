@@ -11,5 +11,15 @@ public class BrickFactory {
         this.registry = registry;
     }
 
-    //public Brick createBrick() {}
+    public Brick createBrick(String brickType, double x, double y, double width, double height) {
+        Brick prototype = registry.getPrototype(brickType);
+        if (prototype == null) {
+            throw new IllegalArgumentException("Prototype not found" + brickType);
+        }
+
+        Brick newBrick = prototype.clone();
+        newBrick.setPosition(x,y);
+        return newBrick;
+
+    }
 }
