@@ -19,7 +19,7 @@ public final class PlayingState implements GameState {
 
     @Override
     public void render(javafx.scene.canvas.GraphicsContext gc) {
-        gc.setFill(Color.PINK);
+        gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         //render
     }
