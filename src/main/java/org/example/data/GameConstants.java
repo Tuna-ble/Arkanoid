@@ -4,28 +4,38 @@
 
 package org.example.data;
 
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+
 /**
  * Centralized game constants
  * Data layer - provides immutable configuration values
  */
 public final class GameConstants {
 
+    public static final Color BALL_COLOR = Color.RED;
+    public static final Color PADDLE_COLOR = Color.CYAN;
+    public static final Color PADDLE_BORDER_COLOR = Color.DARKBLUE;
+
     // Prevent instantiation
     private GameConstants() {}
 
     // Screen
-    public static final int SCREEN_WIDTH = 800;
-    public static final int SCREEN_HEIGHT = 600;
+    public static final double SCREEN_WIDTH = 800;
+    public static final double SCREEN_HEIGHT = 600;
 
     // Paddle
-    public static final int PADDLE_WIDTH = 120;
-    public static final int PADDLE_HEIGHT = 16;
-    public static final int PADDLE_Y = 536; // SCREEN_HEIGHT - 64
+    public static final double PADDLE_X = SCREEN_WIDTH / 2;
+    public static final double PADDLE_Y = 536; // SCREEN_HEIGHT - 64
+    public static final double PADDLE_WIDTH = 120;
+    public static final double PADDLE_HEIGHT = 16;
     public static final double PADDLE_SPEED = 600.0; // pixels per second
     public static final double PADDLE_MOVE_INFLUENCE = 0.15; // influence on ball direction
 
     // Ball
-    public static final int BALL_RADIUS = 6;
+    public static final double BALL_RADIUS = 8;
+    public static final double BALL_X = SCREEN_WIDTH / 2;
+    public static final double BALL_Y = PADDLE_Y - PADDLE_HEIGHT / 2 - BALL_RADIUS - 1.5; // SCREEN_HEIGHT - 64
     public static final double BALL_INITIAL_SPEED = 320.0;
     public static final double BALL_MIN_SPEED = 240.0;
     public static final double BALL_MAX_SPEED = 900.0;
@@ -36,16 +46,16 @@ public final class GameConstants {
 
     // Physics / timestep
     public static final double FIXED_TIMESTEP = 0.0083333; // 1/120 seconds
-    public static final int MAX_SUBSTEPS = 5;
+    public static final double MAX_SUBSTEPS = 5;
     public static final double EPSILON = 0.001;
 
     // Collision / CCD
     public static final boolean USE_CCD = true;
-    public static final int MAX_ITER_PER_FRAME = 5;
+    public static final double MAX_ITER_PER_FRAME = 5;
 
     // Bricks
-    public static final int BRICK_PADDING = 2;
-    public static final int BRICK_DURABILITY = 1;
+    public static final double BRICK_PADDING = 2;
+    public static final double BRICK_DURABILITY = 1;
 
     // Gameplay tuning
     public static final double BALL_INITIAL_ANGLE_RANDOM_RANGE = 15.0; // ±15 degrees
