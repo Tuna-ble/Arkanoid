@@ -3,12 +3,10 @@ package org.example.gamelogic.entities.powerups;
 import javafx.scene.canvas.GraphicsContext;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.entities.Paddle;
+import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public interface PowerUp {
-    void applyPowerUp(GameManager gm);
-    void removePowerUp(GameManager gm);
-    boolean isTaken(Paddle p);
-
+    PowerUpStrategy getStrategy();
     void setPosition(double x, double y);
     double getX();
     double getY();
@@ -17,7 +15,7 @@ public interface PowerUp {
     void update();
     void render(GraphicsContext gc);
 
+    void setActive(boolean active);
     boolean isActive();
     boolean isOutOfBounds();
-    double getRemainingTime();
 }

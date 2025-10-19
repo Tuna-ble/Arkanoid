@@ -12,9 +12,6 @@ import java.awt.geom.Rectangle2D;
 public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
     protected PowerUpStrategy strategy;
 
-    // Thời gian hiệu lực của powerup
-    protected double remainingTime = 20.0;
-
     // Kiểm tra powerup đã rơi khỏi cửa sổ chưa
     protected boolean outOfBounds = false;
 
@@ -26,27 +23,16 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
     }
 
     @Override
-    public void applyPowerUp(GameManager gm) {
-        if (!isActive && isTaken(gm.getPaddle())) {
-            strategy.apply(gm);
-            isActive = true;
-        }
+    public abstract PowerUp clone();
+
+    @Override
+    public void update() {
+        if (!outOfBounds) y += dy;
+        if (y > GameConfig.SCREEN_HEIGHT) outOfBounds = true;
     }
 
     @Override
-    public void removePowerUp(GameManager gm) {
-        if (isActive) {
-            strategy.remove(gm);
-            isActive = false;
-        }
-    }
-
-    @Override
-    public boolean isTaken(Paddle p) {
-        Rectangle2D powerup = new Rectangle2D.Double(this.x, this.y, this.width, this.height);
-        Rectangle2D paddle = new Rectangle2D.Double(p.getX(), p.getY(), p.getWidth(), p.getHeight());
-        return powerup.intersects(paddle);
-    }
+    public abstract void render(GraphicsContext gc);
 
     @Override
     public void setPosition(double x, double y) {
@@ -72,10 +58,12 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
         return isActive;
     }
 
-    public double getRemainingTime() {
-        return remainingTime;
+    @Override
+    public void setActive(boolean active) {
+        this.isActive=active;
     }
 
+    @Override
     public PowerUpStrategy getStrategy() {
         return strategy;
     }
@@ -83,23 +71,4 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
     public void setStrategy(PowerUpStrategy strategy) {
         this.strategy = strategy;
     }
-
-    @Override
-    public abstract PowerUp clone();
-
-    @Override
-    public void update() {
-        if (!outOfBounds) y += dy;
-        if (y > GameConfig.SCREEN_HEIGHT) outOfBounds = true;
-
-        if (isActive) {
-            remainingTime -= (1.0 / 60.0);
-            if (remainingTime <= 0) {
-                removePowerUp(GameManager.getInstance());
-            }
-        }
-    }
-
-    @Override
-    public abstract void render(GraphicsContext gc);
 }

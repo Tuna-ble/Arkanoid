@@ -33,7 +33,7 @@ public final class PowerUpManager {
         final double POWERUP_WIDTH = 40;
         final double POWERUP_HEIGHT = 40;
 
-        powerUpRegistry.register("E", new ExpandPaddlePowerUp(0.0, 0.0, POWERUP_WIDTH, POWERUP_HEIGHT, 0.0, 3.0, new ExpandPaddleStrategy()));
+        powerUpRegistry.register("E", new ExpandPaddlePowerUp(0.0, 0.0, POWERUP_WIDTH, POWERUP_HEIGHT, 0.0, 0.5, new ExpandPaddleStrategy()));
         powerUpRegistry.register("F", new FastBallPowerUp(0.0, 0.0, POWERUP_WIDTH, POWERUP_HEIGHT, 0.0, 3.0, new FastBallStrategy()));
 
     }
@@ -52,13 +52,13 @@ public final class PowerUpManager {
             powerUp.update();
 
             // Paddle đã ăn chưa?
-            if (powerUp.isTaken(gm.getPaddle()) && !powerUp.isActive()) {
-                powerUp.applyPowerUp(gm);
+            if (!powerUp.isActive()) {
+                gm.addStrategy(powerUp.getStrategy());
+                powerUp.setActive(true);
             }
 
             // Xóa khi hết hiệu lực
-            if (powerUp.isActive() && powerUp.getRemainingTime() <= 0) {
-                powerUp.removePowerUp(gm);
+            if (powerUp.isActive() && powerUp.getStrategy().isExpired()) {
                 iterator.remove();
                 continue;
             }

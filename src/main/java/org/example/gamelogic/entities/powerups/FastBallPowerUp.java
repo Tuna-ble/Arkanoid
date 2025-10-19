@@ -12,7 +12,7 @@ public class FastBallPowerUp extends AbstractPowerUp {
 
     @Override
     public PowerUp clone() {
-        return new FastBallPowerUp(0.0, 0.0, this.width, this.height, 0.0, 3.0, super.getStrategy());
+        return new FastBallPowerUp(0.0, 0.0, this.width, this.height, this.dx, this.dy, super.getStrategy());
     }
 
     @Override
