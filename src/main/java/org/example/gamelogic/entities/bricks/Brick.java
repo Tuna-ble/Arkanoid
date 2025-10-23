@@ -1,6 +1,7 @@
 package org.example.gamelogic.entities.bricks;
 
 import javafx.scene.canvas.GraphicsContext;
+import org.example.gamelogic.entities.GameObject;
 
 public interface Brick {
     void takeDamage();
@@ -13,4 +14,6 @@ public interface Brick {
 
     void update();
     void render(GraphicsContext gc);
+
+    GameObject getGameObject();
 }

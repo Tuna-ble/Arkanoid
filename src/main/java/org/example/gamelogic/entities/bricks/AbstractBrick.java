@@ -26,4 +26,9 @@ public abstract class AbstractBrick extends GameObject implements Brick {
     public double getY() {
         return y;
     }
+
+    @Override
+    public GameObject getGameObject() {
+        return this;
+    }
 }

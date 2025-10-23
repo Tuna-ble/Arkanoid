@@ -4,14 +4,22 @@ import javafx.scene.canvas.GraphicsContext;
 import org.example.data.ILevelRepository;
 import org.example.gamelogic.states.GameState;
 import org.example.gamelogic.states.PlayingState;
+import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
+
+import java.util.List;
+import java.util.ArrayList;
 
 //singleton (co dung Bill Pugh Idiom de xu li multithreading)
 public final class GameManager {
     private final AnimationTimer gameLoop;
     private StateManager stateManager;
     private BrickManager brickManager;
+    private PowerUpManager powerUpManager;
+    private BallManager ballManager;
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
+
+    private List<PowerUpStrategy> activeStrategies=new ArrayList<>();
 
     private GameManager() {
         this.gameLoop = new AnimationTimer() {
@@ -48,17 +56,35 @@ public final class GameManager {
         this.levelRepository = repo;
     }
 
+    public void addStrategy(PowerUpStrategy strategy) {
+        activeStrategies.add(strategy);
+        strategy.apply(this);
+    }
+
     public void init() {
         this.stateManager = new StateManager();
         this.brickManager = new BrickManager(levelRepository);
+        this.powerUpManager = new PowerUpManager();
+        this.ballManager = new BallManager();
         GameState currentState = new PlayingState(this, 1);
         this.stateManager.setState(currentState);
+    }
+
+    public void updateStrategy(double deltaTime) {
+        for (PowerUpStrategy strategy : activeStrategies) {
+            strategy.update(this, deltaTime);
+            if (strategy.isExpired()) {
+                strategy.remove(this);
+                activeStrategies.remove(strategy);
+            }
+        }
     }
 
     public void update(double deltaTime) {
         if (stateManager != null) {
             stateManager.update(deltaTime);
         }
+        updateStrategy(deltaTime);
     }
 
     public void render() {
@@ -66,7 +92,6 @@ public final class GameManager {
         if (currentState != null && gc != null) {
             currentState.render(gc);
         }
-        brickManager.render(gc);
     }
 
     public void startGameLoop() {
@@ -79,5 +104,13 @@ public final class GameManager {
 
     public BrickManager getBrickManager() {
         return this.brickManager;
+    }
+
+    public PowerUpManager getPowerUpManager() {
+        return this.powerUpManager;
+    }
+
+    public BallManager getballManager() {
+        return this.ballManager;
     }
 }

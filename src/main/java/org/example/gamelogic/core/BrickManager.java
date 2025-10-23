@@ -5,7 +5,7 @@ import org.example.data.LevelData;
 import org.example.gamelogic.entities.bricks.*;
 import org.example.gamelogic.factory.BrickFactory;
 import org.example.gamelogic.registry.BrickRegistry;
-import org.example.config.GameConfig;
+import org.example.config.GameConstants;
 
 import javafx.scene.canvas.GraphicsContext;
 import java.util.ArrayList;
@@ -57,9 +57,9 @@ public final class BrickManager {
             }
         }
 
-        double gridWidth = maxCols * (GameConfig.BRICK_WIDTH + GameConfig.PADDING) - GameConfig.PADDING;
+        double gridWidth = maxCols * (GameConstants.BRICK_WIDTH + GameConstants.PADDING) - GameConstants.PADDING;
 
-        double startX = (GameConfig.SCREEN_WIDTH - gridWidth) / 2.0;
+        double startX = (GameConstants.SCREEN_WIDTH - gridWidth) / 2.0;
 
         for (int row = 0; row < layout.size(); row++) {
             String[] types = layout.get(row).split(" ");
@@ -68,8 +68,8 @@ public final class BrickManager {
                 if (type.equals("_")) {
                     continue;
                 }
-                double x = startX + col * (GameConfig.BRICK_WIDTH + GameConfig.PADDING);
-                double y = GameConfig.TOP_MARGIN + row * (GameConfig.BRICK_HEIGHT + GameConfig.PADDING);
+                double x = startX + col * (GameConstants.BRICK_WIDTH + GameConstants.PADDING);
+                double y = GameConstants.TOP_MARGIN + row * (GameConstants.BRICK_HEIGHT + GameConstants.PADDING);
                 Brick brick = brickFactory.createBrick(type, x, y);
                 if (brick != null) {
                     this.bricks.add(brick);
