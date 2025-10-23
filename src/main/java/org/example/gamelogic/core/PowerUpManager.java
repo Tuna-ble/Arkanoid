@@ -43,13 +43,13 @@ public final class PowerUpManager {
         activePowerUps.add(newPowerUp);
     }
 
-    public void update(GameManager gm) {
+    public void update(GameManager gm, double deltaTime) {
         Iterator<PowerUp> iterator = activePowerUps.iterator();
         while (iterator.hasNext()) {
             PowerUp powerUp = iterator.next();
 
             // Di chuyển powerup
-            powerUp.update();
+            powerUp.update(deltaTime);
 
             // Paddle đã ăn chưa?
             if (!powerUp.isActive()) {

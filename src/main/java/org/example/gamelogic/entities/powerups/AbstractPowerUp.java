@@ -24,7 +24,7 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
     public abstract PowerUp clone();
 
     @Override
-    public void update() {
+    public void update(double deltaTime) {
         if (!outOfBounds) y += dy;
         if (y > GameConstants.SCREEN_HEIGHT) outOfBounds = true;
     }

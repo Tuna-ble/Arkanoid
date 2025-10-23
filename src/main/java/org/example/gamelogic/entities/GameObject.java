@@ -15,7 +15,7 @@ public abstract class GameObject {
         this.isActive = true;
     }
 
-    public abstract void update();
+    public abstract void update(double deltaTime);
     public abstract void render(GraphicsContext gc);
 
 

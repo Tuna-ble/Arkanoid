@@ -3,7 +3,7 @@ package org.example.gamelogic.entities.bricks;
 import javafx.scene.canvas.GraphicsContext;
 
 public class HardBrick extends AbstractBrick {
-    public void update() {
+    public void update(double deltaTime) {
 
     }
 

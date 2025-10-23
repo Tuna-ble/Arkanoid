@@ -12,7 +12,7 @@ public class NormalBrick extends AbstractBrick {
         return 0;
     }
 
-    public void update() {
+    public void update(double deltaTime) {
 
     }
 

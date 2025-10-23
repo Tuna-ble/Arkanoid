@@ -12,7 +12,7 @@ public interface Brick {
     double getY();
     Brick clone();
 
-    void update();
+    void update(double deltaTime);
     void render(GraphicsContext gc);
 
     GameObject getGameObject();

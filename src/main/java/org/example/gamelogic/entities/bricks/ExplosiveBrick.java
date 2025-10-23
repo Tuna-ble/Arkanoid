@@ -22,7 +22,7 @@ public class ExplosiveBrick extends AbstractBrick {
     }
 
     @Override
-    public void update() {
+    public void update(double deltaTime) {
 
     }
 

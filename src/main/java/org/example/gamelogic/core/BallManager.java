@@ -13,9 +13,10 @@ import java.util.List;
 
 public final class BallManager {
     private final BallFactory ballFactory;
-    private List<IBall> activeBalls = new ArrayList<>();
+    private List<IBall> activeBalls;
 
     public BallManager() {
+        this.activeBalls =  new ArrayList<>();
         BallRegistry registry = BallRegistry.getInstance();
         registerBallPrototypes(registry);
         this.ballFactory = new BallFactory(registry);
@@ -35,11 +36,9 @@ public final class BallManager {
     }
 
     public void update(double deltaTime) {
-        // Cập nhật tất cả bóng
         for (IBall ball : activeBalls) {
             ball.update(deltaTime);
         }
-        // Dọn dẹp bóng đã bị destroy (isAlive = false)
         activeBalls.removeIf(ball -> ball.isDestroyed());
     }
 

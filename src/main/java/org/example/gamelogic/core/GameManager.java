@@ -19,7 +19,7 @@ public final class GameManager {
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
 
-    private List<PowerUpStrategy> activeStrategies=new ArrayList<>();
+    private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
 
     private GameManager() {
         this.gameLoop = new AnimationTimer() {
@@ -110,7 +110,7 @@ public final class GameManager {
         return this.powerUpManager;
     }
 
-    public BallManager getballManager() {
+    public BallManager getBallManager() {
         return this.ballManager;
     }
 }

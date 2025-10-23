@@ -22,8 +22,6 @@ public class Paddle extends MovableObject {
     }
 
     @Override
-    public void update() {}
-
     // update paddle theop delta time
     public void update(double deltaTime) {
         x += dx * deltaTime;

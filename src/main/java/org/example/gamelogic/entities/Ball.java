@@ -12,7 +12,6 @@ import org.example.gamelogic.entities.bricks.ExplosiveBrick;
 public class Ball extends MovableObject implements IBall {
     private double radius;
     private double speed;
-    private boolean isActive;
     private boolean attachedToPaddle;
 
     public Ball(double x, double y, double radius, double dx, double dy) {
@@ -21,14 +20,12 @@ public class Ball extends MovableObject implements IBall {
         this.speed = GameConstants.BALL_INITIAL_SPEED;
     }
 
-    @Override
-    public void update() {}
-
     public double getCenterX() {
         return x + width / 2;
     }
 
     // update bóng theo delta
+    @Override
     public void update(double deltaTime) {
         if (!isActive) { // bóng rời paddle
 
@@ -154,7 +151,7 @@ public class Ball extends MovableObject implements IBall {
     }
 
     public boolean isDestroyed() {
-        return isActive;
+        return !isActive;
     }
 
     public void setPosition(double x, double y) {

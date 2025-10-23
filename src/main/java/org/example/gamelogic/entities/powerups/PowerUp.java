@@ -13,7 +13,7 @@ public interface PowerUp {
     double getY();
     PowerUp clone();
 
-    void update();
+    void update(double deltaTime);
     void render(GraphicsContext gc);
 
     void setActive(boolean active);
