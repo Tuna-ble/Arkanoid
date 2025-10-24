@@ -26,7 +26,7 @@ public final class PlayingState implements GameState {
                 GameConstants.PADDLE_Y,
                 GameConstants.PADDLE_WIDTH,
                 GameConstants.PADDLE_HEIGHT,
-                GameConstants.PADDLE_SPEED,
+                0,
                 0);
 
         this.ballManager.createInitialBall(this.paddle);
