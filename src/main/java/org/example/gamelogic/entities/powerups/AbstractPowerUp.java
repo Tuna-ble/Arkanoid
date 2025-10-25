@@ -1,16 +1,16 @@
 package org.example.gamelogic.entities.powerups;
 
 import javafx.scene.canvas.GraphicsContext;
-import org.example.config.GameConfig;
-import org.example.gamelogic.core.GameManager;
+import org.example.config.GameConstants;
+import org.example.gamelogic.core.EventManager;
+import org.example.gamelogic.entities.GameObject;
 import org.example.gamelogic.entities.MovableObject;
-import org.example.gamelogic.entities.Paddle;
+import org.example.gamelogic.events.PowerUpCollectedEvent;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
-
-import java.awt.geom.Rectangle2D;
 
 public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
     protected PowerUpStrategy strategy;
+    private boolean isTaken = false;
 
     // Kiểm tra powerup đã rơi khỏi cửa sổ chưa
     protected boolean outOfBounds = false;
@@ -19,16 +19,35 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
                            double dx, double dy, PowerUpStrategy strategy) {
         super(x, y, width, height, dx, dy);
         this.strategy = strategy;
-        this.isActive = false;
+        this.isActive = true;
+
+        subscribeToPowerUpCollectedEvent();
+    }
+
+    private void subscribeToPowerUpCollectedEvent() {
+        EventManager.getInstance().subscribe(
+                PowerUpCollectedEvent.class,
+                this::onPowerUpCollected);
+    }
+
+    protected void onPowerUpCollected(PowerUpCollectedEvent event) {
+        if (event.getPowerUpCollected()==this) {
+            activate();
+        }
+    }
+
+    protected void activate() {
+        markAsTaken();
+        // System.out.print("power up collected");
     }
 
     @Override
     public abstract PowerUp clone();
 
     @Override
-    public void update() {
+    public void update(double deltaTime) {
         if (!outOfBounds) y += dy;
-        if (y > GameConfig.SCREEN_HEIGHT) outOfBounds = true;
+        if (y > GameConstants.SCREEN_HEIGHT) outOfBounds = true;
     }
 
     @Override
@@ -70,5 +89,20 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
 
     public void setStrategy(PowerUpStrategy strategy) {
         this.strategy = strategy;
+    }
+
+    @Override
+    public GameObject getGameObject() {
+        return this;
+    }
+
+    public void destroy() {
+        this.isActive = false;
+        EventManager.getInstance().unsubscribe(PowerUpCollectedEvent.class, this::onPowerUpCollected);
+    }
+
+    public void markAsTaken() {
+        this.isTaken = true;
+        destroy();
     }
 }

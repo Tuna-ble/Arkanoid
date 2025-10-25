@@ -1,5 +1,7 @@
 package org.example.gamelogic.states;
 
+import org.example.presentation.InputHandler;
+
 public final class PauseState implements GameState {
     @Override
     public void update(double deltaTime) {
@@ -12,7 +14,7 @@ public final class PauseState implements GameState {
     }
 
     @Override
-    public void handleInput() {
+    public void handleInput(InputHandler inputHandler) {
 
     }
 }

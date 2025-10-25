@@ -1,13 +1,18 @@
 package org.example.gamelogic.core;
+
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
+import org.example.config.GameConstants;
 import org.example.data.ILevelRepository;
+import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.states.GameState;
 import org.example.gamelogic.states.PlayingState;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
+import org.example.presentation.InputHandler;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 //singleton (co dung Bill Pugh Idiom de xu li multithreading)
 public final class GameManager {
@@ -15,10 +20,15 @@ public final class GameManager {
     private StateManager stateManager;
     private BrickManager brickManager;
     private PowerUpManager powerUpManager;
+    private BallManager ballManager;
+    private CollisionManager collisionManager;
+    private Paddle paddle;
+
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
+    private InputHandler inputHandler;
 
-    private List<PowerUpStrategy> activeStrategies=new ArrayList<>();
+    private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
 
     private GameManager() {
         this.gameLoop = new AnimationTimer() {
@@ -32,9 +42,12 @@ public final class GameManager {
                 }
                 double deltaTime = (now - lastUpdate) / 1_000_000_000.0;
                 lastUpdate = now;
-
+                handleInput();
                 update(deltaTime);
                 render();
+                if (inputHandler != null) {
+                    inputHandler.resetMouseClick();
+                }
             }
         };
     }
@@ -47,6 +60,10 @@ public final class GameManager {
         return SingletonHolder.INSTANCE;
     }
 
+    public void setInputHandler(InputHandler inputHandler) {
+        this.inputHandler = inputHandler;
+    }
+
     public void setGraphicsContext(GraphicsContext gc) {
         this.gc = gc;
     }
@@ -55,26 +72,44 @@ public final class GameManager {
         this.levelRepository = repo;
     }
 
-    public void addStrategy(PowerUpStrategy strategy) {
-        activeStrategies.add(strategy);
-        strategy.apply(this);
-    }
-
     public void init() {
         this.stateManager = new StateManager();
         this.brickManager = new BrickManager(levelRepository);
-        this.powerUpManager=new PowerUpManager();
+        this.powerUpManager = new PowerUpManager();
+        this.ballManager = new BallManager();
+        this.collisionManager = new CollisionManager();
+        this.paddle = new Paddle(
+                GameConstants.PADDLE_X,
+                GameConstants.PADDLE_Y,
+                GameConstants.PADDLE_WIDTH,
+                GameConstants.PADDLE_HEIGHT,
+                0,
+                0);
         GameState currentState = new PlayingState(this, 1);
         this.stateManager.setState(currentState);
     }
 
+    public void addStrategy(PowerUpStrategy strategy) {
+        strategy.apply(this);
+        activeStrategies.add(strategy);
+    }
+
     public void updateStrategy(double deltaTime) {
-        for (PowerUpStrategy strategy : activeStrategies) {
+        Iterator<PowerUpStrategy> iterator = activeStrategies.iterator();
+        while (iterator.hasNext()) {
+            PowerUpStrategy strategy = iterator.next();
             strategy.update(this, deltaTime);
             if (strategy.isExpired()) {
                 strategy.remove(this);
-                activeStrategies.remove(strategy);
+                iterator.remove();
             }
+        }
+    }
+
+    public void handleInput() {
+        GameState currentState = stateManager.getState();
+        if (currentState != null && this.inputHandler != null) {
+            currentState.handleInput(this.inputHandler);
         }
     }
 
@@ -82,7 +117,6 @@ public final class GameManager {
         if (stateManager != null) {
             stateManager.update(deltaTime);
         }
-        updateStrategy(deltaTime);
     }
 
     public void render() {
@@ -90,8 +124,6 @@ public final class GameManager {
         if (currentState != null && gc != null) {
             currentState.render(gc);
         }
-        brickManager.render(gc);
-        powerUpManager.render(gc);
     }
 
     public void startGameLoop() {
@@ -108,5 +140,17 @@ public final class GameManager {
 
     public PowerUpManager getPowerUpManager() {
         return this.powerUpManager;
+    }
+
+    public BallManager getBallManager() {
+        return this.ballManager;
+    }
+
+    public CollisionManager getCollisionManager() {
+        return this.collisionManager;
+    }
+
+    public Paddle getPaddle() {
+        return this.paddle;
     }
 }

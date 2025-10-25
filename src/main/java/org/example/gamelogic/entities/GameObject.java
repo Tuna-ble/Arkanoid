@@ -2,6 +2,8 @@ package org.example.gamelogic.entities;
 
 import javafx.scene.canvas.GraphicsContext;
 
+import java.awt.geom.Rectangle2D;
+
 public abstract class GameObject {
     protected double x, y, width, height;
     protected boolean isActive;
@@ -13,7 +15,7 @@ public abstract class GameObject {
         this.isActive = true;
     }
 
-    public abstract void update();
+    public abstract void update(double deltaTime);
     public abstract void render(GraphicsContext gc);
 
 
@@ -36,4 +38,17 @@ public abstract class GameObject {
     public boolean isAlive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
 
+    public boolean intersects(GameObject other) {
+        if (other == null) {
+            return false;
+        }
+        return this.x < other.x + other.width &&
+                this.x + this.width > other.x &&
+                this.y < other.y + other.height &&
+                this.y + this.height > other.y;
+    }
+
+    public GameObject getGameObject() {
+        return this;
+    }
 }
