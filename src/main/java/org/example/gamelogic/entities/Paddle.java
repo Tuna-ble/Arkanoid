@@ -18,25 +18,26 @@ public class Paddle extends MovableObject {
     }
 
     public double getCenterX() {
-        return x + width / 2;
+        return x; // x là tâm
     }
 
     @Override
-    // update paddle theop delta time
+    // update paddle theo delta time
     public void update(double deltaTime) {
         x += dx * deltaTime;
 
-        if (x < minX) {
-            x = minX;
+        // Kiểm tra mép TRÁI của paddle
+        if (x - (width / 2) < minX) {
+            x = minX + (width / 2);
             dx = 0;
         }
-        if (x + width > maxX) {
-            x = maxX - width;
+        // Kiểm tra mép PHẢI của paddle
+        if (x + (width / 2) > maxX) {
+            x = maxX - (width / 2);
             dx = 0;
         }
     }
 
-    // set up state cho paddle
     public void moveLeft() {
         dx = -speed;
     }
@@ -60,8 +61,8 @@ public class Paddle extends MovableObject {
 
     @Override
     public void render(GraphicsContext gc) {
-        double drawX = x - width / 2;
-        double drawY = y; // y vẫn tính từ trên xuống, nên không cần trừ nửa height
+        double drawX = x - (width / 2);
+        double drawY = y;
 
         gc.setFill(GameConstants.PADDLE_COLOR);
         gc.fillRoundRect(drawX, drawY, width, height, 10, 10);
@@ -71,4 +72,8 @@ public class Paddle extends MovableObject {
         gc.strokeRoundRect(drawX, drawY, width, height, 10, 10);
     }
 
+    public void setVelocity(double v, int i) {
+        this.dx = v;
+        this.dy = i;
+    }
 }

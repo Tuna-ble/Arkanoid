@@ -10,6 +10,8 @@ import org.example.gamelogic.core.BrickManager;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.core.PowerUpManager;
 import org.example.gamelogic.entities.Paddle;
+import org.example.presentation.InputHandler;
+import javafx.scene.input.KeyCode;
 
 public final class PlayingState implements GameState {
     BrickManager brickManager;
@@ -43,10 +45,12 @@ public final class PlayingState implements GameState {
 
     @Override
     public void update(double deltaTime) {
+        paddle.update(deltaTime);
+        ballManager.updateAttachedBalls(paddle);
+
         brickManager.update(deltaTime);
         ballManager.update(deltaTime);
         powerUpManager.update(gameManager, deltaTime);
-        paddle.update(deltaTime);
     }
 
     @Override
@@ -58,7 +62,7 @@ public final class PlayingState implements GameState {
         ballManager.render(gc);
         powerUpManager.render(gc);
         paddle.render(gc);
-        
+
         renderScore(gc);
     }
 
@@ -71,7 +75,19 @@ public final class PlayingState implements GameState {
     }
 
     @Override
-    public void handleInput() {
+    public void handleInput(InputHandler input) {
 
+        if (input.isKeyPressed(KeyCode.LEFT) || input.isKeyPressed(KeyCode.A)) {
+            paddle.setVelocity(-GameConstants.PADDLE_SPEED, 0);
+        } else if (input.isKeyPressed(KeyCode.RIGHT) || input.isKeyPressed(KeyCode.D)) {
+            paddle.setVelocity(GameConstants.PADDLE_SPEED, 0);
+        } else {
+            paddle.setVelocity(0, 0);
+        }
+
+
+        if (input.isKeyPressed(KeyCode.SPACE) || input.isMouseClicked()) {
+            ballManager.releaseAllBalls(); // gọi hàm mới trong BallManager
+        }
     }
 }

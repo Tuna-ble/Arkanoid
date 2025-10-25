@@ -9,6 +9,8 @@ import javafx.stage.Stage;
 import org.example.data.FileLevelRepository;
 import org.example.data.ILevelRepository;
 import org.example.gamelogic.core.GameManager;
+// MỚI: Import InputHandler
+import org.example.presentation.InputHandler;
 
 
 public class GameApplication extends Application {
@@ -19,7 +21,11 @@ public class GameApplication extends Application {
         GameManager gameManager = GameManager.getInstance();
         ILevelRepository repo = new FileLevelRepository();
 
+        InputHandler inputHandler = new InputHandler();
+
         gameManager.setLevelRepository(repo);
+        gameManager.setInputHandler(inputHandler);
+
         gameManager.init();
 
         Canvas canvas = new Canvas((double) WIDTH, (double) HEIGHT);
@@ -28,17 +34,32 @@ public class GameApplication extends Application {
         StackPane root = new StackPane(canvas);
         Scene scene = new Scene(root, (double) WIDTH, (double) HEIGHT);
 
+        scene.setOnKeyPressed(event -> {
+            inputHandler.addKey(event.getCode());
+        });
+
+        scene.setOnKeyReleased(event -> {
+            inputHandler.removeKey(event.getCode());
+        });
+
+        scene.setOnMouseMoved(event -> {
+            inputHandler.setMousePos(event.getX(), event.getY());
+        });
+
+        scene.setOnMouseClicked(event -> {
+            inputHandler.setMouseClicked(true);
+        });
+
         primaryStage.setTitle("Arkanoid");
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
         primaryStage.show();
 
         gameManager.setGraphicsContext(gc);
-        //addInputHandlers(scene, gameManager.getInputHandler());
-
         gameManager.startGameLoop();
     }
 
     public static void main(String[] args) {
-        launch(args); // Phương thức của JavaFX để khởi chạy ứng dụng
+        launch(args);
     }
 }
