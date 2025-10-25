@@ -24,6 +24,7 @@ public interface IBall {
     void update(double deltaTime);
     void render(GraphicsContext gc);
     boolean isActive();
+    boolean isAttachedToPaddle();
     double getWidth();
     double getHeight();
 }

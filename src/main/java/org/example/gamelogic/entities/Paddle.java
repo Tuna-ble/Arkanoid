@@ -27,8 +27,8 @@ public class Paddle extends MovableObject {
         x += dx * deltaTime;
 
         // Kiểm tra mép TRÁI của paddle
-        if (x - (width / 2) < minX) {
-            x = minX + (width / 2);
+        if (x + (width / 2) < minX) {
+            x = minX - (width / 2);
             dx = 0;
         }
         // Kiểm tra mép PHẢI của paddle

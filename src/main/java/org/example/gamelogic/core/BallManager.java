@@ -40,7 +40,7 @@ public final class BallManager {
             ball.update(deltaTime);
         }
 
-        activeBalls.removeIf(ball -> ball.getY() > GameConstants.SCREEN_HEIGHT + ball.getHeight());
+        activeBalls.removeIf(ball -> !ball.isActive());
     }
 
     /**
@@ -49,7 +49,7 @@ public final class BallManager {
      */
     public void releaseAllBalls() {
         for (IBall ball : activeBalls) {
-            if (ball.isActive()) {
+            if (ball.isAttachedToPaddle()) {
                 ball.release();
             }
         }
@@ -60,7 +60,7 @@ public final class BallManager {
      */
     public void updateAttachedBalls(Paddle paddle) {
         for (IBall ball : activeBalls) {
-            if (ball.isActive()) {
+            if (ball.isAttachedToPaddle()) {
                 ball.setPosition(
                         paddle.getX() + (paddle.getWidth() / 2.0) - (ball.getWidth() / 2.0),
                         paddle.getY() - ball.getHeight()

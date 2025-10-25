@@ -18,16 +18,14 @@ public class Ball extends MovableObject implements IBall {
         super(x, y, radius * 2, radius * 2, dx, dy);
         this.radius = radius;
         this.speed = GameConstants.BALL_INITIAL_SPEED;
-    }
-
-    public double getCenterX() {
-        return x + width / 2;
+        this.attachedToPaddle=true;
+        this.isActive=true;
     }
 
     // update bóng theo delta
     @Override
     public void update(double deltaTime) {
-        if (!isActive) { // bóng rời paddle
+        if (!attachedToPaddle && isActive) { // bóng rời paddle
 
             // đảm bảo vận tốc theo trục Y đủ lớn -> bóng nảy lên xuống
             if (Math.abs(dy) < GameConstants.BALL_MIN_VY) {
@@ -54,8 +52,8 @@ public class Ball extends MovableObject implements IBall {
 
     // bắn bóng ra khỏi paddle
     public void release() {
-        if (isActive) {
-            isActive = false;
+        if (attachedToPaddle && isActive) {
+            attachedToPaddle = false;
             // tạo độ lệch nhỏ so với baseAngle (75 độ)
             double angleVariation = Math.toRadians(
                     (Math.random() - 0.5) * 2 * GameConstants.BALL_INITIAL_ANGLE_RANDOM_RANGE
@@ -154,6 +152,15 @@ public class Ball extends MovableObject implements IBall {
         return !isActive;
     }
 
+    public boolean isAttachedToPaddle() {
+        return attachedToPaddle;
+    }
+
+    public void destroy() {
+        isActive = false;
+        attachedToPaddle=false;
+    }
+
     public void setPosition(double x, double y) {
         this.x = x;
         this.y = y;
@@ -200,9 +207,5 @@ public class Ball extends MovableObject implements IBall {
         dy = -currentSpeed * Math.sin(newAngle);
 
         incrementSpeed();
-    }
-
-    public void destroy() {
-        this.isActive = false;
     }
 }
