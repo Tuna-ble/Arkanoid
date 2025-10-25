@@ -3,7 +3,9 @@ package org.example.gamelogic.entities.bricks;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
-import org.example.gamelogic.core.ScoreManager;
+import org.example.gamelogic.core.EventManager;
+import org.example.gamelogic.events.BrickDestroyedEvent;
+
 
 public class HardBrick extends AbstractBrick {
     private int durability; //do ben
@@ -42,14 +44,13 @@ public class HardBrick extends AbstractBrick {
         this.durability--;
         if (this.durability <= 0) {
             this.isActive = false;
-            ScoreManager.getInstance().addScore(GameConstants.POINTS_PER_HARD_BRICK);
+            EventManager.getInstance().publish(new BrickDestroyedEvent(this));
         }
     }
 
     public int getScore() {
         return 0;
     }
-
 
     @Override
     public Brick clone() {

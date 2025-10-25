@@ -15,6 +15,7 @@ public final class GameConstants {
     public static final Color BALL_COLOR = Color.RED;
     public static final Color PADDLE_COLOR = Color.CYAN;
     public static final Color PADDLE_BORDER_COLOR = Color.DARKBLUE;
+    public static final int POINTS_PER_EXPLOSIVE_BRICK = 30;
 
     // Prevent instantiation
     private GameConstants() {}
@@ -74,6 +75,7 @@ public final class GameConstants {
 
     // Score
     public static final int POINTS_PER_BRICK = 10;
+
 
 
 }
