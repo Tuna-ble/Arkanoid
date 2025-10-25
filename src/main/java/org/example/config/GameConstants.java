@@ -59,6 +59,8 @@ public final class GameConstants {
     public static final double BRICK_HEIGHT = 60;
     public static final double PADDING = 5;
     public static final double TOP_MARGIN = 50;
+    public static final int HARD_BRICK_DURABILITY = 3;
+    public static final int POINTS_PER_HARD_BRICK = 50;
 
     // Gameplay tuning
     public static final double BALL_INITIAL_ANGLE_RANDOM_RANGE = 15.0; // ±15 degrees
@@ -69,4 +71,9 @@ public final class GameConstants {
     public static final double PADDLE_CENTER_X = SCREEN_WIDTH / 2.0;
     public static final double BALL_INITIAL_X = SCREEN_WIDTH / 2.0;
     public static final double BALL_INITIAL_Y = PADDLE_Y - BALL_RADIUS - 10;
+
+    // Score
+    public static final int POINTS_PER_BRICK = 10;
+
+
 }

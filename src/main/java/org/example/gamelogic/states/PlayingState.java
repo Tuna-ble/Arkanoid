@@ -1,5 +1,8 @@
 package org.example.gamelogic.states;
 
+import javafx.scene.canvas.GraphicsContext;
+import org.example.gamelogic.core.*;
+import javafx.scene.text.Font;
 import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.BallManager;
@@ -14,6 +17,7 @@ public final class PlayingState implements GameState {
     GameManager gameManager;
     BallManager ballManager;
     Paddle paddle;
+    Font scoreFont;
 
     public PlayingState(GameManager gameManager, int levelNumber) {
         this.gameManager=gameManager;
@@ -32,6 +36,9 @@ public final class PlayingState implements GameState {
         this.ballManager.createInitialBall(this.paddle);
         powerUpManager.spawnPowerUp("E", 400, 100);
         powerUpManager.spawnPowerUp("F", 500, 100);
+
+        ScoreManager.getInstance().resetScore();
+        this.scoreFont = new Font("Arial", 24);
     }
 
     @Override
@@ -51,6 +58,16 @@ public final class PlayingState implements GameState {
         ballManager.render(gc);
         powerUpManager.render(gc);
         paddle.render(gc);
+        
+        renderScore(gc);
+    }
+
+    private void renderScore(GraphicsContext gc) {
+        int currentScore = ScoreManager.getInstance().getScore();
+
+        gc.setFont(scoreFont);
+        gc.setFill(Color.WHITE);
+        gc.fillText("Score: " + currentScore, 10, 25);
     }
 
     @Override
