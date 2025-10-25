@@ -1,5 +1,6 @@
 package org.example.gamelogic.states;
 
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.BallManager;
@@ -7,6 +8,7 @@ import org.example.gamelogic.core.BrickManager;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.core.PowerUpManager;
 import org.example.gamelogic.entities.Paddle;
+import org.example.presentation.InputHandler;
 
 public final class PlayingState implements GameState {
     BrickManager brickManager;
@@ -54,7 +56,6 @@ public final class PlayingState implements GameState {
     }
 
     @Override
-    public void handleInput() {
-
+    public void handleInput(InputHandler inputHandler) {
     }
 }

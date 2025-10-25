@@ -69,26 +69,6 @@ public class Ball extends MovableObject implements IBall {
         }
     }
 
-    /**
-     * demo va chạm với paddle
-     */
-    public void adjustAngle(double hitPosition, double paddledx) {
-        dx += paddledx * GameConstants.PADDLE_MOVE_INFLUENCE;
-        dx += speed * hitPosition * 0.5;
-
-        if (dy > 0) { dy = -Math.abs(dy); }
-
-        double currentSpeed = Math.sqrt(dx * dx + dy * dy);
-        double targetSpeed = speed * GameConstants.BALL_RESTITUTION;
-        if (currentSpeed > 0) {
-            double factor = targetSpeed / currentSpeed;
-            dx *= factor;
-            dy *= factor;
-        }
-
-        speed = Math.min(speed + GameConstants.BALL_SPEED_INCREMENT_PER_BRICK,
-                GameConstants.BALL_MAX_SPEED);
-    }
 
     // tăng tốc nhẹ
     public void incrementSpeed() {
@@ -107,25 +87,8 @@ public class Ball extends MovableObject implements IBall {
     public double getRadius() { return radius; }
     public double getSpeed() { return speed; }
 
-    // setter vận tốc và đảm bảo trong khoảng [min, max]
-    public void setSpeed(double speed) {
-        this.speed = Math.max(GameConstants.BALL_MIN_SPEED,
-                Math.min(speed, GameConstants.BALL_MAX_SPEED));
-
-        if (!isActive) {
-            double currentSpeed = Math.sqrt(dx * dx + dy * dy);
-            if (currentSpeed > 0) {
-                double factor = this.speed / currentSpeed;
-                dx *= factor;
-                dy *= factor;
-            }
-        }
-    }
-
     @Override
     public void render(GraphicsContext gc) {
-
-        // Tạo gradient nhẹ để bóng có cảm giác 3D
         RadialGradient gradient = new RadialGradient(
                 0, 0,                // focus angle, focus distance
                 x + radius, y + radius, // tâm gradient
@@ -136,7 +99,6 @@ public class Ball extends MovableObject implements IBall {
                 new Stop(1, GameConstants.BALL_COLOR) // vùng tối
         );
 
-        // tô hình tròn bằng gradient
         gc.setFill(gradient);
         gc.fillOval(x, y, radius * 2, radius * 2);
 
