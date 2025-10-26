@@ -14,12 +14,14 @@ import java.util.List;
 public final class BallManager {
     private final BallFactory ballFactory;
     private List<IBall> activeBalls;
+    private boolean Start;
 
     public BallManager() {
         this.activeBalls =  new ArrayList<>();
         BallRegistry registry = BallRegistry.getInstance();
         registerBallPrototypes(registry);
         this.ballFactory = new BallFactory(registry);
+        Start = false;
     }
 
     private void registerBallPrototypes(BallRegistry registry) {
@@ -35,9 +37,10 @@ public final class BallManager {
         }
     }
 
-    public void update(double deltaTime) {
+    public void update(double deltaTime, Paddle paddle) {
         for (IBall ball : activeBalls) {
-            ball.update(deltaTime);
+            if(Start) ball.update(deltaTime);
+            else ball.updateBeforeStart(deltaTime, paddle);
         }
         activeBalls.removeIf(ball -> {
             boolean destroyed = ball.isDestroyed();
@@ -68,13 +71,14 @@ public final class BallManager {
 
     public void Start() {
         if(!activeBalls.isEmpty()) {
+            Start = true;
             IBall ball = activeBalls.get(0);
-            System.out.println(ball.getdy());
             ball.release();
         }
     }
 
     public void clear() {
+        Start = false;
         activeBalls.clear();
     }
 }

@@ -23,7 +23,5 @@ public interface IBall {
     double getWidth();
     double getHeight();
 
-    boolean attachedToPaddle();
-    double getdy();
-
+    void updateBeforeStart(double deltaTime, Paddle paddle);
 }

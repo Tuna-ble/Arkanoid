@@ -39,9 +39,9 @@ public final class PlayingState implements GameState {
     @Override
     public void update(double deltaTime) {
         brickManager.update(deltaTime);
-        ballManager.update(deltaTime);
-        powerUpManager.update(gameManager, deltaTime);
         paddle.update(deltaTime);
+        ballManager.update(deltaTime, paddle);
+        powerUpManager.update(gameManager, deltaTime);
     }
 
     @Override
@@ -55,38 +55,37 @@ public final class PlayingState implements GameState {
         paddle.render(gc);
     }
 
-    @Override
     public void handleInput(InputHandler inputHandler) {
-        // Mouse
-        /*
+        // Key states
+        boolean leftPressed = inputHandler.isKeyPressed(KeyCode.LEFT) ||
+                inputHandler.isKeyPressed(KeyCode.A);
+        boolean rightPressed = inputHandler.isKeyPressed(KeyCode.RIGHT) ||
+                inputHandler.isKeyPressed(KeyCode.D);
+
+        // Mouse state
         int mouseX = inputHandler.getMouseX();
-        double paddleTargetX = mouseX - paddle.getWidth() / 2;
-        paddleTargetX = Math.max(0, Math.min(paddleTargetX, GameConstants.SCREEN_WIDTH - paddle.getWidth()));
+        boolean mouseInBounds = inputHandler.isMouseInBounds(GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        boolean mouseActive = inputHandler.isMouseActive() && mouseInBounds;
 
-        double currentPaddleX = paddle.getX();
-        if (paddleTargetX < currentPaddleX + 10) {
-            paddle.moveLeft();
-        } else if (paddleTargetX > currentPaddleX - 10) {
-            paddle.moveRight();
+        if (mouseActive) { // Ưu tiên chuột
+            double newPaddleX = mouseX - paddle.getWidth() / 2.0;
+            newPaddleX = Math.max(0, Math.min(newPaddleX, GameConstants.SCREEN_WIDTH - paddle.getWidth()));
+            paddle.setX(newPaddleX);
+            paddle.stop();
         } else {
-            //paddle.stop();
-        }
-        */
-
-        // Key
-        boolean leftPressed = inputHandler.isKeyPressed(KeyCode.LEFT.getCode()) ||
-                inputHandler.isKeyPressed(KeyCode.A.getCode());
-        boolean rightPressed = inputHandler.isKeyPressed(KeyCode.RIGHT.getCode()) ||
-                inputHandler.isKeyPressed(KeyCode.D.getCode());
-        if (leftPressed) {
-            paddle.moveLeft();
-        } else if (rightPressed) {
-            paddle.moveRight();
+            if (leftPressed && !rightPressed) {
+                paddle.moveLeft();
+            } else if (rightPressed && !leftPressed) {
+                paddle.moveRight();
+            } else {
+                paddle.stop();
+            }
         }
 
-        // SPACE
-        if (inputHandler.isKeyPressed(KeyCode.SPACE.getCode())) {
+        // SPACE để bắt đầu/bắn
+        if (inputHandler.isKeyPressed(KeyCode.SPACE)) {
             ballManager.Start();
         }
     }
+
 }

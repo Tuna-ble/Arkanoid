@@ -13,6 +13,9 @@ public class InputHandler implements I_InputProvider {
     private int mouseX;
     private int mouseY;
     private boolean mouseClicked;
+    private int lastMouseX;
+    private long lastMouseMoveTime;
+    private static final long MOUSE_ACTIVE_MS = 150;
 
     public InputHandler(GameState initialState) {
         this.currentState = initialState;
@@ -20,6 +23,8 @@ public class InputHandler implements I_InputProvider {
         this.mouseX = 0;
         this.mouseY = 0;
         this.mouseClicked = false;
+        this.lastMouseX = 0;
+        this.lastMouseMoveTime = 0;
     }
 
     public void setCurrentState(GameState newState) {
@@ -32,6 +37,7 @@ public class InputHandler implements I_InputProvider {
         }
     }
 
+    // Key
     public void keyPressed(KeyCode keyCode) {
         pressedKeys.add(keyCode);
     }
@@ -40,24 +46,6 @@ public class InputHandler implements I_InputProvider {
         pressedKeys.remove(keyCode);
     }
 
-    public void mouseMoved(int x, int y) {
-        this.mouseX = x;
-        this.mouseY = y;
-    }
-
-    public void mousePressed(int x, int y) {
-        this.mouseX = x;
-        this.mouseY = y;
-        this.mouseClicked = true;
-    }
-
-    public void resetMouseClick() {
-        mouseClicked = false;
-    }
-
-    /**
-     * Getter methods for I_InputProvider interface
-     */
     @Override
     public Set<Integer> getPressedKeys() {
         Set<Integer> keyCodes = new HashSet<>();
@@ -67,14 +55,32 @@ public class InputHandler implements I_InputProvider {
         return keyCodes;
     }
 
-    public boolean isKeyPressed(int keyCode) {
-        for (KeyCode kc : pressedKeys) {
-            if (kc.getCode() == keyCode) {
-                return true;
-            }
-        }
-        return false;
+    public boolean isKeyPressed(KeyCode keyCode) {
+        return pressedKeys.contains(keyCode);
     }
+
+    // Mouse.
+    public void mouseMoved(int x, int y) {
+        this.mouseX = x;
+        this.mouseY = y;
+        if (x != lastMouseX) {
+            lastMouseX = x;
+            lastMouseMoveTime = System.currentTimeMillis();
+        }
+    }
+
+    public void mousePressed(int x, int y) {
+        this.mouseX = x;
+        this.mouseY = y;
+        this.mouseClicked = true;
+        lastMouseX = x;
+        lastMouseMoveTime = System.currentTimeMillis();
+    }
+
+    public void resetMouseClick() {
+        mouseClicked = false;
+    }
+
 
     @Override
     public int getMouseX() {
@@ -89,5 +95,15 @@ public class InputHandler implements I_InputProvider {
     @Override
     public boolean isMouseClicked() {
         return mouseClicked;
+    }
+
+    // kiểm tra chuột vừa di chuyển trong ngưỡng thời gian
+    public boolean isMouseActive() {
+        return System.currentTimeMillis() - lastMouseMoveTime <= MOUSE_ACTIVE_MS;
+    }
+
+    // helper: nếu muốn biết chuột có trong bounds
+    public boolean isMouseInBounds(double width, double height) {
+        return mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height;
     }
 }
