@@ -3,7 +3,6 @@ package org.example.gamelogic.core;
 import org.example.config.GameConstants;
 import org.example.gamelogic.entities.GameObject;
 import org.example.gamelogic.entities.IBall;
-import org.example.gamelogic.entities.Ball;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.entities.bricks.Brick;
 import org.example.gamelogic.entities.powerups.PowerUp;
@@ -40,13 +39,21 @@ public final class CollisionManager {
     }
 
     private void checkBallBoundsCollisions(IBall ball) {
-        // Tường trái/phải
-        if (ball.getX() <= 0 || (ball.getX() + ball.getWidth()) >= GameConstants.SCREEN_WIDTH) {
+        // Tường trái
+        if (ball.getX() <= 0) {
+            ball.setPosition(0, ball.getY());
+            ball.reverseDirX();
+            // EventManager.getInstance().publish(new BallHitWallEvent(ball, WallDirection.SIDE)); // Tùy chọn
+        }
+        // Tường phải
+        if ((ball.getX() + ball.getWidth()) >= GameConstants.SCREEN_WIDTH) {
+            ball.setPosition(GameConstants.SCREEN_WIDTH - ball.getWidth(), ball.getY());
             ball.reverseDirX();
             // EventManager.getInstance().publish(new BallHitWallEvent(ball, WallDirection.SIDE)); // Tùy chọn
         }
         // Tường trên
         if (ball.getY() <= 0) {
+            ball.setPosition(ball.getX(), 0);
             ball.reverseDirY();
             // EventManager.getInstance().publish(new BallHitWallEvent(ball, WallDirection.TOP)); // Tùy chọn
         }

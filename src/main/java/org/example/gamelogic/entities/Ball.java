@@ -110,7 +110,7 @@ public class Ball extends MovableObject implements IBall {
         this.speed = Math.max(GameConstants.BALL_MIN_SPEED,
                 Math.min(speed, GameConstants.BALL_MAX_SPEED));
 
-        if (!isActive) {
+        if (isActive) {
             double currentSpeed = Math.sqrt(dx * dx + dy * dy);
             if (currentSpeed > 0) {
                 double factor = this.speed / currentSpeed;
