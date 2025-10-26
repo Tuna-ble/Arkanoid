@@ -5,6 +5,7 @@ import org.example.gamelogic.entities.bricks.Brick;
 
 public interface IBall {
     boolean isDestroyed();
+    boolean isAttachedToPaddle();
     void setPosition(double x, double y);
     void release();
     double getX();
@@ -22,4 +23,6 @@ public interface IBall {
     boolean isActive();
     double getWidth();
     double getHeight();
+
+    GameObject getGameObject();
 }

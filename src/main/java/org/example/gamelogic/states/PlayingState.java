@@ -9,6 +9,7 @@ import org.example.gamelogic.core.BallManager;
 import org.example.gamelogic.core.BrickManager;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.core.PowerUpManager;
+import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
 import org.example.presentation.InputHandler;
 import javafx.scene.input.KeyCode;
@@ -18,6 +19,7 @@ public final class PlayingState implements GameState {
     PowerUpManager powerUpManager;
     GameManager gameManager;
     BallManager ballManager;
+    CollisionManager collisionManager;
     Paddle paddle;
     Font scoreFont;
 
@@ -27,6 +29,7 @@ public final class PlayingState implements GameState {
         this.brickManager.loadLevel(levelNumber);
         this.powerUpManager = gameManager.getPowerUpManager();
         this.ballManager = gameManager.getBallManager();
+        this.collisionManager = gameManager.getCollisionManager();
         this.paddle = new Paddle(
                 GameConstants.PADDLE_X,
                 GameConstants.PADDLE_Y,
@@ -46,11 +49,20 @@ public final class PlayingState implements GameState {
     @Override
     public void update(double deltaTime) {
         paddle.update(deltaTime);
-        ballManager.updateAttachedBalls(paddle);
+        updateAttachedBallPosition();
 
         brickManager.update(deltaTime);
         ballManager.update(deltaTime);
         powerUpManager.update(gameManager, deltaTime);
+
+        if (collisionManager != null) {
+            collisionManager.checkCollisions(
+                    ballManager.getActiveBalls(),
+                    paddle,
+                    brickManager.getBricks(),
+                    powerUpManager.getActivePowerUps()
+            );
+        }
     }
 
     @Override
@@ -87,7 +99,20 @@ public final class PlayingState implements GameState {
 
 
         if (input.isKeyPressed(KeyCode.SPACE) || input.isMouseClicked()) {
-            ballManager.releaseAllBalls(); // gọi hàm mới trong BallManager
+            ballManager.releaseAttachedBalls(); // gọi hàm mới trong BallManager
+        }
+    }
+
+    private void updateAttachedBallPosition() {
+        for (IBall ball : ballManager.getActiveBalls()) {
+            // Kiểm tra xem bóng có đang dính không
+            if (ball.isAttachedToPaddle()) {
+                // Tính toán và đặt lại vị trí bóng dựa trên paddle
+                ball.setPosition(
+                        paddle.getX() + (paddle.getWidth() / 2.0) - (ball.getGameObject().getWidth() / 2.0),
+                        paddle.getY() - ball.getGameObject().getHeight()
+                );
+            }
         }
     }
 }

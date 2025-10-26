@@ -9,6 +9,7 @@ public abstract class AbstractBrick extends GameObject implements Brick {
         super(x, y, width, height);
         subscribeToHitEvent();
     }
+
     private void subscribeToHitEvent() {
         EventManager.getInstance().subscribe(
                 BrickHitEvent.class,

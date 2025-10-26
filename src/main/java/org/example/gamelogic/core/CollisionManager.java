@@ -1,7 +1,7 @@
 package org.example.gamelogic.core;
 
 import org.example.config.GameConstants;
-import org.example.gamelogic.entities.Ball;
+import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.entities.bricks.Brick;
 import org.example.gamelogic.entities.powerups.PowerUp;
@@ -19,10 +19,10 @@ public final class CollisionManager {
 
     }
 
-    public void checkCollisions(List<Ball> balls, Paddle paddle, List<Brick> bricks, List<PowerUp> fallingPowerUps) {
-        Iterator<Ball> ballIterator = balls.iterator();
+    public void checkCollisions(List<IBall> balls, Paddle paddle, List<Brick> bricks, List<PowerUp> fallingPowerUps) {
+        Iterator<IBall> ballIterator = balls.iterator();
         while (ballIterator.hasNext()) {
-            Ball ball = ballIterator.next();
+            IBall ball = ballIterator.next();
             if (!ball.isActive()) continue;
 
             checkBallBoundsCollisions(ball);
@@ -37,7 +37,7 @@ public final class CollisionManager {
         checkPaddlePowerUpCollisions(paddle, fallingPowerUps);
     }
 
-    private void checkBallBoundsCollisions(Ball ball) {
+    private void checkBallBoundsCollisions(IBall ball) {
         // Tường trái/phải
         if (ball.getX() <= 0 || (ball.getX() + ball.getWidth()) >= GameConstants.SCREEN_WIDTH) {
             ball.reverseDirX();
@@ -55,8 +55,8 @@ public final class CollisionManager {
         }
     }
 
-    private void checkBallPaddleCollision(Ball ball, Paddle paddle) {
-        if (paddle != null && ball.intersects(paddle.getGameObject())) {
+    private void checkBallPaddleCollision(IBall ball, Paddle paddle) {
+        if (paddle != null && ball.getGameObject().intersects(paddle.getGameObject())) {
             // Tính toán vị trí va chạm tương đối trên paddle (-1 đến 1)
             double paddleCenter = paddle.getX() + paddle.getWidth() / 2.0;
             double ballCenter = ball.getX() + ball.getWidth() / 2.0;
@@ -72,11 +72,11 @@ public final class CollisionManager {
         }
     }
 
-    private void checkBallBrickCollisions(Ball ball, List<Brick> bricks) {
+    private void checkBallBrickCollisions(IBall ball, List<Brick> bricks) {
         // Không dùng Iterator ở đây vì gạch không bị xóa ngay lập tức
         for (Brick brick : bricks) {
             // Chỉ kiểm tra gạch còn sống và có va chạm
-            if (!brick.isDestroyed() && ball.intersects(brick.getGameObject())) {
+            if (!brick.isDestroyed() && ball.getGameObject().intersects(brick.getGameObject())) {
 
                 // Phát sự kiện va chạm (Gạch sẽ tự xử lý takeDamage khi nghe sự kiện này)
                 EventManager.getInstance().publish(new BrickHitEvent(brick, ball));

@@ -23,7 +23,7 @@ public final class BallManager {
     }
 
     private void registerBallPrototypes(BallRegistry registry) {
-        registry.register("STANDARD", new Ball(0, 0, GameConstants.BALL_RADIUS,0, 0));
+        registry.register("STANDARD", new Ball(0, 0, GameConstants.BALL_RADIUS));
     }
 
     public void createInitialBall(Paddle paddle) {
@@ -43,28 +43,11 @@ public final class BallManager {
         activeBalls.removeIf(ball -> ball.getY() > GameConstants.SCREEN_HEIGHT + ball.getHeight());
     }
 
-    /**
-     * MỚI: Thêm hàm bắn tất cả bóng đang dính vào paddle.
-     * (Giả định hàm ball.isActive() trả về true nếu đang dính, false nếu đang bay)
-     */
-    public void releaseAllBalls() {
+    public void releaseAttachedBalls() {
         for (IBall ball : activeBalls) {
-            if (ball.isActive()) {
+            // Ball cần có getter isAttachedToPaddle()
+            if (ball instanceof Ball && ((Ball) ball).isAttachedToPaddle()) {
                 ball.release();
-            }
-        }
-    }
-
-    /**
-     * MỚI: Thêm hàm cập nhật vị trí bóng theo paddle (khi bóng đang dính).
-     */
-    public void updateAttachedBalls(Paddle paddle) {
-        for (IBall ball : activeBalls) {
-            if (ball.isActive()) {
-                ball.setPosition(
-                        paddle.getX() + (paddle.getWidth() / 2.0) - (ball.getWidth() / 2.0),
-                        paddle.getY() - ball.getHeight()
-                );
             }
         }
     }

@@ -7,6 +7,7 @@ import org.example.gamelogic.states.PlayingState;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 import org.example.presentation.InputHandler;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -17,6 +18,8 @@ public final class GameManager {
     private BrickManager brickManager;
     private PowerUpManager powerUpManager;
     private BallManager ballManager;
+    private CollisionManager collisionManager;
+
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
     private InputHandler inputHandler;
@@ -74,16 +77,21 @@ public final class GameManager {
         this.brickManager = new BrickManager(levelRepository);
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
+        this.collisionManager = new CollisionManager();
         GameState currentState = new PlayingState(this, 1);
         this.stateManager.setState(currentState);
     }
 
     public void updateStrategy(double deltaTime) {
-        for (PowerUpStrategy strategy : activeStrategies) {
-            strategy.update(this, deltaTime);
+        Iterator<PowerUpStrategy> iterator = activeStrategies.iterator();
+        while (iterator.hasNext()) {
+            PowerUpStrategy strategy = iterator.next();
+
+            strategy.update(this, deltaTime); // Giả sử PowerUpStrategy có phương thức này
+
             if (strategy.isExpired()) {
                 strategy.remove(this);
-                activeStrategies.remove(strategy);
+                iterator.remove();
             }
         }
     }
@@ -127,5 +135,9 @@ public final class GameManager {
 
     public BallManager getBallManager() {
         return this.ballManager;
+    }
+
+    public CollisionManager getCollisionManager() {
+        return this.collisionManager;
     }
 }

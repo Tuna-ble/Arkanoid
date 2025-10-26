@@ -81,4 +81,8 @@ public final class BrickManager {
     public boolean isLevelComplete() {
         return bricks.isEmpty();
     }
+
+    public List<Brick> getBricks() {
+        return bricks;
+    }
 }
