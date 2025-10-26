@@ -13,11 +13,27 @@ public class Ball extends MovableObject implements IBall {
     private double radius;
     private double speed;
     private boolean attachedToPaddle;
+    private boolean released;
+
+    @Override
+    public boolean isActive() {
+        return isActive();
+    }
+
+    @Override
+    public boolean attachedToPaddle() {
+        return attachedToPaddle;
+    }
 
     public Ball(double x, double y, double radius, double dx, double dy) {
         super(x, y, radius * 2, radius * 2, dx, dy);
         this.radius = radius;
         this.speed = GameConstants.BALL_INITIAL_SPEED;
+        this.released = false;
+    }
+
+    public double getdy() {
+        return dy;
     }
 
     public double getCenterX() {
@@ -27,25 +43,25 @@ public class Ball extends MovableObject implements IBall {
     // update bóng theo delta
     @Override
     public void update(double deltaTime) {
-        if (!isActive) { // bóng rời paddle
-
-            // đảm bảo vận tốc theo trục Y đủ lớn -> bóng nảy lên xuống
-            if (Math.abs(dy) < GameConstants.BALL_MIN_VY) {
-                dy = dy > 0 ? GameConstants.BALL_MIN_VY : -GameConstants.BALL_MIN_VY;
+        if (isActive) { // bóng rời paddle
+            System.out.println("???: " + dy);
+            if (released) {
+                // đảm bảo vận tốc theo trục Y đủ lớn -> bóng nảy lên xuống
+                if (Math.abs(dy) < GameConstants.BALL_MIN_VY) {
+                    dy = dy > 0 ? GameConstants.BALL_MIN_VY : -GameConstants.BALL_MIN_VY;
+                }
+                // tính speed và đảm bảo trong khoảng [min, max] nếu có cơ chế tăng tốc
+                double currentSpeed = Math.sqrt(dx * dx + dy * dy);
+                if (currentSpeed < GameConstants.BALL_MIN_SPEED) {
+                    double factor = GameConstants.BALL_MIN_SPEED / currentSpeed;
+                    dx *= factor;
+                    dy *= factor;
+                } else if (currentSpeed > GameConstants.BALL_MAX_SPEED) {
+                    double factor = GameConstants.BALL_MAX_SPEED / currentSpeed;
+                    dx *= factor;
+                    dy *= factor;
+                }
             }
-
-            // tính speed và đảm bảo trong khoảng [min, max] nếu có cơ chế tăng tốc
-            double currentSpeed = Math.sqrt(dx * dx + dy * dy);
-            if (currentSpeed < GameConstants.BALL_MIN_SPEED) {
-                double factor = GameConstants.BALL_MIN_SPEED / currentSpeed;
-                dx *= factor;
-                dy *= factor;
-            } else if (currentSpeed > GameConstants.BALL_MAX_SPEED) {
-                double factor = GameConstants.BALL_MAX_SPEED / currentSpeed;
-                dx *= factor;
-                dy *= factor;
-            }
-
             // update theo vận tốc
             this.x += dx * deltaTime;
             this.y += dy * deltaTime;
@@ -54,8 +70,8 @@ public class Ball extends MovableObject implements IBall {
 
     // bắn bóng ra khỏi paddle
     public void release() {
-        if (isActive) {
-            isActive = false;
+        if (!released) {
+            released = true;
             // tạo độ lệch nhỏ so với baseAngle (75 độ)
             double angleVariation = Math.toRadians(
                     (Math.random() - 0.5) * 2 * GameConstants.BALL_INITIAL_ANGLE_RANDOM_RANGE
@@ -66,9 +82,9 @@ public class Ball extends MovableObject implements IBall {
             // tính toán vận tốc ban đầu
             this.dx = speed * Math.cos(angle);
             this.dy = speed * Math.sin(angle);
+            System.out.println("van toc: " + dx + ", " + dy);
         }
     }
-
 
     // tăng tốc nhẹ
     public void incrementSpeed() {
@@ -89,6 +105,8 @@ public class Ball extends MovableObject implements IBall {
 
     @Override
     public void render(GraphicsContext gc) {
+
+        // Tạo gradient nhẹ để bóng có cảm giác 3D
         RadialGradient gradient = new RadialGradient(
                 0, 0,                // focus angle, focus distance
                 x + radius, y + radius, // tâm gradient
@@ -99,6 +117,7 @@ public class Ball extends MovableObject implements IBall {
                 new Stop(1, GameConstants.BALL_COLOR) // vùng tối
         );
 
+        // tô hình tròn bằng gradient
         gc.setFill(gradient);
         gc.fillOval(x, y, radius * 2, radius * 2);
 
@@ -136,6 +155,7 @@ public class Ball extends MovableObject implements IBall {
     public void reset(double paddleX, double paddleY, double paddleWidth) {
         this.attachedToPaddle = true;
         this.isActive = true;
+        this.released = false;
         this.x = paddleX + (paddleWidth / 2.0) - (this.width / 2.0);
         this.y = paddleY - this.height;
         this.dx = 0;
@@ -145,22 +165,17 @@ public class Ball extends MovableObject implements IBall {
 
     public void handlePaddleCollision(Paddle paddle, double hitPositionRatio) {
         if (!isActive || attachedToPaddle) return;
-
         this.y = paddle.getY() - this.height;
         if (dy > 0) {
             dy = -dy;
         }
-
         double maxAngleChange = Math.toRadians(60);
         double angleOffset = maxAngleChange * hitPositionRatio;
         double currentSpeed = Math.sqrt(dx * dx + dy * dy);
         if (currentSpeed == 0) currentSpeed = speed;
-
         double newAngle = Math.PI / 2.0 + angleOffset;
-
         dx = currentSpeed * Math.cos(newAngle);
         dy = -currentSpeed * Math.sin(newAngle);
-
         incrementSpeed();
     }
 

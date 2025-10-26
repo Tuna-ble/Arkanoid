@@ -43,14 +43,6 @@ public final class GameConstants {
     public static final double BALL_RESTITUTION = 1.0;
     public static final double BALL_MAX_ANGLE_FROM_VERTICAL = 75.0; // degrees
 
-    // Physics / timestep
-    public static final double FIXED_TIMESTEP = 0.0083333; // 1/120 seconds
-    public static final double MAX_SUBSTEPS = 5;
-    public static final double EPSILON = 0.001;
-
-    // Collision / CCD
-    public static final boolean USE_CCD = true;
-    public static final double MAX_ITER_PER_FRAME = 5;
 
     // Bricks
     public static final double BRICK_PADDING = 2;
@@ -61,7 +53,7 @@ public final class GameConstants {
     public static final double TOP_MARGIN = 50;
 
     // Gameplay tuning
-    public static final double BALL_INITIAL_ANGLE_RANDOM_RANGE = 15.0; // ±15 degrees
+    public static final double BALL_INITIAL_ANGLE_RANDOM_RANGE = 20.0; // ±15 degrees
     public static final double BALL_SPEED_SCALE_ON_HIT = 1.02; // speed increase on hit
     public static final double BALL_VERTICAL_CORRECTION_RATIO = 0.3; // force angle if vy too small
 

@@ -4,12 +4,12 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.example.data.FileLevelRepository;
 import org.example.data.ILevelRepository;
 import org.example.gamelogic.core.GameManager;
-
 
 public class GameApplication extends Application {
     private static final int WIDTH = 800;
@@ -33,12 +33,28 @@ public class GameApplication extends Application {
         primaryStage.show();
 
         gameManager.setGraphicsContext(gc);
-        //addInputHandlers(scene, gameManager.getInputHandler());
+
+        addInputHandlers(scene, gameManager.getInputHandler());
 
         gameManager.startGameLoop();
     }
 
+    private void addInputHandlers(Scene scene, InputHandler inputHandler) {
+        scene.setOnKeyPressed(event -> {
+            inputHandler.keyPressed(event.getCode());
+        });
+        scene.setOnKeyReleased(event -> {
+            inputHandler.keyReleased(event.getCode());
+        });
+        scene.setOnMouseMoved(event -> {
+            inputHandler.mouseMoved((int) event.getX(), (int) event.getY());
+        });
+        scene.setOnMousePressed(event -> {
+            inputHandler.mousePressed((int) event.getX(), (int) event.getY());
+        });
+    }
+
     public static void main(String[] args) {
-        launch(args); // Phương thức của JavaFX để khởi chạy ứng dụng
+        launch(args);
     }
 }

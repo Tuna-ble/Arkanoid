@@ -19,4 +19,11 @@ public interface IBall {
 
     void update(double deltaTime);
     void render(GraphicsContext gc);
+    boolean isActive();
+    double getWidth();
+    double getHeight();
+
+    boolean attachedToPaddle();
+    double getdy();
+
 }

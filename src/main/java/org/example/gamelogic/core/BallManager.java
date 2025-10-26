@@ -39,7 +39,10 @@ public final class BallManager {
         for (IBall ball : activeBalls) {
             ball.update(deltaTime);
         }
-        activeBalls.removeIf(ball -> ball.isDestroyed());
+        activeBalls.removeIf(ball -> {
+            boolean destroyed = ball.isDestroyed();
+            return destroyed;
+        });
     }
 
     public void render(GraphicsContext gc) {
@@ -61,6 +64,14 @@ public final class BallManager {
     // Lấy bóng chính (nếu chỉ có 1)
     public IBall getPrimaryBall() {
         return activeBalls.isEmpty() ? null : activeBalls.get(0);
+    }
+
+    public void Start() {
+        if(!activeBalls.isEmpty()) {
+            IBall ball = activeBalls.get(0);
+            System.out.println(ball.getdy());
+            ball.release();
+        }
     }
 
     public void clear() {

@@ -5,6 +5,7 @@ import org.example.data.ILevelRepository;
 import org.example.gamelogic.states.GameState;
 import org.example.gamelogic.states.PlayingState;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
+import org.example.presentation.InputHandler;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public final class GameManager {
     private BallManager ballManager;
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
+    private InputHandler inputHandler;
 
     private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
 
@@ -33,7 +35,9 @@ public final class GameManager {
                 }
                 double deltaTime = (now - lastUpdate) / 1_000_000_000.0;
                 lastUpdate = now;
-
+                if (inputHandler != null) {
+                    inputHandler.handleInput();
+                }
                 update(deltaTime);
                 render();
             }
@@ -68,6 +72,7 @@ public final class GameManager {
         this.ballManager = new BallManager();
         GameState currentState = new PlayingState(this, 1);
         this.stateManager.setState(currentState);
+        this.inputHandler = new InputHandler(currentState);
     }
 
     public void updateStrategy(double deltaTime) {
@@ -112,5 +117,9 @@ public final class GameManager {
 
     public BallManager getBallManager() {
         return this.ballManager;
+    }
+
+    public InputHandler getInputHandler() {
+        return this.inputHandler;
     }
 }

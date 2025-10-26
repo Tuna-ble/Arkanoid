@@ -57,5 +57,36 @@ public final class PlayingState implements GameState {
 
     @Override
     public void handleInput(InputHandler inputHandler) {
+        // Mouse
+        /*
+        int mouseX = inputHandler.getMouseX();
+        double paddleTargetX = mouseX - paddle.getWidth() / 2;
+        paddleTargetX = Math.max(0, Math.min(paddleTargetX, GameConstants.SCREEN_WIDTH - paddle.getWidth()));
+
+        double currentPaddleX = paddle.getX();
+        if (paddleTargetX < currentPaddleX + 10) {
+            paddle.moveLeft();
+        } else if (paddleTargetX > currentPaddleX - 10) {
+            paddle.moveRight();
+        } else {
+            //paddle.stop();
+        }
+        */
+
+        // Key
+        boolean leftPressed = inputHandler.isKeyPressed(KeyCode.LEFT.getCode()) ||
+                inputHandler.isKeyPressed(KeyCode.A.getCode());
+        boolean rightPressed = inputHandler.isKeyPressed(KeyCode.RIGHT.getCode()) ||
+                inputHandler.isKeyPressed(KeyCode.D.getCode());
+        if (leftPressed) {
+            paddle.moveLeft();
+        } else if (rightPressed) {
+            paddle.moveRight();
+        }
+
+        // SPACE
+        if (inputHandler.isKeyPressed(KeyCode.SPACE.getCode())) {
+            ballManager.Start();
+        }
     }
 }

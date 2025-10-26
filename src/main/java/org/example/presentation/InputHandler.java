@@ -2,18 +2,14 @@ package org.example.presentation;
 
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.states.GameState;
+import javafx.scene.input.KeyCode;
 
-import java.awt.event.KeyListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseEvent;
 import java.util.HashSet;
 import java.util.Set;
 
-public class InputHandler implements KeyListener, MouseListener, MouseMotionListener, I_InputProvider {
+public class InputHandler implements I_InputProvider {
     private GameState currentState;
-    private Set<Integer> pressedKeys;
+    private Set<KeyCode> pressedKeys;
     private int mouseX;
     private int mouseY;
     private boolean mouseClicked;
@@ -36,16 +32,48 @@ public class InputHandler implements KeyListener, MouseListener, MouseMotionList
         }
     }
 
+    public void keyPressed(KeyCode keyCode) {
+        pressedKeys.add(keyCode);
+    }
+
+    public void keyReleased(KeyCode keyCode) {
+        pressedKeys.remove(keyCode);
+    }
+
+    public void mouseMoved(int x, int y) {
+        this.mouseX = x;
+        this.mouseY = y;
+    }
+
+    public void mousePressed(int x, int y) {
+        this.mouseX = x;
+        this.mouseY = y;
+        this.mouseClicked = true;
+    }
+
+    public void resetMouseClick() {
+        mouseClicked = false;
+    }
+
     /**
-     * getter, setter
+     * Getter methods for I_InputProvider interface
      */
     @Override
     public Set<Integer> getPressedKeys() {
-        return new HashSet<>(pressedKeys);
+        Set<Integer> keyCodes = new HashSet<>();
+        for (KeyCode keyCode : pressedKeys) {
+            keyCodes.add(keyCode.getCode());
+        }
+        return keyCodes;
     }
 
     public boolean isKeyPressed(int keyCode) {
-        return pressedKeys.contains(keyCode);
+        for (KeyCode kc : pressedKeys) {
+            if (kc.getCode() == keyCode) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -61,63 +89,5 @@ public class InputHandler implements KeyListener, MouseListener, MouseMotionList
     @Override
     public boolean isMouseClicked() {
         return mouseClicked;
-    }
-
-
-    public void resetMouseClick() {
-        mouseClicked = false;
-    }
-
-    /**
-     * Key.
-     * @param e the event to be processed
-     */
-    @Override
-    public void keyPressed(KeyEvent e) {
-        pressedKeys.add(e.getKeyCode());
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        pressedKeys.remove(e.getKeyCode());
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-    }
-
-    /**
-     * Mouse.
-     * @param e the event to be processed
-     */
-    @Override
-    public void mousePressed(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
-        mouseClicked = true;
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) { }
-
-    @Override
-    public void mouseClicked(MouseEvent e) { }
-
-    @Override
-    public void mouseEntered(MouseEvent e) { }
-
-    @Override
-    public void mouseExited(MouseEvent e) { }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
     }
 }
