@@ -1,86 +1,54 @@
 package org.example.presentation;
 
-import org.example.gamelogic.I_InputProvider;
-import org.example.gamelogic.states.GameState;
 import javafx.scene.input.KeyCode;
-
+import org.example.gamelogic.I_InputProvider;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Lớp xử lý input cho JavaFX.
+ * Lớp này KHÔNG implement listener, nó chỉ lưu trữ trạng thái.
+ * Các sự kiện (events) sẽ được đăng ký từ lớp Main (nơi có Scene).
+ */
 public class InputHandler implements I_InputProvider {
-    private GameState currentState;
+
     private Set<KeyCode> pressedKeys;
     private int mouseX;
     private int mouseY;
     private boolean mouseClicked;
-    private int lastMouseX;
-    private long lastMouseMoveTime;
-    private static final long MOUSE_ACTIVE_MS = 150;
 
-    public InputHandler(GameState initialState) {
-        this.currentState = initialState;
+    public InputHandler() {
         this.pressedKeys = new HashSet<>();
         this.mouseX = 0;
         this.mouseY = 0;
         this.mouseClicked = false;
-        this.lastMouseX = 0;
-        this.lastMouseMoveTime = 0;
     }
 
-    public void setCurrentState(GameState newState) {
-        this.currentState = newState;
+    public void addKey(KeyCode code) {
+        pressedKeys.add(code);
     }
 
-    public void handleInput() {
-        if (currentState != null) {
-            currentState.handleInput(this);
-        }
+    public void removeKey(KeyCode code) {
+        pressedKeys.remove(code);
     }
 
-    // Key
-    public void keyPressed(KeyCode keyCode) {
-        pressedKeys.add(keyCode);
+    public void setMousePos(double x, double y) {
+        this.mouseX = (int) x;
+        this.mouseY = (int) y;
     }
 
-    public void keyReleased(KeyCode keyCode) {
-        pressedKeys.remove(keyCode);
+    public void setMouseClicked(boolean clicked) {
+        this.mouseClicked = clicked;
     }
 
     @Override
-    public Set<Integer> getPressedKeys() {
-        Set<Integer> keyCodes = new HashSet<>();
-        for (KeyCode keyCode : pressedKeys) {
-            keyCodes.add(keyCode.getCode());
-        }
-        return keyCodes;
+    public Set<KeyCode> getPressedKeys() {
+        return new HashSet<>(pressedKeys);
     }
 
-    public boolean isKeyPressed(KeyCode keyCode) {
-        return pressedKeys.contains(keyCode);
+    public boolean isKeyPressed(KeyCode code) {
+        return pressedKeys.contains(code);
     }
-
-    // Mouse.
-    public void mouseMoved(int x, int y) {
-        this.mouseX = x;
-        this.mouseY = y;
-        if (x != lastMouseX) {
-            lastMouseX = x;
-            lastMouseMoveTime = System.currentTimeMillis();
-        }
-    }
-
-    public void mousePressed(int x, int y) {
-        this.mouseX = x;
-        this.mouseY = y;
-        this.mouseClicked = true;
-        lastMouseX = x;
-        lastMouseMoveTime = System.currentTimeMillis();
-    }
-
-    public void resetMouseClick() {
-        mouseClicked = false;
-    }
-
 
     @Override
     public int getMouseX() {
@@ -97,13 +65,7 @@ public class InputHandler implements I_InputProvider {
         return mouseClicked;
     }
 
-    // kiểm tra chuột vừa di chuyển trong ngưỡng thời gian
-    public boolean isMouseActive() {
-        return System.currentTimeMillis() - lastMouseMoveTime <= MOUSE_ACTIVE_MS;
-    }
-
-    // helper: nếu muốn biết chuột có trong bounds
-    public boolean isMouseInBounds(double width, double height) {
-        return mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height;
+    public void resetMouseClick() {
+        mouseClicked = false;
     }
 }

@@ -7,6 +7,7 @@ import org.example.gamelogic.states.PlayingState;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 import org.example.presentation.InputHandler;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -17,6 +18,8 @@ public final class GameManager {
     private BrickManager brickManager;
     private PowerUpManager powerUpManager;
     private BallManager ballManager;
+    private CollisionManager collisionManager;
+
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
     private InputHandler inputHandler;
@@ -35,11 +38,12 @@ public final class GameManager {
                 }
                 double deltaTime = (now - lastUpdate) / 1_000_000_000.0;
                 lastUpdate = now;
-                if (inputHandler != null) {
-                    inputHandler.handleInput();
-                }
+                handleInput();
                 update(deltaTime);
                 render();
+                if (inputHandler != null) {
+                    inputHandler.resetMouseClick();
+                }
             }
         };
     }
@@ -52,6 +56,9 @@ public final class GameManager {
         return SingletonHolder.INSTANCE;
     }
 
+    public void setInputHandler(InputHandler inputHandler) {
+        this.inputHandler = inputHandler;
+    }
     public void setGraphicsContext(GraphicsContext gc) {
         this.gc = gc;
     }
@@ -70,18 +77,29 @@ public final class GameManager {
         this.brickManager = new BrickManager(levelRepository);
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
+        this.collisionManager = new CollisionManager();
         GameState currentState = new PlayingState(this, 1);
         this.stateManager.setState(currentState);
-        this.inputHandler = new InputHandler(currentState);
     }
 
     public void updateStrategy(double deltaTime) {
-        for (PowerUpStrategy strategy : activeStrategies) {
-            strategy.update(this, deltaTime);
+        Iterator<PowerUpStrategy> iterator = activeStrategies.iterator();
+        while (iterator.hasNext()) {
+            PowerUpStrategy strategy = iterator.next();
+
+            strategy.update(this, deltaTime); // Giả sử PowerUpStrategy có phương thức này
+
             if (strategy.isExpired()) {
                 strategy.remove(this);
-                activeStrategies.remove(strategy);
+                iterator.remove();
             }
+        }
+    }
+
+    public void handleInput() {
+        GameState currentState = stateManager.getState();
+        if (currentState != null && this.inputHandler != null) {
+            currentState.handleInput(this.inputHandler);
         }
     }
 
@@ -119,7 +137,7 @@ public final class GameManager {
         return this.ballManager;
     }
 
-    public InputHandler getInputHandler() {
-        return this.inputHandler;
+    public CollisionManager getCollisionManager() {
+        return this.collisionManager;
     }
 }

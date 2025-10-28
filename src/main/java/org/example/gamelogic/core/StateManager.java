@@ -33,7 +33,8 @@ public final class StateManager {
             currentState.render(gc);
     }
 
-    public void handleInput(InputHandler inputHandler) {
+    public void handleInput() {
+        InputHandler inputHandler = null;
         if (currentState != null)
             currentState.handleInput(inputHandler);
     }

@@ -4,7 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 import org.example.config.GameConstants;
 import org.example.gamelogic.entities.Ball;
 import org.example.gamelogic.entities.IBall;
-import org.example.gamelogic.entities.Paddle;
+import org.example.gamelogic.entities.Paddle; // MỚI: Import Paddle
 import org.example.gamelogic.factory.BallFactory;
 import org.example.gamelogic.registry.BallRegistry;
 
@@ -14,18 +14,16 @@ import java.util.List;
 public final class BallManager {
     private final BallFactory ballFactory;
     private List<IBall> activeBalls;
-    private boolean Start;
 
     public BallManager() {
         this.activeBalls =  new ArrayList<>();
         BallRegistry registry = BallRegistry.getInstance();
         registerBallPrototypes(registry);
         this.ballFactory = new BallFactory(registry);
-        Start = false;
     }
 
     private void registerBallPrototypes(BallRegistry registry) {
-        registry.register("STANDARD", new Ball(0, 0, GameConstants.BALL_RADIUS,0, 0));
+        registry.register("STANDARD", new Ball(0, 0, GameConstants.BALL_RADIUS));
     }
 
     public void createInitialBall(Paddle paddle) {
@@ -37,15 +35,21 @@ public final class BallManager {
         }
     }
 
-    public void update(double deltaTime, Paddle paddle) {
+    public void update(double deltaTime) {
         for (IBall ball : activeBalls) {
-            if(Start) ball.update(deltaTime);
-            else ball.updateBeforeStart(deltaTime, paddle);
+            ball.update(deltaTime);
         }
-        activeBalls.removeIf(ball -> {
-            boolean destroyed = ball.isDestroyed();
-            return destroyed;
-        });
+
+        activeBalls.removeIf(ball -> ball.getY() > GameConstants.SCREEN_HEIGHT + ball.getHeight());
+    }
+
+    public void releaseAttachedBalls() {
+        for (IBall ball : activeBalls) {
+            // Ball cần có getter isAttachedToPaddle()
+            if (ball instanceof Ball && ((Ball) ball).isAttachedToPaddle()) {
+                ball.release();
+            }
+        }
     }
 
     public void render(GraphicsContext gc) {
@@ -54,7 +58,6 @@ public final class BallManager {
         }
     }
 
-    // Cần thiết cho CollisionManager
     public List<IBall> getActiveBalls() {
         return activeBalls;
     }
@@ -64,21 +67,11 @@ public final class BallManager {
         createInitialBall(paddle);
     }
 
-    // Lấy bóng chính (nếu chỉ có 1)
     public IBall getPrimaryBall() {
         return activeBalls.isEmpty() ? null : activeBalls.get(0);
     }
 
-    public void Start() {
-        if(!activeBalls.isEmpty()) {
-            Start = true;
-            IBall ball = activeBalls.get(0);
-            ball.release();
-        }
-    }
-
     public void clear() {
-        Start = false;
         activeBalls.clear();
     }
 }

@@ -14,19 +14,26 @@ public class Paddle extends MovableObject {
         super(x, y, width, height, dx, dy);
         this.speed = GameConstants.PADDLE_SPEED;
         this.minX = 0;
-        this.maxX = GameConstants.SCREEN_WIDTH;
+        this.maxX = GameConstants.SCREEN_WIDTH - this.width;
+    }
+
+    public double getCenterX() {
+        return x + width / 2.0;
     }
 
     @Override
-    // update paddle theop delta time
+    // update paddle theo delta time
     public void update(double deltaTime) {
         x += dx * deltaTime;
+
+        // Kiểm tra mép TRÁI của paddle
         if (x < minX) {
             x = minX;
             dx = 0;
         }
-        if (x + width > maxX) {
-            x = maxX - width;
+        // Kiểm tra mép PHẢI của paddle
+        if (x > maxX) {
+            x = maxX;
             dx = 0;
         }
     }
@@ -43,9 +50,18 @@ public class Paddle extends MovableObject {
         dx = 0;
     }
 
+    public void setBounds(double minX, double maxX) {
+        this.minX = minX;
+        this.maxX = GameConstants.SCREEN_WIDTH - this.width;
+    }
+
+    // setter and getter
+    public double getSpeed() { return speed; }
+    public void setSpeed(double speed) { this.speed = speed; }
+
     @Override
     public void render(GraphicsContext gc) {
-        double drawX = x - width / 2;
+        double drawX = x;
         double drawY = y;
 
         gc.setFill(GameConstants.PADDLE_COLOR);
@@ -56,4 +72,8 @@ public class Paddle extends MovableObject {
         gc.strokeRoundRect(drawX, drawY, width, height, 10, 10);
     }
 
+    public void setVelocity(double v, int i) {
+        this.dx = v;
+        this.dy = i;
+    }
 }

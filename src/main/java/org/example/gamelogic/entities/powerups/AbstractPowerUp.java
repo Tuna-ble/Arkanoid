@@ -2,8 +2,10 @@ package org.example.gamelogic.entities.powerups;
 
 import javafx.scene.canvas.GraphicsContext;
 import org.example.config.GameConstants;
+import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.entities.GameObject;
 import org.example.gamelogic.entities.MovableObject;
+import org.example.gamelogic.events.PowerUpCollectedEvent;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
@@ -18,6 +20,20 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
         super(x, y, width, height, dx, dy);
         this.strategy = strategy;
         this.isActive = false;
+
+        subscribeToPowerUpCollectedEvent();
+    }
+
+    private void subscribeToPowerUpCollectedEvent() {
+        EventManager.getInstance().subscribe(
+                PowerUpCollectedEvent.class,
+                this::onPowerUpCollected);
+    }
+
+    protected void onPowerUpCollected(PowerUpCollectedEvent event) {
+        if (event.getPowerUpCollected()==this) {
+            markAsTaken();
+        }
     }
 
     @Override

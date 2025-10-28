@@ -1,7 +1,9 @@
 package org.example.gamelogic.core;
 
 import javafx.scene.canvas.GraphicsContext;
-import org.example.gamelogic.entities.powerups.*;
+import org.example.gamelogic.entities.powerups.ExpandPaddlePowerUp;
+import org.example.gamelogic.entities.powerups.FastBallPowerUp;
+import org.example.gamelogic.entities.powerups.PowerUp;
 import org.example.gamelogic.factory.PowerUpFactory;
 import org.example.gamelogic.registry.PowerUpRegistry;
 import org.example.gamelogic.strategy.powerup.ExpandPaddleStrategy;
@@ -33,8 +35,8 @@ public final class PowerUpManager {
         final double POWERUP_WIDTH = 40;
         final double POWERUP_HEIGHT = 40;
 
-        powerUpRegistry.register("E", new ExpandPaddlePowerUp(0.0, 0.0, POWERUP_WIDTH, POWERUP_HEIGHT, 0.0, 0.5, new ExpandPaddleStrategy()));
-        powerUpRegistry.register("F", new FastBallPowerUp(0.0, 0.0, POWERUP_WIDTH, POWERUP_HEIGHT, 0.0, 3.0, new FastBallStrategy()));
+        powerUpRegistry.register("E", new ExpandPaddlePowerUp(0.0, 0.0, POWERUP_WIDTH, POWERUP_HEIGHT, 0.0, 3.0, new ExpandPaddleStrategy()));
+        powerUpRegistry.register("F", new FastBallPowerUp(0.0, 0.0, POWERUP_WIDTH, POWERUP_HEIGHT, 0.0, 2.0, new FastBallStrategy()));
 
     }
 
@@ -47,24 +49,8 @@ public final class PowerUpManager {
         Iterator<PowerUp> iterator = activePowerUps.iterator();
         while (iterator.hasNext()) {
             PowerUp powerUp = iterator.next();
-
-            // Di chuyển powerup
             powerUp.update(deltaTime);
-
-            // Paddle đã ăn chưa?
-            if (!powerUp.isActive()) {
-                gm.addStrategy(powerUp.getStrategy());
-                powerUp.setActive(true);
-            }
-
-            // Xóa khi hết hiệu lực
-            if (powerUp.isActive() && powerUp.getStrategy().isExpired()) {
-                iterator.remove();
-                continue;
-            }
-
-            // Xóa khi rơi ra khỏi cửa số
-            if (powerUp.isOutOfBounds()) {
+            if (!powerUp.isActive() || powerUp.isOutOfBounds()) {
                 iterator.remove();
             }
         }
@@ -78,5 +64,9 @@ public final class PowerUpManager {
 
     public void clear() {
         activePowerUps.clear();
+    }
+
+    public List<PowerUp> getActivePowerUps() {
+        return activePowerUps;
     }
 }

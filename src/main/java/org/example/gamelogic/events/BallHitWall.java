@@ -1,15 +1,15 @@
 package org.example.gamelogic.events;
 
-import org.example.gamelogic.entities.Ball;
+import org.example.gamelogic.entities.IBall;
 
 public final class BallHitWall extends GameEvent {
-    private final Ball ball;
+    private final IBall ball;
 
-    public BallHitWall(Ball ball) {
+    public BallHitWall(IBall ball) {
         this.ball = ball;
     }
 
-    public Ball getBall() {
+    public IBall getBall() {
         return ball;
     }
 }

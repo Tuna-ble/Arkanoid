@@ -2,10 +2,21 @@ package org.example.gamelogic.entities.bricks;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import org.example.config.GameConstants;
+import org.example.gamelogic.core.EventManager;
+import org.example.gamelogic.events.BrickDestroyedEvent;
 
 public class NormalBrick extends AbstractBrick {
-    public void takeDamage() {
+    public NormalBrick(double x, double y, double width, double height) {
+        super(x, y, width, height);
+    }
 
+    public void takeDamage() {
+        if (isDestroyed()) {
+            return;
+        }
+        this.isActive = false;
+        EventManager.getInstance().publish(new BrickDestroyedEvent(this));
     }
 
     public int getScore() {
@@ -25,10 +36,6 @@ public class NormalBrick extends AbstractBrick {
             gc.setStroke(Color.BLACK);
             gc.strokeRect(x, y, width, height);
         }
-    }
-
-    public NormalBrick(double x, double y, double width, double height) {
-        super(x, y, width, height);
     }
 
     @Override
