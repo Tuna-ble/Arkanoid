@@ -3,7 +3,7 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import org.example.data.ILevelRepository;
 import org.example.gamelogic.states.GameState;
-import org.example.gamelogic.states.PlayingState;
+import org.example.gamelogic.states.MainMenuState;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 import org.example.presentation.InputHandler;
 
@@ -62,7 +62,9 @@ public final class GameManager {
     public void setGraphicsContext(GraphicsContext gc) {
         this.gc = gc;
     }
-
+    public void setState(GameState gameState) {
+        this.stateManager.setState(gameState);
+    }
     public void setLevelRepository(ILevelRepository repo) {
         this.levelRepository = repo;
     }
@@ -78,7 +80,7 @@ public final class GameManager {
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
-        GameState currentState = new PlayingState(this, 1);
+        GameState currentState = new MainMenuState(this);
         this.stateManager.setState(currentState);
     }
 
