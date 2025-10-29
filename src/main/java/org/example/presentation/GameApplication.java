@@ -30,7 +30,6 @@ public class GameApplication extends Application {
 
         Canvas canvas = new Canvas((double) WIDTH, (double) HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-
         StackPane root = new StackPane(canvas);
         Scene scene = new Scene(root, (double) WIDTH, (double) HEIGHT);
 

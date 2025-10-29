@@ -5,10 +5,7 @@ import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.entities.bricks.Brick;
 import org.example.gamelogic.entities.powerups.PowerUp;
-import org.example.gamelogic.events.BallHitPaddleEvent;
-import org.example.gamelogic.events.BallLostEvent;
-import org.example.gamelogic.events.BrickHitEvent;
-import org.example.gamelogic.events.PowerUpCollectedEvent;
+import org.example.gamelogic.events.*;
 
 import java.util.Iterator;
 import java.util.List;
@@ -38,20 +35,36 @@ public final class CollisionManager {
     }
 
     private void checkBallBoundsCollisions(IBall ball) {
+        boolean collisionOccurred = false;
         // Tường trái/phải
-        if (ball.getX() <= 0 || (ball.getX() + ball.getWidth()) >= GameConstants.SCREEN_WIDTH) {
+        if (ball.getX() <= 0) {
+            ball.setPosition(0, ball.getY()); // Đẩy bóng về đúng biên trái
             ball.reverseDirX();
-            // EventManager.getInstance().publish(new BallHitWallEvent(ball, WallDirection.SIDE)); // Tùy chọn
+            collisionOccurred = true;
         }
+        // Tường phải
+        else if ((ball.getX() + ball.getWidth()) >= GameConstants.SCREEN_WIDTH) {
+            // Đẩy bóng về đúng biên phải
+            ball.setPosition(GameConstants.SCREEN_WIDTH - ball.getWidth(), ball.getY());
+            ball.reverseDirX();
+            collisionOccurred = true;
+        }
+
         // Tường trên
         if (ball.getY() <= 0) {
+            ball.setPosition(ball.getX(), 0);
             ball.reverseDirY();
-            // EventManager.getInstance().publish(new BallHitWallEvent(ball, WallDirection.TOP)); // Tùy chọn
+            collisionOccurred = true;
         }
         // Đáy màn hình
         if (ball.getY() > GameConstants.SCREEN_HEIGHT) {
             EventManager.getInstance().publish(new BallLostEvent(ball));
             ball.destroy(); // Đánh dấu bóng để xóa bởi BallManager
+            collisionOccurred = true;
+        }
+
+        if (collisionOccurred) {
+            EventManager.getInstance().publish(new BallHitWallEvent(ball));
         }
     }
 
@@ -73,21 +86,68 @@ public final class CollisionManager {
     }
 
     private void checkBallBrickCollisions(IBall ball, List<Brick> bricks) {
-        // Không dùng Iterator ở đây vì gạch không bị xóa ngay lập tức
+        Brick bestCollisionBrick = null; // Viên gạch va chạm "tốt nhất"
+        double maxOverlap = -1.0;          // Độ lún lớn nhất tìm thấy
+        boolean collisionIsHorizontal = false; // Hướng va chạm chính
+
         for (Brick brick : bricks) {
-            // Chỉ kiểm tra gạch còn sống và có va chạm
             if (!brick.isDestroyed() && ball.getGameObject().intersects(brick.getGameObject())) {
+                // --- Tính toán độ lún (overlap) ---
+                double ballCenterX = ball.getX() + ball.getWidth() / 2.0;
+                double ballCenterY = ball.getY() + ball.getHeight() / 2.0;
+                double brickCenterX = brick.getX() + brick.getWidth() / 2.0;
+                double brickCenterY = brick.getY() + brick.getHeight() / 2.0;
+                double dx = ballCenterX - brickCenterX;
+                double dy = ballCenterY - brickCenterY;
+                double combinedHalfWidth = ball.getWidth() / 2.0 + brick.getWidth() / 2.0;
+                double combinedHalfHeight = ball.getHeight() / 2.0 + brick.getHeight() / 2.0;
+                double overlapX = combinedHalfWidth - Math.abs(dx);
+                double overlapY = combinedHalfHeight - Math.abs(dy);
 
-                // Phát sự kiện va chạm (Gạch sẽ tự xử lý takeDamage khi nghe sự kiện này)
-                EventManager.getInstance().publish(new BrickHitEvent(brick, ball));
+                // Chỉ xử lý nếu thực sự có lún vào (overlap > 0)
+                if (overlapX > 0 && overlapY > 0) {
+                    // Xác định hướng va chạm chính (hướng lún ÍT hơn)
+                    double currentOverlap;
+                    boolean isHorizontal;
+                    if (overlapX < overlapY) {
+                        currentOverlap = overlapX;
+                        isHorizontal = true;
+                    } else {
+                        currentOverlap = overlapY;
+                        isHorizontal = false;
+                    }
 
-                // Xử lý vật lý cơ bản: Đổi hướng bóng
-                // TODO: Logic đổi hướng cần chính xác hơn (xét va chạm cạnh nào)
-                ball.reverseDirY(); // Giả định va chạm trên/dưới
-
-                // Chỉ xử lý 1 va chạm gạch mỗi frame cho mỗi quả bóng
-                return; // Thoát khỏi hàm này sau khi xử lý 1 gạch
+                    // Lưu lại va chạm có độ lún lớn nhất
+                    if (currentOverlap > maxOverlap) {
+                        maxOverlap = currentOverlap;
+                        bestCollisionBrick = brick;
+                        collisionIsHorizontal = isHorizontal;
+                    }
+                }
             }
+        } // Kết thúc vòng lặp FOR
+
+        // --- Xử lý va chạm TỐT NHẤT sau khi duyệt hết ---
+        if (bestCollisionBrick != null) {
+            // Đẩy bóng ra khỏi viên gạch va chạm sâu nhất
+            if (collisionIsHorizontal) { // Va chạm ngang
+                if (ball.getX() + ball.getWidth() / 2.0 > bestCollisionBrick.getX() + bestCollisionBrick.getWidth() / 2.0) { // Bóng bên phải
+                    ball.setPosition(bestCollisionBrick.getX() + bestCollisionBrick.getWidth(), ball.getY());
+                } else { // Bóng bên trái
+                    ball.setPosition(bestCollisionBrick.getX() - ball.getWidth(), ball.getY());
+                }
+                ball.reverseDirX();
+            } else { // Va chạm dọc
+                if (ball.getY() + ball.getHeight() / 2.0 > bestCollisionBrick.getY() + bestCollisionBrick.getHeight() / 2.0) { // Bóng bên dưới
+                    ball.setPosition(ball.getX(), bestCollisionBrick.getY() + bestCollisionBrick.getHeight());
+                } else { // Bóng bên trên
+                    ball.setPosition(ball.getX(), bestCollisionBrick.getY() - ball.getHeight());
+                }
+                ball.reverseDirY();
+            }
+
+            // Phát sự kiện cho viên gạch bị va chạm
+            EventManager.getInstance().publish(new BrickHitEvent(bestCollisionBrick, ball));
         }
     }
 

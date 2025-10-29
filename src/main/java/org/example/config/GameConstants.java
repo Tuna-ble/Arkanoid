@@ -30,7 +30,7 @@ public final class GameConstants {
     public static final double PADDLE_WIDTH = 120;
     public static final double PADDLE_HEIGHT = 16;
     public static final double PADDLE_SPEED = 600.0; // pixels per second
-    public static final double PADDLE_MOVE_INFLUENCE = 0.15; // influence on ball direction
+    public static final double PADDLE_MOVE_INFLUENCE = 0.7; // influence on ball direction
 
     // Ball
     public static final double BALL_RADIUS = 8;

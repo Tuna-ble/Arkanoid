@@ -45,6 +45,14 @@ public abstract class AbstractBrick extends GameObject implements Brick {
         return y;
     }
 
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
     @Override
     public GameObject getGameObject() {
         return this;

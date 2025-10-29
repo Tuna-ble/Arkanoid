@@ -1,5 +1,6 @@
 package org.example.gamelogic.states;
 
+import javafx.scene.canvas.GraphicsContext;
 import org.example.presentation.InputHandler;
 
 public final class MainMenuState implements GameState {
@@ -9,7 +10,7 @@ public final class MainMenuState implements GameState {
     }
 
     @Override
-    public void render(javafx.scene.canvas.GraphicsContext gc) {
+    public void render(GraphicsContext gc) {
 
     }
 

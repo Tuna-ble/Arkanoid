@@ -90,25 +90,44 @@ public class Ball extends MovableObject implements IBall {
         this.speed = GameConstants.BALL_INITIAL_SPEED;
     }
 
+    @Override
     public void handlePaddleCollision(Paddle paddle, double hitPositionRatio) {
-        if (!isActive || attachedToPaddle) return;
+        if (!isActive() || attachedToPaddle) return;
 
-        this.y = paddle.getY() - this.height;
-        if (dy > 0) {
-            dy = -dy;
+        // 1. Đẩy bóng lên trên paddle (vẫn cần thiết để tránh kẹt)
+        //    Bạn có thể làm nhẹ nhàng hơn: chỉ đẩy lên nếu bóng đã lún vào
+        double overlapY = (this.y + this.height) - paddle.getY();
+        if (overlapY > 0) {
+            this.y -= overlapY; // Chỉ đẩy lên đúng bằng độ lún
         }
+        // Hoặc giữ cách cũ nếu đơn giản:
+        // this.y = paddle.getY() - this.height;
 
-        double maxAngleChange = Math.toRadians(60);
-        double angleOffset = maxAngleChange * hitPositionRatio;
-        double currentSpeed = Math.sqrt(dx * dx + dy * dy);
-        if (currentSpeed == 0) currentSpeed = speed;
+        // 2. Phản xạ: Đảo ngược thành phần Y
+        if (dy > 0) { // Chỉ đảo ngược nếu đang đi xuống
+            dy = -dy;
+        } else if (dy == 0) { // Xử lý trường hợp bóng đi ngang
+            dy = -GameConstants.BALL_MIN_VY; // Đẩy nhẹ lên
+        }
+        dy = -Math.abs(dy); // Đảm bảo dy luôn âm (đi lên)
 
-        double newAngle = Math.PI / 2.0 + angleOffset;
+        // 3. (TÙY CHỌN) Ảnh hưởng của chuyển động Paddle lên dx:
+        //    Thêm một phần nhỏ vận tốc của paddle vào dx của bóng
+        //    để tạo hiệu ứng "đẩy" bóng sang trái/phải khi paddle di chuyển.
+        dx += paddle.getDx() * GameConstants.PADDLE_MOVE_INFLUENCE; // PADDLE_MOVE_INFLUENCE là hệ số nhỏ, ví dụ 0.2
 
-        dx = currentSpeed * Math.cos(newAngle);
-        dy = -currentSpeed * Math.sin(newAngle);
+        // 4. (TÙY CHỌN) Điều chỉnh dx nhẹ dựa trên vị trí va chạm:
+        //    Làm bóng hơi lệch sang trái/phải nếu chạm vào rìa paddle.
+        //    Dùng hitPositionRatio nhưng với ảnh hưởng nhỏ hơn nhiều so với cách cũ.
+        double angleInfluence = speed * hitPositionRatio * 0.1; // Hệ số nhỏ, ví dụ 0.1
+        dx += angleInfluence;
 
-        incrementSpeed();
+        // 5. Cập nhật tốc độ (nếu muốn tăng tốc sau va chạm) và giới hạn
+        double speedAfterCollision = Math.min(speed + GameConstants.BALL_SPEED_INCREMENT_PER_BRICK, GameConstants.BALL_MAX_SPEED);
+        this.speed = speedAfterCollision;
+        updateVelocityWithSpeed(); // Điều chỉnh dx, dy để khớp với speed mới
+        ensureMinimumVelocity(); // Đảm bảo không quá chậm
+        limitMaximumSpeed(); // Đảm bảo không quá nhanh
     }
 
     /**

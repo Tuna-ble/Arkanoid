@@ -76,4 +76,7 @@ public class Paddle extends MovableObject {
         this.dx = v;
         this.dy = i;
     }
+
+    public double getDx() { return dx; }
+    public double getDy() { return dy; }
 }
