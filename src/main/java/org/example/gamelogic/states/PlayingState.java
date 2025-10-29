@@ -1,6 +1,7 @@
 package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.text.TextAlignment;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.*;
 import javafx.scene.text.Font;
@@ -84,6 +85,7 @@ public final class PlayingState implements GameState {
 
         gc.setFont(scoreFont);
         gc.setFill(Color.WHITE);
+        gc.setTextAlign(TextAlignment.LEFT);
         gc.fillText("Score: " + currentScore, 10, 25);
     }
 
