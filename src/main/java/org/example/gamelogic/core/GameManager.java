@@ -2,10 +2,10 @@ package org.example.gamelogic.core;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import org.example.data.ILevelRepository;
-import org.example.gamelogic.states.GameState;
-import org.example.gamelogic.states.PlayingState;
+import org.example.gamelogic.I_InputProvider;
+import org.example.gamelogic.events.*;
+import org.example.gamelogic.states.*;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
-import org.example.presentation.InputHandler;
 
 import java.util.Iterator;
 import java.util.List;
@@ -22,9 +22,10 @@ public final class GameManager {
 
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
-    private InputHandler inputHandler;
 
     private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
+
+    private I_InputProvider inputProvider;
 
     private GameManager() {
         this.gameLoop = new AnimationTimer() {
@@ -38,12 +39,9 @@ public final class GameManager {
                 }
                 double deltaTime = (now - lastUpdate) / 1_000_000_000.0;
                 lastUpdate = now;
-                handleInput();
+
                 update(deltaTime);
                 render();
-                if (inputHandler != null) {
-                    inputHandler.resetMouseClick();
-                }
             }
         };
     }
@@ -56,8 +54,8 @@ public final class GameManager {
         return SingletonHolder.INSTANCE;
     }
 
-    public void setInputHandler(InputHandler inputHandler) {
-        this.inputHandler = inputHandler;
+    public void setInputProvider(I_InputProvider provider) {
+        this.inputProvider = provider;
     }
     public void setGraphicsContext(GraphicsContext gc) {
         this.gc = gc;
@@ -78,8 +76,10 @@ public final class GameManager {
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
-        GameState currentState = new PlayingState(this, 1);
+        GameState currentState = new MainMenuState();
         this.stateManager.setState(currentState);
+
+        subscribeToEvents();
     }
 
     public void updateStrategy(double deltaTime) {
@@ -96,18 +96,15 @@ public final class GameManager {
         }
     }
 
-    public void handleInput() {
-        GameState currentState = stateManager.getState();
-        if (currentState != null && this.inputHandler != null) {
-            currentState.handleInput(this.inputHandler);
-        }
-    }
-
     public void update(double deltaTime) {
-        if (stateManager != null) {
+        if (stateManager != null && inputProvider != null) {
+            stateManager.handleInput(inputProvider);
             stateManager.update(deltaTime);
         }
         updateStrategy(deltaTime);
+        if (inputProvider != null) {
+            inputProvider.resetMouseClick();
+        }
     }
 
     public void render() {
@@ -123,6 +120,76 @@ public final class GameManager {
 
     public void stopGameLoop() {
         gameLoop.stop();
+    }
+
+    private void subscribeToEvents() {
+        /*EventManager.getInstance().subscribe(
+                LifeLostEvent.class,
+                this::onHit
+        );
+        EventManager.getInstance().subscribe(
+                LevelCompletedEvent.class,
+                this::onHit
+        );
+        EventManager.getInstance().subscribe(
+                GameOverEvent.class,
+                this::GameOver
+        );*/
+
+        EventManager.getInstance().subscribe(
+                BallLostEvent.class,
+                this::handleBallLost
+        );
+        EventManager.getInstance().subscribe(
+                ChangeStateEvent.class,
+                this::handleStateChangeRequest
+        );
+    }
+
+    private void resetBallAndPaddle() {
+        GameState currentState = stateManager.getState();
+        if (currentState instanceof PlayingState) {
+            PlayingState playingState = (PlayingState) currentState;
+            ballManager.resetBalls(playingState.getPaddle());
+        }
+    }
+
+    private void handleBallLost(BallLostEvent event) {
+        gameOver();
+    }
+
+    public void gameOver() {
+        GameState gameOverState = new GameOverState();
+        stateManager.setState(gameOverState);
+    }
+
+    public void handleStateChangeRequest(ChangeStateEvent event) {
+        GameState newState = null;
+        switch (event.targetState) {
+            case PLAYING:
+                newState = new PlayingState(this, 1);
+                break;
+            case MAIN_MENU:
+                newState = new MainMenuState();
+                break;
+            case GAME_OVER:
+                newState = new GameOverState();
+                break;
+        }
+
+        if (newState != null && stateManager != null) {
+            stateManager.setState(newState);
+        }
+    }
+
+    public void startNewGame() {
+        GameState newPlayingState = new PlayingState(this, 1);
+        stateManager.setState(newPlayingState);
+    }
+
+    public void goToMainMenu() {
+        GameState mainMenuState = new MainMenuState();
+        stateManager.setState(mainMenuState);
     }
 
     public BrickManager getBrickManager() {

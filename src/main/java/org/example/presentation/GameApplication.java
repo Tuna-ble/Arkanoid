@@ -24,7 +24,7 @@ public class GameApplication extends Application {
         InputHandler inputHandler = new InputHandler();
 
         gameManager.setLevelRepository(repo);
-        gameManager.setInputHandler(inputHandler);
+        gameManager.setInputProvider(inputHandler);
 
         gameManager.init();
 

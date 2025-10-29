@@ -70,18 +70,22 @@ public final class CollisionManager {
 
     private void checkBallPaddleCollision(IBall ball, Paddle paddle) {
         if (paddle != null && ball.getGameObject().intersects(paddle.getGameObject())) {
-            // Tính toán vị trí va chạm tương đối trên paddle (-1 đến 1)
-            double paddleCenter = paddle.getX() + paddle.getWidth() / 2.0;
-            double ballCenter = ball.getX() + ball.getWidth() / 2.0;
-            double hitPositionRatio = (ballCenter - paddleCenter) / (paddle.getWidth() / 2.0);
-            // Giới hạn tỉ lệ trong khoảng [-1, 1]
-            hitPositionRatio = Math.max(-1.0, Math.min(1.0, hitPositionRatio));
+            boolean hitTopSurface = (ball.getY() + ball.getHeight()) < (paddle.getY() + paddle.getHeight() * 0.33);
 
-            // Yêu cầu bóng tự xử lý va chạm với paddle
-            ball.handlePaddleCollision(paddle, hitPositionRatio);
+            if (hitTopSurface) {
+                // Tính toán vị trí va chạm tương đối trên paddle (-1 đến 1)
+                double paddleCenter = paddle.getX() + paddle.getWidth() / 2.0;
+                double ballCenter = ball.getX() + ball.getWidth() / 2.0;
+                double hitPositionRatio = (ballCenter - paddleCenter) / (paddle.getWidth() / 2.0);
+                // Giới hạn tỉ lệ trong khoảng [-1, 1]
+                hitPositionRatio = Math.max(-1.0, Math.min(1.0, hitPositionRatio));
 
-            // Phát sự kiện
-            EventManager.getInstance().publish(new BallHitPaddleEvent(ball, paddle));
+                // Yêu cầu bóng tự xử lý va chạm với paddle
+                ball.handlePaddleCollision(paddle, hitPositionRatio);
+
+                // Phát sự kiện
+                EventManager.getInstance().publish(new BallHitPaddleEvent(ball, paddle));
+            }
         }
     }
 

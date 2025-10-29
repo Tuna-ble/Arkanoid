@@ -1,6 +1,7 @@
 package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
+import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.*;
 import javafx.scene.text.Font;
 import javafx.scene.paint.Color;
@@ -87,8 +88,7 @@ public final class PlayingState implements GameState {
     }
 
     @Override
-    public void handleInput(InputHandler input) {
-
+    public void handleInput(I_InputProvider input) {
         if (input.isKeyPressed(KeyCode.LEFT) || input.isKeyPressed(KeyCode.A)) {
             paddle.setVelocity(-GameConstants.PADDLE_SPEED, 0);
         } else if (input.isKeyPressed(KeyCode.RIGHT) || input.isKeyPressed(KeyCode.D)) {
@@ -96,7 +96,6 @@ public final class PlayingState implements GameState {
         } else {
             paddle.setVelocity(0, 0);
         }
-
 
         if (input.isKeyPressed(KeyCode.SPACE) || input.isMouseClicked()) {
             ballManager.releaseAttachedBalls(); // gọi hàm mới trong BallManager
@@ -114,5 +113,9 @@ public final class PlayingState implements GameState {
                 );
             }
         }
+    }
+
+    public Paddle getPaddle() {
+        return paddle;
     }
 }
