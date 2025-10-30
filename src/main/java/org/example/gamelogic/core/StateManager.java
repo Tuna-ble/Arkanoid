@@ -15,8 +15,8 @@ public final class StateManager {
         return SingletonHolder.INSTANCE;
     }
 
-    public void setState(GameState state) {
-        this.currentState = state;
+    public void setState(GameState newState) {
+        this.currentState = newState;
     }
 
     public GameState getState() {

@@ -64,6 +64,7 @@ public final class GameManager {
     }
     public void setState(GameState gameState) {
         this.stateManager.setState(gameState);
+
     }
     public void setLevelRepository(ILevelRepository repo) {
         this.levelRepository = repo;

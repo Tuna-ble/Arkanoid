@@ -1,41 +1,30 @@
 package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
+import javafx.scene.text.FontWeight;
+import javafx.scene.transform.Affine;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.Stop;
+import javafx.scene.effect.DropShadow;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.GameManager;
 import org.example.presentation.InputHandler;
-
-import java.io.File;
+import org.example.presentation.TextRenderer;
 
 public final class MainMenuState implements GameState {
     private final GameManager gameManager;
-    private MediaPlayer mediaPlayer;
+    private Image mainMenuImage;
     private double elapsedTime = 0;
-    private boolean videoLoaded = false;
 
     public MainMenuState(GameManager gameManager) {
         this.gameManager = gameManager;
-        initializeVideo();
-    }
-
-    private void initializeVideo() {
-        try {
-            String videoPath = new File("src/main/resources/menu_video.mp4").toURI().toString();
-            Media media = new Media(videoPath);
-            mediaPlayer = new MediaPlayer(media);
-            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-            mediaPlayer.setVolume(0);
-            mediaPlayer.play();
-            videoLoaded = true;
-        } catch (Exception e) {
-            System.out.println("Video not found, using fallback background");
-            videoLoaded = false;
-        }
+        mainMenuImage = new Image(getClass().getResourceAsStream("/GameIcon/MainMenu.png"));
     }
 
     @Override
@@ -45,41 +34,63 @@ public final class MainMenuState implements GameState {
 
     @Override
     public void render(GraphicsContext gc) {
-        // Draw background
-        gc.setFill(Color.web("#1a1a1a"));
-        gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        gc.setTransform(new Affine());
+        gc.setTextAlign(TextAlignment.LEFT);
+        gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        // Background
+        gc.drawImage(mainMenuImage, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        // Title (outlined with subtle shadow and gradient)
+        gc.setTextAlign(TextAlignment.CENTER);
+        LinearGradient titleFill = new LinearGradient(
+                0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.web("#66ccff")),
+                new Stop(1, Color.web("#228BE6"))
+        );
+        DropShadow titleShadow = new DropShadow(12, Color.color(0, 0, 0, 0.6));
+        Font titleFont = Font.font("Verdana", FontWeight.BOLD, 72);
+        TextRenderer.drawOutlinedText(
+                gc,
+                "ARKANOID",
+                GameConstants.SCREEN_WIDTH / 2.0,
+                250,
+                titleFont,
+                titleFill,
+                Color.color(0,0,0,0.8),
+                2.5,
+                titleShadow
+        );
 
-        gc.setFill(Color.color(0, 0, 0, 0.6));
-        gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        // Subtext
+        gc.setFont(new Font("Arial", 20));
+        gc.setFill(Color.WHITE);
+        gc.fillText("Click or Press SPACE to Start", GameConstants.SCREEN_WIDTH / 2.0, 300);
 
-        // Draw title
-        gc.setFill(Color.web("#00ffff"));
-        gc.setFont(new Font("Arial", 60));
-        gc.fillText("ARKANOID", GameConstants.SCREEN_WIDTH / 2.0 - 150, 250);
-
+        // Blinking text
         if ((int)(elapsedTime * 2) % 2 == 0) {
-            gc.setFill(Color.web("#ffffff"));
-            gc.setFont(new Font("Arial", 15));
-            gc.fillText("Press SPACE to Start", GameConstants.SCREEN_WIDTH / 2.0 - 60, GameConstants.SCREEN_HEIGHT / 2.0);
+            gc.setFont(new Font("Arial", 16));
+            gc.setFill(Color.WHITE);
+            gc.fillText("Press ESC to Exit", GameConstants.SCREEN_WIDTH / 2.0, GameConstants.SCREEN_HEIGHT - 40);
         }
+        gc.setTextAlign(TextAlignment.LEFT);
     }
 
     @Override
     public void handleInput(InputHandler inputHandler) {
         if (inputHandler == null) return;
+
+        // Thoát
         if (inputHandler.isKeyPressed(KeyCode.ESCAPE)) {
             System.exit(0);
         }
-        if (inputHandler.isKeyPressed(KeyCode.SPACE)) {
+
+        // Bắt đầu game khi nhấn SPACE hoặc click chuột
+        if (inputHandler.isKeyPressed(KeyCode.SPACE) || inputHandler.isMouseClicked()) {
+            inputHandler.clear();
             startGame();
         }
     }
 
     private void startGame() {
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.dispose();
-        }
         GameState playingState = new PlayingState(gameManager, 1);
         gameManager.setState(playingState);
     }

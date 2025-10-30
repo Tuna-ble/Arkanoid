@@ -9,13 +9,12 @@ import javafx.stage.Stage;
 import org.example.data.FileLevelRepository;
 import org.example.data.ILevelRepository;
 import org.example.gamelogic.core.GameManager;
+import org.example.config.GameConstants;
 // MỚI: Import InputHandler
 import org.example.presentation.InputHandler;
 
 
 public class GameApplication extends Application {
-    private static final int WIDTH = 800;
-    private static final int HEIGHT = 600;
 
     public void start(Stage primaryStage) throws Exception {
         GameManager gameManager = GameManager.getInstance();
@@ -28,11 +27,11 @@ public class GameApplication extends Application {
 
         gameManager.init();
 
-        Canvas canvas = new Canvas((double) WIDTH, (double) HEIGHT);
+        Canvas canvas = new Canvas(GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         StackPane root = new StackPane(canvas);
-        Scene scene = new Scene(root, (double) WIDTH, (double) HEIGHT);
+        Scene scene = new Scene(root, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
         scene.setOnKeyPressed(event -> {
             inputHandler.addKey(event.getCode());

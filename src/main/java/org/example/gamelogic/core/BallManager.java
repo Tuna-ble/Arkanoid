@@ -4,7 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 import org.example.config.GameConstants;
 import org.example.gamelogic.entities.Ball;
 import org.example.gamelogic.entities.IBall;
-import org.example.gamelogic.entities.Paddle; // MỚI: Import Paddle
+import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.factory.BallFactory;
 import org.example.gamelogic.registry.BallRegistry;
 
@@ -38,14 +38,14 @@ public final class BallManager {
     public void update(double deltaTime) {
         for (IBall ball : activeBalls) {
             ball.update(deltaTime);
+            if (ball.getY() + GameConstants.BALL_RADIUS > GameConstants.SCREEN_HEIGHT) {
+                activeBalls.remove(ball);
+            }
         }
-
-        activeBalls.removeIf(ball -> ball.getY() > GameConstants.SCREEN_HEIGHT + ball.getHeight());
     }
 
     public void releaseAttachedBalls() {
         for (IBall ball : activeBalls) {
-            // Ball cần có getter isAttachedToPaddle()
             if (ball instanceof Ball && ((Ball) ball).isAttachedToPaddle()) {
                 ball.release();
             }
@@ -73,5 +73,9 @@ public final class BallManager {
 
     public void clear() {
         activeBalls.clear();
+    }
+
+    public boolean isEmpty() {
+        return activeBalls.isEmpty();
     }
 }

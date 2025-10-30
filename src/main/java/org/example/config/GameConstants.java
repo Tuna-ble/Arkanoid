@@ -1,15 +1,11 @@
 package org.example.config;
 /**
- * Game Constants theo thiết kế logic vật lí của ChatGPT
+ * Game Constants
  */
 
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
-/**
- * Centralized game constants
- * Data layer - provides immutable configuration values
- */
 public final class GameConstants {
 
     public static final Color BALL_COLOR = Color.RED;
@@ -34,8 +30,6 @@ public final class GameConstants {
 
     // Ball
     public static final double BALL_RADIUS = 8;
-    public static final double BALL_X = SCREEN_WIDTH / 2;
-    public static final double BALL_Y = PADDLE_Y - PADDLE_HEIGHT / 2 - BALL_RADIUS - 1.5; // SCREEN_HEIGHT - 64
     public static final double BALL_INITIAL_SPEED = 320.0;
     public static final double BALL_MIN_SPEED = 240.0;
     public static final double BALL_MAX_SPEED = 900.0;
@@ -69,13 +63,14 @@ public final class GameConstants {
     public static final double BALL_VERTICAL_CORRECTION_RATIO = 0.3; // force angle if vy too small
 
     // Calculated constants
-    public static final double PADDLE_CENTER_X = SCREEN_WIDTH / 2.0;
-    public static final double BALL_INITIAL_X = SCREEN_WIDTH / 2.0;
-    public static final double BALL_INITIAL_Y = PADDLE_Y - BALL_RADIUS - 10;
+    // Removed unused calculated position constants (were not referenced in code)
 
     // Score
     public static final int POINTS_PER_BRICK = 10;
 
-
+    // UI - Buttons
+    public static final double UI_BUTTON_WIDTH = 200;
+    public static final double UI_BUTTON_HEIGHT = 60;
+    public static final double UI_BUTTON_SPACING = 20;
 
 }
