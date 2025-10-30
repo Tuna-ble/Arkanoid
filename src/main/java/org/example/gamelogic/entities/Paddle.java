@@ -77,6 +77,9 @@ public class Paddle extends MovableObject {
         this.dy = i;
     }
 
-    public double getDx() { return dx; }
-    public double getDy() { return dy; }
+    @Override
+    public void setWidth(double width) {
+        super.setWidth(width);
+        this.maxX = GameConstants.SCREEN_WIDTH - this.width;
+    }
 }

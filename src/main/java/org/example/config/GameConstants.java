@@ -43,6 +43,7 @@ public final class GameConstants {
     public static final double BALL_MIN_VY = 120.0;
     public static final double BALL_RESTITUTION = 1.0;
     public static final double BALL_MAX_ANGLE_FROM_VERTICAL = 75.0; // degrees
+    public static final int MAX_BALL_COUNT = 30;
 
     // Physics / timestep
     public static final double FIXED_TIMESTEP = 0.0083333; // 1/120 seconds

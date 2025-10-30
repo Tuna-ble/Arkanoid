@@ -1,5 +1,6 @@
 package org.example.gamelogic.strategy.powerup;
 
+import org.example.config.GameConstants;
 import org.example.gamelogic.core.BallManager;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.states.PlayingState;
@@ -20,10 +21,16 @@ public class MultiBallStrategy implements PowerUpStrategy {
         List<IBall> newBalls = new ArrayList<>();
         List<IBall> currentBalls = new ArrayList<>(ballManager.getActiveBalls());
 
+        int currentBallCount = currentBalls.size();
+
         for (IBall originalBall : currentBalls) {
             if (originalBall.isAttachedToPaddle()) continue;
 
             for (int i = 0; i < CLONES_PER_BALL; i++) {
+                if (currentBallCount >= GameConstants.MAX_BALL_COUNT) {
+                    break;
+                }
+
                 IBall clone = originalBall.clone(); // clone() đã set attachedToPaddle=false
                 clone.setPosition(originalBall.getX(), originalBall.getY());
 
@@ -40,6 +47,10 @@ public class MultiBallStrategy implements PowerUpStrategy {
                 clone.setDy(speed * Math.sin(newAngle));
 
                 newBalls.add(clone);
+                currentBallCount++;
+            }
+            if (currentBallCount >= GameConstants.MAX_BALL_COUNT) {
+                break;
             }
         }
 
