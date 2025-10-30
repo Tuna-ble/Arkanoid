@@ -1,6 +1,7 @@
 package org.example.gamelogic.core;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
+import org.example.data.AssetManager;
 import org.example.data.ILevelRepository;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.events.*;
@@ -11,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.example.gamelogic.core.SoundManager;
+
 //singleton (co dung Bill Pugh Idiom de xu li multithreading)
 public final class GameManager {
     private final AnimationTimer gameLoop;
@@ -19,6 +22,8 @@ public final class GameManager {
     private PowerUpManager powerUpManager;
     private BallManager ballManager;
     private CollisionManager collisionManager;
+    private ScoreManager scoreManager;
+    private SoundManager soundManager;
 
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
@@ -71,11 +76,17 @@ public final class GameManager {
     }
 
     public void init() {
+        AssetManager.getInstance().loadAssets();
+
         this.stateManager = new StateManager();
         this.brickManager = new BrickManager(levelRepository);
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
+
+        this.scoreManager = ScoreManager.getInstance();
+        this.soundManager = SoundManager.getInstance();
+
         GameState currentState = new MainMenuState();
         this.stateManager.setState(currentState);
 
@@ -123,18 +134,6 @@ public final class GameManager {
     }
 
     private void subscribeToEvents() {
-        /*EventManager.getInstance().subscribe(
-                LifeLostEvent.class,
-                this::onHit
-        );
-        EventManager.getInstance().subscribe(
-                LevelCompletedEvent.class,
-                this::onHit
-        );
-        EventManager.getInstance().subscribe(
-                GameOverEvent.class,
-                this::GameOver
-        );*/
 
         EventManager.getInstance().subscribe(
                 BallLostEvent.class,
@@ -143,6 +142,26 @@ public final class GameManager {
         EventManager.getInstance().subscribe(
                 ChangeStateEvent.class,
                 this::handleStateChangeRequest
+        );
+        EventManager.getInstance().subscribe(
+                BrickDestroyedEvent.class,
+                scoreManager::onBrickDestroyed
+        );
+        EventManager.getInstance().subscribe(
+                BrickDestroyedEvent.class,
+                soundManager::onBrickDestroyed
+        );
+        EventManager.getInstance().subscribe(
+                BallHitPaddleEvent.class,
+                soundManager::onPaddleHit
+        );
+        EventManager.getInstance().subscribe(
+                BallLostEvent.class,
+                soundManager::onBallLost
+        );
+        EventManager.getInstance().subscribe(
+                GameOverEvent.class,
+                soundManager::onGameOver
         );
     }
 
@@ -183,6 +202,10 @@ public final class GameManager {
     }
 
     public void startNewGame() {
+
+        if (scoreManager != null) {
+            scoreManager.resetScore();
+        }
         GameState newPlayingState = new PlayingState(this, 1);
         stateManager.setState(newPlayingState);
     }
@@ -207,4 +230,8 @@ public final class GameManager {
     public CollisionManager getCollisionManager() {
         return this.collisionManager;
     }
+
+    public ScoreManager getScoreManager() { return this.scoreManager; }
+
+    public SoundManager getSoundManager() { return this.soundManager; }
 }
