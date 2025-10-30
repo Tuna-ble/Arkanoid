@@ -12,7 +12,7 @@ import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.core.PowerUpManager;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
-import org.example.presentation.InputHandler;
+import org.example.gamelogic.I_InputProvider;
 import javafx.scene.input.KeyCode;
 import javafx.scene.image.Image;
 import javafx.scene.text.TextAlignment;
@@ -126,7 +126,7 @@ public final class PlayingState implements GameState {
     }
 
     @Override
-    public void handleInput(InputHandler input) {
+    public void handleInput(I_InputProvider input) {
         if (input == null) return;
 
         // --- 1️⃣ Điều khiển paddle ---

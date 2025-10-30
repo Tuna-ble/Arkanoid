@@ -14,7 +14,7 @@ import javafx.scene.paint.Stop;
 import javafx.scene.effect.DropShadow;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.GameManager;
-import org.example.presentation.InputHandler;
+import org.example.gamelogic.I_InputProvider;
 import org.example.presentation.TextRenderer;
 
 public final class MainMenuState implements GameState {
@@ -75,17 +75,16 @@ public final class MainMenuState implements GameState {
     }
 
     @Override
-    public void handleInput(InputHandler inputHandler) {
-        if (inputHandler == null) return;
+    public void handleInput(I_InputProvider inputProvider) {
+        if (inputProvider == null) return;
 
         // Thoát
-        if (inputHandler.isKeyPressed(KeyCode.ESCAPE)) {
+        if (inputProvider.isKeyPressed(KeyCode.ESCAPE)) {
             System.exit(0);
         }
 
         // Bắt đầu game khi nhấn SPACE hoặc click chuột
-        if (inputHandler.isKeyPressed(KeyCode.SPACE) || inputHandler.isMouseClicked()) {
-            inputHandler.clear();
+        if (inputProvider.isKeyPressed(KeyCode.SPACE) || inputProvider.isMouseClicked()) {
             startGame();
         }
     }

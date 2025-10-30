@@ -2,7 +2,7 @@ package org.example.gamelogic.core;
 
 import javafx.scene.canvas.GraphicsContext;
 import org.example.gamelogic.states.GameState;
-import org.example.presentation.InputHandler;
+import org.example.gamelogic.I_InputProvider;
 
 public final class StateManager {
     private GameState currentState;
@@ -33,9 +33,8 @@ public final class StateManager {
             currentState.render(gc);
     }
 
-    public void handleInput() {
-        InputHandler inputHandler = null;
-        if (currentState != null)
-            currentState.handleInput(inputHandler);
+    public void handleInput(I_InputProvider inputProvider) {
+        if (currentState != null && inputProvider != null)
+            currentState.handleInput(inputProvider);
     }
 }

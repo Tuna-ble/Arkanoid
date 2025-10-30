@@ -5,7 +5,7 @@ import org.example.data.ILevelRepository;
 import org.example.gamelogic.states.GameState;
 import org.example.gamelogic.states.MainMenuState;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
-import org.example.presentation.InputHandler;
+import org.example.gamelogic.I_InputProvider;
 
 import java.util.Iterator;
 import java.util.List;
@@ -22,7 +22,7 @@ public final class GameManager {
 
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
-    private InputHandler inputHandler;
+    private I_InputProvider inputProvider;
 
     private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
 
@@ -41,8 +41,9 @@ public final class GameManager {
                 handleInput();
                 update(deltaTime);
                 render();
-                if (inputHandler != null) {
-                    inputHandler.resetMouseClick();
+                // Reset mouse click if inputProvider is InputHandler
+                if (inputProvider instanceof org.example.presentation.InputHandler) {
+                    ((org.example.presentation.InputHandler) inputProvider).resetMouseClick();
                 }
             }
         };
@@ -56,8 +57,8 @@ public final class GameManager {
         return SingletonHolder.INSTANCE;
     }
 
-    public void setInputHandler(InputHandler inputHandler) {
-        this.inputHandler = inputHandler;
+    public void setInputHandler(I_InputProvider inputProvider) {
+        this.inputProvider = inputProvider;
     }
     public void setGraphicsContext(GraphicsContext gc) {
         this.gc = gc;
@@ -101,8 +102,8 @@ public final class GameManager {
 
     public void handleInput() {
         GameState currentState = stateManager.getState();
-        if (currentState != null && this.inputHandler != null) {
-            currentState.handleInput(this.inputHandler);
+        if (currentState != null && this.inputProvider != null) {
+            currentState.handleInput(this.inputProvider);
         }
     }
 
