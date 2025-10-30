@@ -11,6 +11,8 @@ import org.example.gamelogic.registry.BallRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.stream;
+
 public final class BallManager {
     private final BallFactory ballFactory;
     private List<IBall> activeBalls;
@@ -40,7 +42,7 @@ public final class BallManager {
             ball.update(deltaTime);
         }
 
-        activeBalls.removeIf(ball -> ball.getY() > GameConstants.SCREEN_HEIGHT + ball.getHeight());
+        activeBalls.removeIf(IBall::isDestroyed);
     }
 
     public void releaseAttachedBalls() {
@@ -73,5 +75,15 @@ public final class BallManager {
 
     public void clear() {
         activeBalls.clear();
+    }
+
+    public void addBall(IBall ball) {
+        if (ball != null && !ball.isAttachedToPaddle()) {
+            this.activeBalls.add(ball);
+        }
+    }
+
+    public long countActiveBalls() {
+        return activeBalls.stream().filter(IBall::isActive).count();
     }
 }

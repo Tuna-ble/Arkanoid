@@ -26,4 +26,12 @@ public interface IBall {
     double getHeight();
 
     GameObject getGameObject();
+
+    double getDx();
+    double getDy();
+
+    double getSpeed();
+
+    void setDx(double v);
+    void setDy(double v);
 }

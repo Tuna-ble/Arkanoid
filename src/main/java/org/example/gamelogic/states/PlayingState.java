@@ -48,8 +48,6 @@ public final class PlayingState implements GameState {
                 0);
 
         this.ballManager.createInitialBall(this.paddle);
-        powerUpManager.spawnPowerUp("E", 400, 100);
-        powerUpManager.spawnPowerUp("F", 500, 100);
 
         ScoreManager.getInstance().resetScore();
         this.scoreFont = new Font("Arial", 24);
@@ -79,7 +77,7 @@ public final class PlayingState implements GameState {
 
         brickManager.update(deltaTime);
         ballManager.update(deltaTime);
-        powerUpManager.update(gameManager, deltaTime);
+        powerUpManager.update(deltaTime);
 
         if (collisionManager != null) {
             collisionManager.checkCollisions(

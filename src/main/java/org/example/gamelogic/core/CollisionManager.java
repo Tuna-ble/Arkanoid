@@ -58,8 +58,8 @@ public final class CollisionManager {
         }
         // Đáy màn hình
         if (ball.getY() > GameConstants.SCREEN_HEIGHT) {
+            ball.destroy();// Đánh dấu bóng để xóa bởi BallManager
             EventManager.getInstance().publish(new BallLostEvent(ball));
-            ball.destroy(); // Đánh dấu bóng để xóa bởi BallManager
             collisionOccurred = true;
         }
 
@@ -70,7 +70,7 @@ public final class CollisionManager {
 
     private void checkBallPaddleCollision(IBall ball, Paddle paddle) {
         if (paddle != null && ball.getGameObject().intersects(paddle.getGameObject())) {
-            boolean hitTopSurface = (ball.getY() + ball.getHeight()) < (paddle.getY() + paddle.getHeight() * 0.33);
+            boolean hitTopSurface = (ball.getY() + ball.getHeight()) < (paddle.getY() + paddle.getHeight() * 0.5);
 
             if (hitTopSurface) {
                 // Tính toán vị trí va chạm tương đối trên paddle (-1 đến 1)

@@ -1,6 +1,7 @@
 package org.example.gamelogic.core;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
+import org.example.config.GameConstants;
 import org.example.data.ILevelRepository;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.events.*;
@@ -25,6 +26,9 @@ public final class GameManager {
     private ILevelRepository levelRepository;
     private I_InputProvider inputProvider;
 
+    private double accumulator = 0.0;
+    private final double FIXED_TIMESTEP = GameConstants.FIXED_TIMESTEP;
+
     private GameManager() {
         this.gameLoop = new AnimationTimer() {
             private long lastUpdate = 0;
@@ -37,8 +41,16 @@ public final class GameManager {
                 }
                 double deltaTime = (now - lastUpdate) / 1_000_000_000.0;
                 lastUpdate = now;
+                accumulator += deltaTime;
 
-                update(deltaTime);
+                while (accumulator >= FIXED_TIMESTEP) {
+                    // 1. Cập nhật logic với BƯỚC THỜI GIAN CỐ ĐỊNH
+                    // Lưu ý: Không truyền "deltaTime" nữa, mà là "FIXED_TIMESTEP"
+                    update(FIXED_TIMESTEP);
+
+                    // 2. Trừ đi thời gian đã xử lý
+                    accumulator -= FIXED_TIMESTEP;
+                }
                 render();
             }
         };
@@ -123,7 +135,9 @@ public final class GameManager {
     }
 
     private void handleBallLost(BallLostEvent event) {
-        gameOver();
+        if (ballManager.countActiveBalls() == 0) {
+            gameOver();
+        }
     }
 
     public void gameOver() {
