@@ -161,6 +161,7 @@ public class Ball extends MovableObject implements IBall {
         updateVelocityWithSpeed();
     }
 
+    @Override
     public void multiplySpeed(double factor) {
         // Giữ tốc độ trong giới hạn min/max
         double targetSpeed = Math.max(GameConstants.BALL_MIN_SPEED, Math.min(this.speed * factor, GameConstants.BALL_MAX_SPEED));

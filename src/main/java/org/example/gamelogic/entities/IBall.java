@@ -15,6 +15,7 @@ public interface IBall {
     void reverseDirY();
     void reset(double paddleX, double paddleY, double paddleWidth);
     void handlePaddleCollision(Paddle paddle, double hitPositionRatio);
+    void multiplySpeed(double factor);
     void destroy();
     IBall clone();
 

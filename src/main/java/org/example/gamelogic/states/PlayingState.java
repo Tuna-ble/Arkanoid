@@ -13,8 +13,13 @@ import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.core.PowerUpManager;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
-import org.example.presentation.InputHandler;
+import org.example.gamelogic.events.PowerUpCollectedEvent;
+import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 import javafx.scene.input.KeyCode;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public final class PlayingState implements GameState {
     BrickManager brickManager;
@@ -24,6 +29,8 @@ public final class PlayingState implements GameState {
     CollisionManager collisionManager;
     Paddle paddle;
     Font scoreFont;
+
+    private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
 
     public PlayingState(GameManager gameManager, int levelNumber) {
         this.gameManager=gameManager;
@@ -46,10 +53,27 @@ public final class PlayingState implements GameState {
 
         ScoreManager.getInstance().resetScore();
         this.scoreFont = new Font("Arial", 24);
+
+        subscribeToPowerUpCollectedEvent();
+    }
+
+    private void subscribeToPowerUpCollectedEvent() {
+        EventManager.getInstance().subscribe(
+                PowerUpCollectedEvent.class,
+                this::handlePowerUpCollected
+        );
+    }
+
+    private void handlePowerUpCollected(PowerUpCollectedEvent event) {
+        if (event.getPowerUpCollected() != null && event.getPowerUpCollected().getStrategy() != null) {
+            addStrategy(event.getPowerUpCollected().getStrategy());
+        }
     }
 
     @Override
     public void update(double deltaTime) {
+        updateStrategy(deltaTime);
+
         paddle.update(deltaTime);
         updateAttachedBallPosition();
 
@@ -117,7 +141,31 @@ public final class PlayingState implements GameState {
         }
     }
 
+    public void addStrategy(PowerUpStrategy strategy) {
+        strategy.reset();
+        activeStrategies.add(strategy);
+        strategy.apply(this);
+    }
+
+    public void updateStrategy(double deltaTime) {
+        Iterator<PowerUpStrategy> iterator = activeStrategies.iterator();
+        while (iterator.hasNext()) {
+            PowerUpStrategy strategy = iterator.next();
+
+            strategy.update(this, deltaTime); // Giả sử PowerUpStrategy có phương thức này
+
+            if (strategy.isExpired()) {
+                strategy.remove(this);
+                iterator.remove();
+            }
+        }
+    }
+
     public Paddle getPaddle() {
         return paddle;
+    }
+
+    public BallManager getBallManager() {
+        return ballManager;
     }
 }

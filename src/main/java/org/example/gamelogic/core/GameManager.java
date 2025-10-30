@@ -22,9 +22,6 @@ public final class GameManager {
 
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
-
-    private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
-
     private I_InputProvider inputProvider;
 
     private GameManager() {
@@ -65,11 +62,6 @@ public final class GameManager {
         this.levelRepository = repo;
     }
 
-    public void addStrategy(PowerUpStrategy strategy) {
-        activeStrategies.add(strategy);
-        strategy.apply(this);
-    }
-
     public void init() {
         this.stateManager = new StateManager();
         this.brickManager = new BrickManager(levelRepository);
@@ -82,26 +74,11 @@ public final class GameManager {
         subscribeToEvents();
     }
 
-    public void updateStrategy(double deltaTime) {
-        Iterator<PowerUpStrategy> iterator = activeStrategies.iterator();
-        while (iterator.hasNext()) {
-            PowerUpStrategy strategy = iterator.next();
-
-            strategy.update(this, deltaTime); // Giả sử PowerUpStrategy có phương thức này
-
-            if (strategy.isExpired()) {
-                strategy.remove(this);
-                iterator.remove();
-            }
-        }
-    }
-
     public void update(double deltaTime) {
         if (stateManager != null && inputProvider != null) {
             stateManager.handleInput(inputProvider);
             stateManager.update(deltaTime);
         }
-        updateStrategy(deltaTime);
         if (inputProvider != null) {
             inputProvider.resetMouseClick();
         }
@@ -202,6 +179,10 @@ public final class GameManager {
 
     public BallManager getBallManager() {
         return this.ballManager;
+    }
+
+    public StateManager getStateManager() {
+        return this.stateManager;
     }
 
     public CollisionManager getCollisionManager() {

@@ -19,7 +19,7 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
                            double dx, double dy, PowerUpStrategy strategy) {
         super(x, y, width, height, dx, dy);
         this.strategy = strategy;
-        this.isActive = false;
+        this.isActive = true;
 
         subscribeToPowerUpCollectedEvent();
     }
