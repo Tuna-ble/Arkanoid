@@ -5,7 +5,6 @@ import org.example.data.ILevelRepository;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.events.*;
 import org.example.gamelogic.states.*;
-import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +18,8 @@ public final class GameManager {
     private PowerUpManager powerUpManager;
     private BallManager ballManager;
     private CollisionManager collisionManager;
+    private SoundManager soundManager;
+    private ScoreManager scoreManager;
 
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
@@ -71,6 +72,9 @@ public final class GameManager {
         GameState currentState = new MainMenuState();
         this.stateManager.setState(currentState);
 
+        this.soundManager = SoundManager.getInstance();
+        this.scoreManager = ScoreManager.getInstance();
+
         subscribeToEvents();
     }
 
@@ -100,19 +104,6 @@ public final class GameManager {
     }
 
     private void subscribeToEvents() {
-        /*EventManager.getInstance().subscribe(
-                LifeLostEvent.class,
-                this::onHit
-        );
-        EventManager.getInstance().subscribe(
-                LevelCompletedEvent.class,
-                this::onHit
-        );
-        EventManager.getInstance().subscribe(
-                GameOverEvent.class,
-                this::GameOver
-        );*/
-
         EventManager.getInstance().subscribe(
                 BallLostEvent.class,
                 this::handleBallLost
