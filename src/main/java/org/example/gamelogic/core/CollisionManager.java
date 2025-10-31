@@ -7,6 +7,7 @@ import org.example.gamelogic.entities.bricks.Brick;
 import org.example.gamelogic.entities.powerups.PowerUp;
 import org.example.gamelogic.events.*;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,9 +18,8 @@ public final class CollisionManager {
     }
 
     public void checkCollisions(List<IBall> balls, Paddle paddle, List<Brick> bricks, List<PowerUp> fallingPowerUps) {
-        Iterator<IBall> ballIterator = balls.iterator();
-        while (ballIterator.hasNext()) {
-            IBall ball = ballIterator.next();
+        List<IBall> ballsSnapshot = new ArrayList<>(balls);
+        for (IBall ball : ballsSnapshot) {
             if (!ball.isActive()) continue;
 
             checkBallBoundsCollisions(ball);
