@@ -68,6 +68,8 @@ public final class MainMenuState implements GameState {
         gc.setFill(Color.WHITE);
         gc.fillText("Press L to Select Level", GameConstants.SCREEN_WIDTH / 2.0, 350);
 
+        gc.fillText("Press R for Ranking", GameConstants.SCREEN_WIDTH / 2.0, 390);
+
         // Blinking text
         if ((int) (elapsedTime * 2) % 2 == 0) {
             gc.setFont(new Font("Arial", 16));
@@ -92,6 +94,11 @@ public final class MainMenuState implements GameState {
         if (inputProvider.isKeyPressed(KeyCode.L)) {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.LEVEL_STATE)
+            );
+        }
+        if (inputProvider.isKeyPressed(KeyCode.R)) {
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.RANKING_STATE)
             );
         }
     }

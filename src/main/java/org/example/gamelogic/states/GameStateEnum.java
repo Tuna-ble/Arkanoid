@@ -9,5 +9,6 @@ public enum GameStateEnum {
     LEVEL_COMPLETE,  // Hoàn thành màn chơi
     HIGHS_SCORES,
     RESUME_GAME,
-    LEVEL_STATE
+    LEVEL_STATE,
+    RANKING_STATE
 }

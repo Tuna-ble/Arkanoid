@@ -160,6 +160,11 @@ public final class GameManager {
             case LEVEL_STATE:
                 newState = new LevelState();
                 break;
+
+            case RANKING_STATE:
+                newState = new RankingState();
+                break;
+
             case MAIN_MENU:
                 if (currentState instanceof PlayingState) {
                     ((PlayingState) currentState).cleanUp();
@@ -174,6 +179,8 @@ public final class GameManager {
                 if (currentState instanceof PlayingState) {
                     PlayingState playingState = (PlayingState) currentState;
                     currentLevel = playingState.getLevelNumber();
+                    int finalScore = ScoreManager.getInstance().getScore();
+                    HighscoreManager.saveNewScore(finalScore);
 
                     playingState.cleanUp();
                     powerUpManager.clear();
