@@ -148,6 +148,7 @@ public final class GameManager {
 
     public void handleStateChangeRequest(ChangeStateEvent event) {
         GameState newState = null;
+        GameState currentState = stateManager.getState();
         switch (event.targetState) {
             case PLAYING:
                 newState = new PlayingState(this, 1);
@@ -164,7 +165,6 @@ public final class GameManager {
                     newState = new PauseState(this, currentState); // Pass state hiện tại vào
                 }
                 break;
-
             case RESUME_GAME:
                 // Chỉ resume khi đang pause
                 if (currentState instanceof PauseState) {
