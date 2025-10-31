@@ -5,41 +5,56 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.transform.Affine;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.core.ScoreManager;
-import org.example.presentation.InputHandler;
+import org.example.gamelogic.I_InputProvider;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.Stop;
-import org.example.presentation.TextRenderer;
+import org.example.gamelogic.grapics.Button;
+import org.example.gamelogic.grapics.TextRenderer;
 
 public final class GameOverState implements GameState {
     private final GameManager gameManager;
     private double elapsedTime = 0;
-    private Image gameOverGif; // Khai báo thêm ở class
+    private Image gameOverGif;
     
     
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
     private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 30;
+    
+    // Button instances
+    private Button restartButton;
+    private Button menuButton;
+    private Button exitButton;
 
     public GameOverState(GameManager gameManager) {
         this.gameManager = gameManager;
         gameOverGif = new Image("/GameIcon/gameOverBackground.gif");
+        
+        // Initialize buttons
+        restartButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 0, "Restart");
+        menuButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 80, "Menu");
+        exitButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 160, "Exit");
     }
 
     @Override
     public void update(double deltaTime) {
         elapsedTime += deltaTime;
     }
+    
+    private void updateButtons(I_InputProvider inputProvider) {
+        if (restartButton != null) restartButton.update(inputProvider);
+        if (menuButton != null) menuButton.update(inputProvider);
+        if (exitButton != null) exitButton.update(inputProvider);
+    }
 
     @Override
     public void render(GraphicsContext gc) {
         gc.drawImage(gameOverGif, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        // Tiêu đề (gradient, viền, shadow)
         gc.setTextAlign(TextAlignment.CENTER);
         LinearGradient titleFill = new LinearGradient(
                 0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
@@ -76,9 +91,9 @@ public final class GameOverState implements GameState {
         );
 
         // Các nút
-        renderButton(gc,centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 0, "Restart");
-        renderButton(gc,centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 80, "Menu");
-        renderButton(gc,centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 160, "Exit");
+        if (restartButton != null) restartButton.render(gc);
+        if (menuButton != null) menuButton.render(gc);
+        if (exitButton != null) exitButton.render(gc);
 
         // Nháy nhẹ phần gợi ý
         if ((int)(elapsedTime * 2) % 2 == 0) {
@@ -95,51 +110,24 @@ public final class GameOverState implements GameState {
                     new DropShadow(5, Color.color(0,0,0,0.5))
             );
         }
-        // Reset text alignment to avoid affecting subsequent states
-        gc.setTextAlign(javafx.scene.text.TextAlignment.LEFT);
+
     }
 
-
-    private void renderButton(GraphicsContext gc, double x, double y, String fallbackText) {
-        gc.setFill(Color.color(0.13, 0.13, 0.13, 0.5)); // tương đương #222222 với độ mờ 50%
-        gc.fillRoundRect(x, y, GameConstants.UI_BUTTON_WIDTH, GameConstants.UI_BUTTON_HEIGHT, 10, 10);
-        gc.setStroke(Color.color(1, 1, 1, 0.8));
-        gc.setLineWidth(2);
-        gc.strokeRoundRect(x, y, GameConstants.UI_BUTTON_WIDTH, GameConstants.UI_BUTTON_HEIGHT, 10, 10);
-        gc.setTextAlign(TextAlignment.CENTER);
-        TextRenderer.drawOutlinedText(
-                gc,
-                fallbackText,
-                x + GameConstants.UI_BUTTON_WIDTH / 2,
-                y + 38,
-                new Font("Arial", 20),
-                Color.WHITE,
-                Color.color(0,0,0,0.85),
-                1.5,
-                new DropShadow(6, Color.color(0,0,0,0.6))
-        );
-    }
 
     @Override
-    public void handleInput(InputHandler inputHandler) {
-        if (inputHandler == null) return;
-
-        if (inputHandler.isMouseClicked()) {
-            int mouseX = inputHandler.getMouseX();
-            int mouseY = inputHandler.getMouseY();
-            if (isInButton(mouseX, mouseY, baseY)) {
-                gameManager.setState(new PlayingState(gameManager, 1));
-            } else if (isInButton(mouseX, mouseY, baseY + 80)) {
-                gameManager.setState(new MainMenuState(gameManager));
-            } else if (isInButton(mouseX, mouseY, baseY + 160)) {
-                System.exit(0);
-            }
+    public void handleInput(I_InputProvider inputProvider) {
+        if (inputProvider == null) return;
+        
+        // Update buttons to check hover and click states
+        updateButtons(inputProvider);
+        
+        // Handle button clicks
+        if (restartButton != null && restartButton.isClicked()) {
+            gameManager.setState(new PlayingState(gameManager, 1));
+        } else if (menuButton != null && menuButton.isClicked()) {
+            gameManager.setState(new MainMenuState(gameManager));
+        } else if (exitButton != null && exitButton.isClicked()) {
+            System.exit(0);
         }
-    }
-
-    private boolean isInButton(int x, int y, double buttonY) {
-        double buttonX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
-        return x >= buttonX && x <= buttonX + GameConstants.UI_BUTTON_WIDTH &&
-                y >= buttonY && y <= buttonY + GameConstants.UI_BUTTON_HEIGHT;
     }
 }

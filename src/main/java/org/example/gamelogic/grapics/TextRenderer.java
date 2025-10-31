@@ -1,4 +1,4 @@
-package org.example.presentation;
+package org.example.gamelogic.grapics;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;
@@ -38,7 +38,6 @@ public final class TextRenderer {
             gc.fillText(text, x, y);
         } finally {
             gc.setFont(previousFont);
-            // Some JavaFX versions don't support getEffect(); reset to null instead
             gc.setEffect(null);
             gc.setFill(previousFill);
             gc.setStroke(previousStroke);

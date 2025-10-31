@@ -9,8 +9,9 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.effect.DropShadow;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.GameManager;
-import org.example.presentation.InputHandler;
-import org.example.presentation.TextRenderer;
+import org.example.gamelogic.I_InputProvider;
+import org.example.gamelogic.grapics.Button;
+import org.example.gamelogic.grapics.TextRenderer;
 
 public final class PauseState implements GameState {
     private final GameManager gameManager;
@@ -23,9 +24,9 @@ public final class PauseState implements GameState {
     // Center screen position
     private double centerX, centerY;
 
-    // Buttons’ positions
-    private double resumeX, resumeY;
-    private double quitX, quitY;
+    // Button instances
+    private Button resumeButton;
+    private Button quitButton;
 
     public PauseState(GameManager gameManager, GameState previousState) {
         this.gameManager = gameManager;
@@ -83,54 +84,63 @@ public final class PauseState implements GameState {
                 titleShadow
         );
 
-        // Draw buttons
-        resumeX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
-        resumeY = panelY + 100;
-        quitX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
-        quitY = resumeY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_SPACING;
+        // Calculate button positions
+        double resumeX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
+        double resumeY = panelY + 100;
+        double quitX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
+        double quitY = resumeY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_SPACING;
 
-        renderButton(gc, "Resume", resumeX, resumeY);
-        renderButton(gc, "Quit", quitX, quitY);
+        // Initialize buttons if not already created
+        if (resumeButton == null) {
+            resumeButton = new Button(resumeX, resumeY, "Resume");
+            resumeButton.setFont(buttonFont);
+            resumeButton.setColors(
+                Color.web("#444"),
+                Color.web("#555"),
+                Color.WHITE,
+                Color.WHITE,
+                Color.WHITE
+            );
+        } else {
+            resumeButton.setX(resumeX);
+            resumeButton.setY(resumeY);
+        }
+        
+        if (quitButton == null) {
+            quitButton = new Button(quitX, quitY, "Quit");
+            quitButton.setFont(buttonFont);
+            quitButton.setColors(
+                Color.web("#444"),
+                Color.web("#555"),
+                Color.WHITE,
+                Color.WHITE,
+                Color.WHITE
+            );
+        } else {
+            quitButton.setX(quitX);
+            quitButton.setY(quitY);
+        }
+
+        // Render buttons
+        if (resumeButton != null) resumeButton.render(gc);
+        if (quitButton != null) quitButton.render(gc);
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
-    private void renderButton(GraphicsContext gc, String text, double x, double y) {
-        gc.setFill(Color.web("#444"));
-        gc.fillRoundRect(x, y, GameConstants.UI_BUTTON_WIDTH, GameConstants.UI_BUTTON_HEIGHT, 10, 10);
-
-        gc.setStroke(Color.WHITE);
-        gc.setLineWidth(2);
-        gc.strokeRoundRect(x, y, GameConstants.UI_BUTTON_WIDTH, GameConstants.UI_BUTTON_HEIGHT, 10, 10);
-
-        gc.setTextAlign(TextAlignment.CENTER);
-        TextRenderer.drawOutlinedText(
-                gc,
-                text,
-                x + (GameConstants.UI_BUTTON_WIDTH / 2),
-                y + GameConstants.UI_BUTTON_HEIGHT / 2 + 8,
-                buttonFont,
-                Color.WHITE,
-                Color.color(0,0,0,0.85),
-                1.5,
-                new DropShadow(6, Color.color(0,0,0,0.6))
-        );
-    }
 
     @Override
-    public void handleInput(InputHandler input) {
-        if (input.isMouseClicked()) {
-            int mx = input.getMouseX();
-            int my = input.getMouseY();
-
-            if (mx >= resumeX && mx <= resumeX + GameConstants.UI_BUTTON_WIDTH &&
-                    my >= resumeY && my <= resumeY + GameConstants.UI_BUTTON_HEIGHT) {
-                gameManager.setState(previousState);
-            }
-
-            if (mx >= quitX && mx <= quitX + GameConstants.UI_BUTTON_WIDTH &&
-                    my >= quitY && my <= quitY + GameConstants.UI_BUTTON_HEIGHT) {
-                gameManager.setState(new MainMenuState(gameManager));
-            }
+    public void handleInput(I_InputProvider inputProvider) {
+        if (inputProvider == null) return;
+        
+        // Update buttons to check hover and click states
+        if (resumeButton != null) resumeButton.update(inputProvider);
+        if (quitButton != null) quitButton.update(inputProvider);
+        
+        // Handle button clicks
+        if (resumeButton != null && resumeButton.isClicked()) {
+            gameManager.setState(previousState);
+        } else if (quitButton != null && quitButton.isClicked()) {
+            gameManager.setState(new MainMenuState(gameManager));
         }
     }
 }

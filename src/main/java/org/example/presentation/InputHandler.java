@@ -50,6 +50,7 @@ public class InputHandler implements I_InputProvider {
         return pressedKeys.contains(code);
     }
 
+    @Override
     public void clear() {
         pressedKeys.clear();
     }
