@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
+import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.core.ScoreManager;
 import org.example.gamelogic.I_InputProvider;
@@ -13,11 +14,11 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.Stop;
+import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.grapics.Button;
 import org.example.gamelogic.grapics.TextRenderer;
 
 public final class GameOverState implements GameState {
-    private final GameManager gameManager;
     private double elapsedTime = 0;
     private Image gameOverGif;
     
@@ -30,8 +31,7 @@ public final class GameOverState implements GameState {
     private Button menuButton;
     private Button exitButton;
 
-    public GameOverState(GameManager gameManager) {
-        this.gameManager = gameManager;
+    public GameOverState() {
         gameOverGif = new Image("/GameIcon/gameOverBackground.gif");
         
         // Initialize buttons
@@ -123,9 +123,13 @@ public final class GameOverState implements GameState {
         
         // Handle button clicks
         if (restartButton != null && restartButton.isClicked()) {
-            gameManager.setState(new PlayingState(gameManager, 1));
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.PLAYING)
+            );
         } else if (menuButton != null && menuButton.isClicked()) {
-            gameManager.setState(new MainMenuState(gameManager));
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.MAIN_MENU)
+            );
         } else if (exitButton != null && exitButton.isClicked()) {
             System.exit(0);
         }

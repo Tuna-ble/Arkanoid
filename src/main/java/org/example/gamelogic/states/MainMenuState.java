@@ -13,17 +13,17 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.Stop;
 import javafx.scene.effect.DropShadow;
 import org.example.config.GameConstants;
+import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.I_InputProvider;
+import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.grapics.TextRenderer;
 
 public final class MainMenuState implements GameState {
-    private final GameManager gameManager;
     private Image mainMenuImage;
     private double elapsedTime = 0;
 
-    public MainMenuState(GameManager gameManager) {
-        this.gameManager = gameManager;
+    public MainMenuState() {
         mainMenuImage = new Image(getClass().getResourceAsStream("/GameIcon/MainMenu.png"));
     }
 
@@ -82,9 +82,9 @@ public final class MainMenuState implements GameState {
             System.exit(0);
         }
         if (inputProvider.isKeyPressed(KeyCode.SPACE) || inputProvider.isMouseClicked()) {
-            inputProvider.clear();
-            GameState playingState = new PlayingState(gameManager, 1);
-            gameManager.setState(playingState);
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.PLAYING)
+            );
         }
     }
 }

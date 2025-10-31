@@ -25,6 +25,7 @@ public final class GameManager {
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
     private I_InputProvider inputProvider;
+    private GameState currentState;
 
     private double accumulator = 0.0;
     private final double FIXED_TIMESTEP = GameConstants.FIXED_TIMESTEP;
@@ -81,7 +82,7 @@ public final class GameManager {
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
-        GameState currentState = new MainMenuState();
+        currentState = new MainMenuState();
         this.stateManager.setState(currentState);
 
         this.soundManager = SoundManager.getInstance();
@@ -127,7 +128,7 @@ public final class GameManager {
     }
 
     private void resetBallAndPaddle() {
-        GameState currentState = stateManager.getState();
+        currentState = stateManager.getState();
         if (currentState instanceof PlayingState) {
             PlayingState playingState = (PlayingState) currentState;
             ballManager.resetBalls(playingState.getPaddle());
@@ -156,6 +157,20 @@ public final class GameManager {
                 break;
             case GAME_OVER:
                 newState = new GameOverState();
+                break;
+            case PAUSED:
+                // Chỉ pause khi đang chơi
+                if (currentState instanceof PlayingState) {
+                    newState = new PauseState(this, currentState); // Pass state hiện tại vào
+                }
+                break;
+
+            case RESUME_GAME:
+                // Chỉ resume khi đang pause
+                if (currentState instanceof PauseState) {
+                    // Lấy lại state cũ (PlayingState) từ PauseState
+                    newState = ((PauseState) currentState).getPreviousState();
+                }
                 break;
         }
 

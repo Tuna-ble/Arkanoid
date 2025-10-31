@@ -8,8 +8,10 @@ import javafx.scene.transform.Affine;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.effect.DropShadow;
 import org.example.config.GameConstants;
+import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.I_InputProvider;
+import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.grapics.Button;
 import org.example.gamelogic.grapics.TextRenderer;
 
@@ -138,9 +140,17 @@ public final class PauseState implements GameState {
         
         // Handle button clicks
         if (resumeButton != null && resumeButton.isClicked()) {
-            gameManager.setState(previousState);
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.RESUME_GAME)
+            );
         } else if (quitButton != null && quitButton.isClicked()) {
-            gameManager.setState(new MainMenuState(gameManager));
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.MAIN_MENU)
+            );
         }
+    }
+
+    public GameState getPreviousState() {
+        return previousState;
     }
 }
