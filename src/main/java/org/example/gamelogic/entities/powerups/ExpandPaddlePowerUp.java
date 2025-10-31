@@ -2,8 +2,6 @@ package org.example.gamelogic.entities.powerups;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import org.example.gamelogic.core.GameManager;
-import org.example.gamelogic.strategy.powerup.ExpandPaddleStrategy;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public class ExpandPaddlePowerUp extends AbstractPowerUp {
@@ -13,14 +11,8 @@ public class ExpandPaddlePowerUp extends AbstractPowerUp {
     }
 
     @Override
-    protected void activate() {
-        super.activate();
-        GameManager.getInstance().addStrategy(strategy);
-    }
-
-    @Override
     public PowerUp clone() {
-        return new ExpandPaddlePowerUp(0.0, 0.0, this.width, this.height, this.dx, this.dy, new ExpandPaddleStrategy());
+        return new ExpandPaddlePowerUp(0.0, 0.0, this.width, this.height, this.dx, this.dy, super.getStrategy());
     }
 
     @Override

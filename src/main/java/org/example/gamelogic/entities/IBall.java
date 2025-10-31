@@ -5,26 +5,33 @@ import org.example.gamelogic.entities.bricks.Brick;
 
 public interface IBall {
     boolean isDestroyed();
+    boolean isAttachedToPaddle();
     void setPosition(double x, double y);
     void release();
-
     double getX();
     double getY();
     double getRadius();
-    double getSpeed();
-    void setSpeed(double speed);
-
     void reverseDirX();
     void reverseDirY();
     void reset(double paddleX, double paddleY, double paddleWidth);
     void handlePaddleCollision(Paddle paddle, double hitPositionRatio);
+    void multiplySpeed(double factor);
     void destroy();
     IBall clone();
 
     void update(double deltaTime);
     void render(GraphicsContext gc);
     boolean isActive();
-    boolean isAttachedToPaddle();
     double getWidth();
     double getHeight();
+
+    GameObject getGameObject();
+
+    double getDx();
+    double getDy();
+
+    double getSpeed();
+
+    void setDx(double v);
+    void setDy(double v);
 }

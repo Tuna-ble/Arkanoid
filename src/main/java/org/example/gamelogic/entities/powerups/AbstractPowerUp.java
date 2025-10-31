@@ -32,13 +32,8 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
 
     protected void onPowerUpCollected(PowerUpCollectedEvent event) {
         if (event.getPowerUpCollected()==this) {
-            activate();
+            markAsTaken();
         }
-    }
-
-    protected void activate() {
-        markAsTaken();
-        // System.out.print("power up collected");
     }
 
     @Override
@@ -98,7 +93,6 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
 
     public void destroy() {
         this.isActive = false;
-        EventManager.getInstance().unsubscribe(PowerUpCollectedEvent.class, this::onPowerUpCollected);
     }
 
     public void markAsTaken() {

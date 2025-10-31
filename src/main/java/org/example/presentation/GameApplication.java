@@ -24,13 +24,12 @@ public class GameApplication extends Application {
         InputHandler inputHandler = new InputHandler();
 
         gameManager.setLevelRepository(repo);
-        gameManager.setInputHandler(inputHandler);
+        gameManager.setInputProvider(inputHandler);
 
         gameManager.init();
 
         Canvas canvas = new Canvas((double) WIDTH, (double) HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-
         StackPane root = new StackPane(canvas);
         Scene scene = new Scene(root, (double) WIDTH, (double) HEIGHT);
 

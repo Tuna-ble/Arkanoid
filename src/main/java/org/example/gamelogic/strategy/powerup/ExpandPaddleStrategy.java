@@ -1,35 +1,48 @@
 package org.example.gamelogic.strategy.powerup;
 
-import org.example.config.GameConstants;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.entities.Paddle;
+import org.example.gamelogic.states.GameState;
+import org.example.gamelogic.states.PlayingState;
 
 public class ExpandPaddleStrategy implements PowerUpStrategy {
     private final double expansionFactor = 1.5;
     private double remainingTime = 5.0;
+    private double originalWidth;
 
     @Override
-    public void apply(GameManager gm) {
-        Paddle p = gm.getPaddle();
-        p.setX(p.getX() - p.getWidth() * (expansionFactor - 1) / 2);
-        p.setWidth(p.getWidth() * expansionFactor);
+    public void apply(PlayingState playingState) {
+        Paddle p = playingState.getPaddle();
+        if (p != null) {
+            originalWidth = p.getWidth();
+            p.setX(p.getX() - p.getWidth() * (expansionFactor - 1) / 2);
+            p.setWidth(p.getWidth() * expansionFactor);
+        }
     }
 
     @Override
-    public void update(GameManager gm, double deltatime) {
+    public void update(PlayingState playingState, double deltatime) {
         remainingTime -= deltatime;
+        if (remainingTime <= 0) remove(playingState);
     }
 
     @Override
-    public void remove(GameManager gm) {
-        Paddle p = gm.getPaddle();
-        p.setX(p.getX() + (p.getWidth() - GameConstants.PADDLE_WIDTH) / 2);
-        p.setWidth(GameConstants.PADDLE_WIDTH);
+    public void remove(PlayingState playingState) {
+        Paddle p = playingState.getPaddle();
+        if (p != null) {
+            p.setX(p.getX() + p.getWidth() * (1 - 1 / expansionFactor) / 2);
+            p.setWidth(originalWidth);
+        }
         remainingTime = 0;
     }
 
     @Override
     public boolean isExpired() {
         return remainingTime <= 0;
+    }
+
+    @Override
+    public void reset() {
+        remainingTime = 5.0;
     }
 }

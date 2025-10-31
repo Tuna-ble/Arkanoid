@@ -10,6 +10,8 @@ public interface Brick {
     void setPosition(double x, double y);
     double getX();
     double getY();
+    double getWidth();
+    double getHeight();
     Brick clone();
 
     void update(double deltaTime);

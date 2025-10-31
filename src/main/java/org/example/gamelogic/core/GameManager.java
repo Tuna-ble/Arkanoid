@@ -1,18 +1,15 @@
 package org.example.gamelogic.core;
-
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import org.example.config.GameConstants;
 import org.example.data.ILevelRepository;
-import org.example.gamelogic.entities.Paddle;
-import org.example.gamelogic.states.GameState;
-import org.example.gamelogic.states.PlayingState;
-import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
-import org.example.presentation.InputHandler;
+import org.example.gamelogic.I_InputProvider;
+import org.example.gamelogic.events.*;
+import org.example.gamelogic.states.*;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 
 //singleton (co dung Bill Pugh Idiom de xu li multithreading)
 public final class GameManager {
@@ -22,13 +19,15 @@ public final class GameManager {
     private PowerUpManager powerUpManager;
     private BallManager ballManager;
     private CollisionManager collisionManager;
-    private Paddle paddle;
+    private SoundManager soundManager;
+    private ScoreManager scoreManager;
 
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
-    private InputHandler inputHandler;
+    private I_InputProvider inputProvider;
 
-    private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
+    private double accumulator = 0.0;
+    private final double FIXED_TIMESTEP = GameConstants.FIXED_TIMESTEP;
 
     private GameManager() {
         this.gameLoop = new AnimationTimer() {
@@ -42,12 +41,17 @@ public final class GameManager {
                 }
                 double deltaTime = (now - lastUpdate) / 1_000_000_000.0;
                 lastUpdate = now;
-                handleInput();
-                update(deltaTime);
-                render();
-                if (inputHandler != null) {
-                    inputHandler.resetMouseClick();
+                accumulator += deltaTime;
+
+                while (accumulator >= FIXED_TIMESTEP) {
+                    // 1. Cập nhật logic với BƯỚC THỜI GIAN CỐ ĐỊNH
+                    // Lưu ý: Không truyền "deltaTime" nữa, mà là "FIXED_TIMESTEP"
+                    update(FIXED_TIMESTEP);
+
+                    // 2. Trừ đi thời gian đã xử lý
+                    accumulator -= FIXED_TIMESTEP;
                 }
+                render();
             }
         };
     }
@@ -60,10 +64,9 @@ public final class GameManager {
         return SingletonHolder.INSTANCE;
     }
 
-    public void setInputHandler(InputHandler inputHandler) {
-        this.inputHandler = inputHandler;
+    public void setInputProvider(I_InputProvider provider) {
+        this.inputProvider = provider;
     }
-
     public void setGraphicsContext(GraphicsContext gc) {
         this.gc = gc;
     }
@@ -78,44 +81,22 @@ public final class GameManager {
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
-        this.paddle = new Paddle(
-                GameConstants.PADDLE_X,
-                GameConstants.PADDLE_Y,
-                GameConstants.PADDLE_WIDTH,
-                GameConstants.PADDLE_HEIGHT,
-                0,
-                0);
-        GameState currentState = new PlayingState(this, 1);
+        GameState currentState = new MainMenuState();
         this.stateManager.setState(currentState);
-    }
 
-    public void addStrategy(PowerUpStrategy strategy) {
-        strategy.apply(this);
-        activeStrategies.add(strategy);
-    }
+        this.soundManager = SoundManager.getInstance();
+        this.scoreManager = ScoreManager.getInstance();
 
-    public void updateStrategy(double deltaTime) {
-        Iterator<PowerUpStrategy> iterator = activeStrategies.iterator();
-        while (iterator.hasNext()) {
-            PowerUpStrategy strategy = iterator.next();
-            strategy.update(this, deltaTime);
-            if (strategy.isExpired()) {
-                strategy.remove(this);
-                iterator.remove();
-            }
-        }
-    }
-
-    public void handleInput() {
-        GameState currentState = stateManager.getState();
-        if (currentState != null && this.inputHandler != null) {
-            currentState.handleInput(this.inputHandler);
-        }
+        subscribeToEvents();
     }
 
     public void update(double deltaTime) {
-        if (stateManager != null) {
+        if (stateManager != null && inputProvider != null) {
+            stateManager.handleInput(inputProvider);
             stateManager.update(deltaTime);
+        }
+        if (inputProvider != null) {
+            inputProvider.resetMouseClick();
         }
     }
 
@@ -134,6 +115,65 @@ public final class GameManager {
         gameLoop.stop();
     }
 
+    private void subscribeToEvents() {
+        EventManager.getInstance().subscribe(
+                BallLostEvent.class,
+                this::handleBallLost
+        );
+        EventManager.getInstance().subscribe(
+                ChangeStateEvent.class,
+                this::handleStateChangeRequest
+        );
+    }
+
+    private void resetBallAndPaddle() {
+        GameState currentState = stateManager.getState();
+        if (currentState instanceof PlayingState) {
+            PlayingState playingState = (PlayingState) currentState;
+            ballManager.resetBalls(playingState.getPaddle());
+        }
+    }
+
+    private void handleBallLost(BallLostEvent event) {
+        if (ballManager.countActiveBalls() == 0) {
+            gameOver();
+        }
+    }
+
+    public void gameOver() {
+        GameState gameOverState = new GameOverState();
+        stateManager.setState(gameOverState);
+    }
+
+    public void handleStateChangeRequest(ChangeStateEvent event) {
+        GameState newState = null;
+        switch (event.targetState) {
+            case PLAYING:
+                newState = new PlayingState(this, 1);
+                break;
+            case MAIN_MENU:
+                newState = new MainMenuState();
+                break;
+            case GAME_OVER:
+                newState = new GameOverState();
+                break;
+        }
+
+        if (newState != null && stateManager != null) {
+            stateManager.setState(newState);
+        }
+    }
+
+    public void startNewGame() {
+        GameState newPlayingState = new PlayingState(this, 1);
+        stateManager.setState(newPlayingState);
+    }
+
+    public void goToMainMenu() {
+        GameState mainMenuState = new MainMenuState();
+        stateManager.setState(mainMenuState);
+    }
+
     public BrickManager getBrickManager() {
         return this.brickManager;
     }
@@ -146,11 +186,11 @@ public final class GameManager {
         return this.ballManager;
     }
 
-    public CollisionManager getCollisionManager() {
-        return this.collisionManager;
+    public StateManager getStateManager() {
+        return this.stateManager;
     }
 
-    public Paddle getPaddle() {
-        return this.paddle;
+    public CollisionManager getCollisionManager() {
+        return this.collisionManager;
     }
 }

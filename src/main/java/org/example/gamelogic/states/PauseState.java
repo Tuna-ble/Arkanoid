@@ -1,5 +1,6 @@
 package org.example.gamelogic.states;
 
+import org.example.gamelogic.I_InputProvider;
 import org.example.presentation.InputHandler;
 
 public final class PauseState implements GameState {
@@ -14,7 +15,7 @@ public final class PauseState implements GameState {
     }
 
     @Override
-    public void handleInput(InputHandler inputHandler) {
+    public void handleInput(I_InputProvider input) {
 
     }
 }

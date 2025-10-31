@@ -14,11 +14,11 @@ public class Paddle extends MovableObject {
         super(x, y, width, height, dx, dy);
         this.speed = GameConstants.PADDLE_SPEED;
         this.minX = 0;
-        this.maxX = GameConstants.SCREEN_WIDTH;
+        this.maxX = GameConstants.SCREEN_WIDTH - this.width;
     }
 
     public double getCenterX() {
-        return x; // x là tâm
+        return x + width / 2.0;
     }
 
     @Override
@@ -27,13 +27,13 @@ public class Paddle extends MovableObject {
         x += dx * deltaTime;
 
         // Kiểm tra mép TRÁI của paddle
-        if (x + (width / 2) < minX) {
-            x = minX - (width / 2);
+        if (x < minX) {
+            x = minX;
             dx = 0;
         }
         // Kiểm tra mép PHẢI của paddle
-        if (x + (width / 2) > maxX) {
-            x = maxX - (width / 2);
+        if (x > maxX) {
+            x = maxX;
             dx = 0;
         }
     }
@@ -52,7 +52,7 @@ public class Paddle extends MovableObject {
 
     public void setBounds(double minX, double maxX) {
         this.minX = minX;
-        this.maxX = maxX;
+        this.maxX = GameConstants.SCREEN_WIDTH - this.width;
     }
 
     // setter and getter
@@ -75,5 +75,11 @@ public class Paddle extends MovableObject {
     public void setVelocity(double v, int i) {
         this.dx = v;
         this.dy = i;
+    }
+
+    @Override
+    public void setWidth(double width) {
+        super.setWidth(width);
+        this.maxX = GameConstants.SCREEN_WIDTH - this.width;
     }
 }

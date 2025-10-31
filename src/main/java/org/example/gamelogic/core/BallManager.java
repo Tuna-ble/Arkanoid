@@ -11,6 +11,8 @@ import org.example.gamelogic.registry.BallRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.stream;
+
 public final class BallManager {
     private final BallFactory ballFactory;
     private List<IBall> activeBalls;
@@ -23,7 +25,7 @@ public final class BallManager {
     }
 
     private void registerBallPrototypes(BallRegistry registry) {
-        registry.register("STANDARD", new Ball(0, 0, GameConstants.BALL_RADIUS,0, 0));
+        registry.register("STANDARD", new Ball(0, 0, GameConstants.BALL_RADIUS));
     }
 
     public void createInitialBall(Paddle paddle) {
@@ -40,31 +42,14 @@ public final class BallManager {
             ball.update(deltaTime);
         }
 
-        activeBalls.removeIf(ball -> !ball.isActive());
+        activeBalls.removeIf(IBall::isDestroyed);
     }
 
-    /**
-     * MỚI: Thêm hàm bắn tất cả bóng đang dính vào paddle.
-     * (Giả định hàm ball.isActive() trả về true nếu đang dính, false nếu đang bay)
-     */
-    public void releaseAllBalls() {
+    public void releaseAttachedBalls() {
         for (IBall ball : activeBalls) {
-            if (ball.isAttachedToPaddle()) {
+            // Ball cần có getter isAttachedToPaddle()
+            if (ball instanceof Ball && ((Ball) ball).isAttachedToPaddle()) {
                 ball.release();
-            }
-        }
-    }
-
-    /**
-     * MỚI: Thêm hàm cập nhật vị trí bóng theo paddle (khi bóng đang dính).
-     */
-    public void updateAttachedBalls(Paddle paddle) {
-        for (IBall ball : activeBalls) {
-            if (ball.isAttachedToPaddle()) {
-                ball.setPosition(
-                        paddle.getX() + (paddle.getWidth() / 2.0) - (ball.getWidth() / 2.0),
-                        paddle.getY() - ball.getHeight()
-                );
             }
         }
     }
@@ -90,5 +75,15 @@ public final class BallManager {
 
     public void clear() {
         activeBalls.clear();
+    }
+
+    public void addBall(IBall ball) {
+        if (ball != null && !ball.isAttachedToPaddle()) {
+            this.activeBalls.add(ball);
+        }
+    }
+
+    public long countActiveBalls() {
+        return activeBalls.stream().filter(IBall::isActive).count();
     }
 }
