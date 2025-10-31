@@ -15,6 +15,7 @@ import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.core.PowerUpManager;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
+import org.example.gamelogic.events.BallLostEvent;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.events.PowerUpCollectedEvent;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
@@ -63,10 +64,14 @@ public final class PlayingState implements GameState {
             e.printStackTrace();
         }
 
-        subscribeToPowerUpCollectedEvent();
+        subscribeToEvents();
     }
 
-    private void subscribeToPowerUpCollectedEvent() {
+    private void subscribeToEvents() {
+        EventManager.getInstance().subscribe(
+                BallLostEvent.class,
+                this::handleBallLost
+        );
         EventManager.getInstance().subscribe(
                 PowerUpCollectedEvent.class,
                 this::handlePowerUpCollected
@@ -227,5 +232,13 @@ public final class PlayingState implements GameState {
             strategy.remove(this);
         }
         activeStrategies.clear();
+    }
+
+    private void handleBallLost(BallLostEvent event) {
+        if (ballManager.countActiveBalls() == 0) {
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.GAME_OVER)
+            );
+        }
     }
 }

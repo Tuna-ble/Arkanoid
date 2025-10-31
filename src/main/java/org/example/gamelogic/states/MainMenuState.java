@@ -14,10 +14,9 @@ import javafx.scene.paint.Stop;
 import javafx.scene.effect.DropShadow;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.EventManager;
-import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.grapics.TextRenderer;
+import org.example.gamelogic.graphics.TextRenderer;
 
 public final class MainMenuState implements GameState {
     private Image mainMenuImage;

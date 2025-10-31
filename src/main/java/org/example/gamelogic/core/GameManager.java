@@ -118,10 +118,6 @@ public final class GameManager {
 
     private void subscribeToEvents() {
         EventManager.getInstance().subscribe(
-                BallLostEvent.class,
-                this::handleBallLost
-        );
-        EventManager.getInstance().subscribe(
                 ChangeStateEvent.class,
                 this::handleStateChangeRequest
         );
@@ -133,16 +129,6 @@ public final class GameManager {
             PlayingState playingState = (PlayingState) currentState;
             ballManager.resetBalls(playingState.getPaddle());
         }
-    }
-
-    private void handleBallLost(BallLostEvent event) {
-        if (ballManager.countActiveBalls() == 0) {
-            gameOver();
-        }
-    }
-
-    public void gameOver() {
-        stateManager.setState(new GameOverState());
     }
 
     public void handleStateChangeRequest(ChangeStateEvent event) {

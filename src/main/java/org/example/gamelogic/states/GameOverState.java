@@ -7,7 +7,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.EventManager;
-import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.core.ScoreManager;
 import org.example.gamelogic.I_InputProvider;
 import javafx.scene.effect.DropShadow;
@@ -15,8 +14,8 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.Stop;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.grapics.Button;
-import org.example.gamelogic.grapics.TextRenderer;
+import org.example.gamelogic.graphics.Button;
+import org.example.gamelogic.graphics.TextRenderer;
 
 public final class GameOverState implements GameState {
     private double elapsedTime = 0;

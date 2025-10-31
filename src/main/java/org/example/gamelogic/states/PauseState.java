@@ -3,7 +3,6 @@ package org.example.gamelogic.states;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.transform.Affine;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.effect.DropShadow;
@@ -12,8 +11,8 @@ import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.grapics.Button;
-import org.example.gamelogic.grapics.TextRenderer;
+import org.example.gamelogic.graphics.Button;
+import org.example.gamelogic.graphics.TextRenderer;
 
 public final class PauseState implements GameState {
     private final GameManager gameManager;
