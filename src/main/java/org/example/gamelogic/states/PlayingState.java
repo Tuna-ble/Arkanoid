@@ -57,6 +57,8 @@ public final class PlayingState implements GameState {
         this.ballManager.createInitialBall(this.paddle);
 
         ScoreManager.getInstance().resetScore();
+        LifeManager.getInstance().reset();
+
         this.scoreFont = new Font("Arial", 24);
 
         this.currentLives = LifeManager.getInstance().getLives();
