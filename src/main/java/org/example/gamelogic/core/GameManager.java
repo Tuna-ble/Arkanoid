@@ -142,13 +142,19 @@ public final class GameManager {
     }
 
     public void gameOver() {
-        GameState gameOverState = new GameOverState();
-        stateManager.setState(gameOverState);
+        stateManager.setState(new GameOverState());
     }
 
     public void handleStateChangeRequest(ChangeStateEvent event) {
         GameState newState = null;
         GameState currentState = stateManager.getState();
+
+        if (currentState instanceof PlayingState && event.targetState != GameStateEnum.PAUSED) {
+            ((PlayingState) currentState).cleanUp();
+            powerUpManager.clear();
+            ballManager.clear();
+        }
+
         switch (event.targetState) {
             case PLAYING:
                 newState = new PlayingState(this, 1);

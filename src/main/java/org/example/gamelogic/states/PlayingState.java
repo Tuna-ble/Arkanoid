@@ -221,4 +221,11 @@ public final class PlayingState implements GameState {
     public BallManager getBallManager() {
         return ballManager;
     }
+
+    public void cleanUp() {
+        for (PowerUpStrategy strategy : activeStrategies) {
+            strategy.remove(this);
+        }
+        activeStrategies.clear();
+    }
 }
