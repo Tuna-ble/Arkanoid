@@ -21,6 +21,7 @@ public final class GameManager {
     private CollisionManager collisionManager;
     private SoundManager soundManager;
     private ScoreManager scoreManager;
+    private LifeManager lifeManager;
 
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
@@ -87,6 +88,7 @@ public final class GameManager {
 
         this.soundManager = SoundManager.getInstance();
         this.scoreManager = ScoreManager.getInstance();
+        this.lifeManager = LifeManager.getInstance();
 
         subscribeToEvents();
     }

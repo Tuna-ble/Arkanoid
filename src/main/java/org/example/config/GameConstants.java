@@ -74,4 +74,6 @@ public final class GameConstants {
     public static final double UI_BUTTON_HEIGHT = 60;
     public static final double UI_BUTTON_SPACING = 20;
 
+    // Lives
+    public static final int INITIAL_LIVES = 3;
 }
