@@ -10,8 +10,8 @@ import javafx.scene.effect.DropShadow;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.I_InputProvider;
-import org.example.presentation.TextRenderer;
-import org.example.presentation.Button;
+import org.example.gamelogic.grapics.Button;
+import org.example.gamelogic.grapics.TextRenderer;
 
 public final class PauseState implements GameState {
     private final GameManager gameManager;

@@ -41,10 +41,7 @@ public final class GameManager {
                 handleInput();
                 update(deltaTime);
                 render();
-                // Reset mouse click if inputProvider is InputHandler
-                if (inputProvider instanceof org.example.presentation.InputHandler) {
-                    ((org.example.presentation.InputHandler) inputProvider).resetMouseClick();
-                }
+                inputProvider.resetMouseClick();
             }
         };
     }

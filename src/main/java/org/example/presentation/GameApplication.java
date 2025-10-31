@@ -10,8 +10,6 @@ import org.example.data.FileLevelRepository;
 import org.example.data.ILevelRepository;
 import org.example.gamelogic.core.GameManager;
 import org.example.config.GameConstants;
-// MỚI: Import InputHandler
-import org.example.presentation.InputHandler;
 
 
 public class GameApplication extends Application {

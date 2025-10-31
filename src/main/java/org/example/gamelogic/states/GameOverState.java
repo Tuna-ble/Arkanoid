@@ -5,7 +5,6 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.transform.Affine;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.core.ScoreManager;
@@ -14,13 +13,13 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.Stop;
-import org.example.presentation.TextRenderer;
-import org.example.presentation.Button;
+import org.example.gamelogic.grapics.Button;
+import org.example.gamelogic.grapics.TextRenderer;
 
 public final class GameOverState implements GameState {
     private final GameManager gameManager;
     private double elapsedTime = 0;
-    private Image gameOverGif; // Khai báo thêm ở class
+    private Image gameOverGif;
     
     
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
@@ -56,7 +55,6 @@ public final class GameOverState implements GameState {
     public void render(GraphicsContext gc) {
         gc.drawImage(gameOverGif, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        // Tiêu đề (gradient, viền, shadow)
         gc.setTextAlign(TextAlignment.CENTER);
         LinearGradient titleFill = new LinearGradient(
                 0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
@@ -112,8 +110,7 @@ public final class GameOverState implements GameState {
                     new DropShadow(5, Color.color(0,0,0,0.5))
             );
         }
-        // Reset text alignment to avoid affecting subsequent states
-        gc.setTextAlign(javafx.scene.text.TextAlignment.LEFT);
+
     }
 
 

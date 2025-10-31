@@ -17,7 +17,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.image.Image;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.effect.DropShadow;
-import org.example.presentation.TextRenderer;
+import org.example.gamelogic.grapics.TextRenderer;
 
 
 public final class PlayingState implements GameState {
@@ -129,7 +129,6 @@ public final class PlayingState implements GameState {
     public void handleInput(I_InputProvider input) {
         if (input == null) return;
 
-        // --- 1️⃣ Điều khiển paddle ---
         boolean moveLeft = input.isKeyPressed(KeyCode.LEFT) || input.isKeyPressed(KeyCode.A);
         boolean moveRight = input.isKeyPressed(KeyCode.RIGHT) || input.isKeyPressed(KeyCode.D);
 
@@ -141,13 +140,11 @@ public final class PlayingState implements GameState {
             paddle.setVelocity(0, 0);
         }
 
-        // --- 2️⃣ Tạm dừng game bằng phím tắt ---
         if (input.isKeyPressed(KeyCode.P)) {
             gameManager.setState(new PauseState(gameManager, this));
             return; // tránh xử lý thêm sau khi chuyển state
         }
 
-        // --- 3️⃣ Xử lý chuột ---
         if (input.isMouseClicked()) {
             int mouseX = input.getMouseX();
             int mouseY = input.getMouseY();
@@ -163,16 +160,12 @@ public final class PlayingState implements GameState {
                             mouseY <= pauseIconY + pauseIconSize;
 
             if (clickOnPause) {
-                // Click vào icon pause
                 gameManager.setState(new PauseState(gameManager, this));
                 return;
             } else {
-                // Click ngoài icon => thả bóng
                 ballManager.releaseAttachedBalls();
             }
         }
-
-        // --- 4️⃣ Thả bóng bằng phím cách ---
         if (input.isKeyPressed(KeyCode.SPACE)) {
             ballManager.releaseAttachedBalls();
         }

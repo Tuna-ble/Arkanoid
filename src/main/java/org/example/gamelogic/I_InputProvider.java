@@ -11,4 +11,6 @@ public interface I_InputProvider {
     int getMouseX();
     int getMouseY();
     boolean isMouseClicked();
+    void resetMouseClick();
+    void clear();
 }
