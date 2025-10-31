@@ -50,6 +50,10 @@ public class InputHandler implements I_InputProvider {
         return pressedKeys.contains(code);
     }
 
+    public void clear() {
+        pressedKeys.clear();
+    }
+
     @Override
     public int getMouseX() {
         return mouseX;
