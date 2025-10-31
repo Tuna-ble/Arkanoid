@@ -8,5 +8,6 @@ public enum GameStateEnum {
     SETTINGS,
     LEVEL_COMPLETE,  // Hoàn thành màn chơi
     HIGHS_SCORES,
-    RESUME_GAME
+    RESUME_GAME,
+    LEVEL_STATE
 }

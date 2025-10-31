@@ -38,6 +38,7 @@ public final class PlayingState implements GameState {
     private int currentLives;
 
     private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
+    private int levelNumber;
 
     public PlayingState(GameManager gameManager, int levelNumber) {
         this.gameManager = gameManager;
@@ -46,6 +47,7 @@ public final class PlayingState implements GameState {
         this.powerUpManager = gameManager.getPowerUpManager();
         this.ballManager = gameManager.getBallManager();
         this.collisionManager = gameManager.getCollisionManager();
+
         this.paddle = new Paddle(
                 GameConstants.PADDLE_X,
                 GameConstants.PADDLE_Y,
@@ -69,8 +71,8 @@ public final class PlayingState implements GameState {
             System.err.println("Không thể tải ảnh pause.png từ resources!");
             e.printStackTrace();
         }
-
         subscribeToEvents();
+        this.levelNumber = levelNumber;
     }
 
     private void subscribeToEvents() {
@@ -262,5 +264,9 @@ public final class PlayingState implements GameState {
     private void handleLifeLost(LifeLostEvent event) {
         this.currentLives = event.getRemainingLives();
         ballManager.resetBalls(this.paddle);
+    }
+
+    public int getLevelNumber() {
+        return this.levelNumber;
     }
 }

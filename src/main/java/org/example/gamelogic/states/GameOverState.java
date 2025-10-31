@@ -30,7 +30,10 @@ public final class GameOverState implements GameState {
     private Button menuButton;
     private Button exitButton;
 
-    public GameOverState() {
+    private final int levelToRestart;
+
+    public GameOverState(int levelToRestart) {
+        this.levelToRestart = levelToRestart;
         gameOverGif = new Image("/GameIcon/gameOverBackground.gif");
         
         // Initialize buttons
@@ -123,7 +126,7 @@ public final class GameOverState implements GameState {
         // Handle button clicks
         if (restartButton != null && restartButton.isClicked()) {
             EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.PLAYING)
+                    new ChangeStateEvent(GameStateEnum.PLAYING, this.levelToRestart)
             );
         } else if (menuButton != null && menuButton.isClicked()) {
             EventManager.getInstance().publish(

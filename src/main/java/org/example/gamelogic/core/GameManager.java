@@ -137,7 +137,12 @@ public final class GameManager {
         GameState newState = null;
         GameState currentState = stateManager.getState();
 
-        if (currentState instanceof PlayingState && event.targetState != GameStateEnum.PAUSED) {
+        int levelToLoad = 1;
+        if (event.getPayload() != null && event.getPayload() instanceof Integer) {
+            levelToLoad = (Integer) event.getPayload();
+        }
+
+        if (currentState instanceof PlayingState && event.targetState != GameStateEnum.PAUSED && event.targetState != GameStateEnum.RESUME_GAME) {
             ((PlayingState) currentState).cleanUp();
             powerUpManager.clear();
             ballManager.clear();
@@ -145,24 +150,44 @@ public final class GameManager {
 
         switch (event.targetState) {
             case PLAYING:
-                newState = new PlayingState(this, 1);
+                if (currentState instanceof PlayingState) {
+                    ((PlayingState) currentState).cleanUp();
+                    powerUpManager.clear();
+                    ballManager.clear();
+                }
+                newState = new PlayingState(this, levelToLoad);
+                break;
+            case LEVEL_STATE:
+                newState = new LevelState();
                 break;
             case MAIN_MENU:
+                if (currentState instanceof PlayingState) {
+                    ((PlayingState) currentState).cleanUp();
+                    powerUpManager.clear();
+                    ballManager.clear();
+                }
                 newState = new MainMenuState();
                 break;
             case GAME_OVER:
-                newState = new GameOverState();
+                int currentLevel = 1;
+
+                if (currentState instanceof PlayingState) {
+                    PlayingState playingState = (PlayingState) currentState;
+                    currentLevel = playingState.getLevelNumber();
+
+                    playingState.cleanUp();
+                    powerUpManager.clear();
+                    ballManager.clear();
+                }
+                newState = new GameOverState(currentLevel);
                 break;
             case PAUSED:
-                // Chỉ pause khi đang chơi
                 if (currentState instanceof PlayingState) {
-                    newState = new PauseState(this, currentState); // Pass state hiện tại vào
+                    newState = new PauseState(this, currentState);
                 }
                 break;
             case RESUME_GAME:
-                // Chỉ resume khi đang pause
                 if (currentState instanceof PauseState) {
-                    // Lấy lại state cũ (PlayingState) từ PauseState
                     newState = ((PauseState) currentState).getPreviousState();
                 }
                 break;

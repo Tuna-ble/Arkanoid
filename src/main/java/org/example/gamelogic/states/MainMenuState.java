@@ -54,7 +54,7 @@ public final class MainMenuState implements GameState {
                 250,
                 titleFont,
                 titleFill,
-                Color.color(0,0,0,0.8),
+                Color.color(0, 0, 0, 0.8),
                 2.5,
                 titleShadow
         );
@@ -64,8 +64,12 @@ public final class MainMenuState implements GameState {
         gc.setFill(Color.WHITE);
         gc.fillText("Click or Press SPACE to Start", GameConstants.SCREEN_WIDTH / 2.0, 300);
 
+        gc.setFont(new Font("Arial", 18));
+        gc.setFill(Color.WHITE);
+        gc.fillText("Press L to Select Level", GameConstants.SCREEN_WIDTH / 2.0, 350);
+
         // Blinking text
-        if ((int)(elapsedTime * 2) % 2 == 0) {
+        if ((int) (elapsedTime * 2) % 2 == 0) {
             gc.setFont(new Font("Arial", 16));
             gc.setFill(Color.WHITE);
             gc.fillText("Press ESC to Exit", GameConstants.SCREEN_WIDTH / 2.0, GameConstants.SCREEN_HEIGHT - 40);
@@ -82,7 +86,12 @@ public final class MainMenuState implements GameState {
         }
         if (inputProvider.isKeyPressed(KeyCode.SPACE) || inputProvider.isMouseClicked()) {
             EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.PLAYING)
+                    new ChangeStateEvent(GameStateEnum.PLAYING, 1)
+            );
+        }
+        if (inputProvider.isKeyPressed(KeyCode.L)) {
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.LEVEL_STATE)
             );
         }
     }
