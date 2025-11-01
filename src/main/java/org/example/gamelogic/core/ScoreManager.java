@@ -4,8 +4,6 @@ import org.example.gamelogic.entities.bricks.*;
 import org.example.gamelogic.events.BrickDestroyedEvent;
 
 public final class ScoreManager {
-
-
     private static class SingletonHolder {
         private static final ScoreManager INSTANCE = new ScoreManager();
     }
@@ -20,7 +18,7 @@ public final class ScoreManager {
         this.currentScore = 0;
         EventManager.getInstance().subscribe(
                 BrickDestroyedEvent.class,
-                this::onBrickDestroyed 
+                this::onBrickDestroyed
         );
     }
 

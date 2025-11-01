@@ -15,6 +15,7 @@ import javafx.scene.effect.DropShadow;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.I_InputProvider;
+import org.example.gamelogic.events.ChangeGameModeEvent;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.TextRenderer;
 
@@ -68,7 +69,9 @@ public final class MainMenuState implements GameState {
         gc.setFill(Color.WHITE);
         gc.fillText("Press L to Select Level", GameConstants.SCREEN_WIDTH / 2.0, 350);
 
-        gc.fillText("Press R for Ranking", GameConstants.SCREEN_WIDTH / 2.0, 390);
+        gc.fillText("Press E to Enter Endless mode", GameConstants.SCREEN_WIDTH / 2.0, 390);
+
+        gc.fillText("Press R for Ranking", GameConstants.SCREEN_WIDTH / 2.0, 430);
 
         // Blinking text
         if ((int) (elapsedTime * 2) % 2 == 0) {
@@ -88,12 +91,26 @@ public final class MainMenuState implements GameState {
         }
         if (inputProvider.isKeyPressed(KeyCode.SPACE) || inputProvider.isMouseClicked()) {
             EventManager.getInstance().publish(
+                    new ChangeGameModeEvent(GameModeEnum.LEVEL_MODE)
+            );
+            EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.PLAYING, 1)
             );
         }
         if (inputProvider.isKeyPressed(KeyCode.L)) {
             EventManager.getInstance().publish(
+                    new ChangeGameModeEvent(GameModeEnum.LEVEL_MODE)
+            );
+            EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.LEVEL_STATE)
+            );
+        }
+        if (inputProvider.isKeyPressed(KeyCode.E)) {
+            EventManager.getInstance().publish(
+                    new ChangeGameModeEvent(GameModeEnum.ENDLESS_MODE)
+            );
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.PLAYING)
             );
         }
         if (inputProvider.isKeyPressed(KeyCode.R)) {

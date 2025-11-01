@@ -2,6 +2,7 @@ package org.example.gamelogic.core;
 
 import org.example.config.GameConstants;
 import org.example.gamelogic.entities.IBall;
+import org.example.gamelogic.entities.LaserBullet;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.entities.bricks.Brick;
 import org.example.gamelogic.entities.powerups.PowerUp;
@@ -17,7 +18,8 @@ public final class CollisionManager {
 
     }
 
-    public void checkCollisions(List<IBall> balls, Paddle paddle, List<Brick> bricks, List<PowerUp> fallingPowerUps) {
+    public void checkCollisions(List<IBall> balls, Paddle paddle, List<Brick> bricks,
+                                List<PowerUp> fallingPowerUps, List<LaserBullet> lasers) {
         List<IBall> ballsSnapshot = new ArrayList<>(balls);
         for (IBall ball : ballsSnapshot) {
             if (!ball.isActive()) continue;
@@ -32,6 +34,8 @@ public final class CollisionManager {
 
         // 4. Thanh đỡ vs PowerUp
         checkPaddlePowerUpCollisions(paddle, fallingPowerUps);
+
+        checkLaserBrickCollisions(lasers, bricks);
     }
 
     private void checkBallBoundsCollisions(IBall ball) {
@@ -167,6 +171,22 @@ public final class CollisionManager {
                 // Phát sự kiện PowerUp đã được nhặt
                 EventManager.getInstance().publish(new PowerUpCollectedEvent(powerUp));
                 powerUp.markAsTaken(); // Đánh dấu đã nhặt (và isAlive = false)
+            }
+        }
+    }
+
+    private void checkLaserBrickCollisions(List<LaserBullet> lasers, List<Brick> bricks) {
+        Iterator<LaserBullet> iterator = lasers.iterator();
+        while (iterator.hasNext()) {
+            LaserBullet laser = iterator.next();
+
+            for (Brick brick : bricks) {
+                if (!brick.isDestroyed() && laser.intersects(brick.getGameObject())) {
+                    EventManager.getInstance().
+                            publish(new BrickDamagedEvent(brick, laser.getGameObject()));
+                    laser.setActive(false);
+                    break;
+                }
             }
         }
     }

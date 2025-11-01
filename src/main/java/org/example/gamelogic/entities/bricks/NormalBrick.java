@@ -26,6 +26,10 @@ public class NormalBrick extends AbstractBrick {
         }
     }
 
+    public int getScore() {
+        return 0;
+    }
+
     public void update(double deltaTime) {
 
     }
@@ -33,7 +37,7 @@ public class NormalBrick extends AbstractBrick {
     @Override
     public void render(GraphicsContext gc) {
         if (!isDestroyed()) {
-            gc.setFill(Color.LIGHTGREEN);
+            gc.setFill(Color.AQUAMARINE);
             gc.fillRect(x, y, width, height);
             //duong vien
             gc.setStroke(Color.BLACK);
@@ -43,6 +47,6 @@ public class NormalBrick extends AbstractBrick {
 
     @Override
     public Brick clone() {
-        return new NormalBrick(0, 0, this.width, this.height);
+        return new NormalBrick(0,0,this.width,this.height);
     }
 }

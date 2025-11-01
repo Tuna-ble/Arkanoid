@@ -6,7 +6,7 @@ import java.awt.geom.Rectangle2D;
 
 public abstract class GameObject {
     protected double x, y, width, height;
-    protected boolean isActive;
+    public boolean isActive;
     public GameObject(double x, double y, double width, double height) {
         this.x = x;
         this.y = y;

@@ -16,10 +16,7 @@ import org.example.gamelogic.core.PowerUpManager;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.entities.powerups.PowerUp;
-import org.example.gamelogic.events.BallLostEvent;
-import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.events.LifeLostEvent;
-import org.example.gamelogic.events.PowerUpCollectedEvent;
+import org.example.gamelogic.events.*;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 import javafx.scene.input.KeyCode;
 
@@ -49,7 +46,7 @@ public final class PlayingState implements GameState {
         this.powerUpManager = gameManager.getPowerUpManager();
         this.ballManager = gameManager.getBallManager();
         this.collisionManager = gameManager.getCollisionManager();
-        this.laserManager=gameManager.getLaserManager();
+        this.laserManager = gameManager.getLaserManager();
 
         this.paddle = new Paddle(
                 GameConstants.PADDLE_X,
@@ -61,8 +58,10 @@ public final class PlayingState implements GameState {
 
         this.ballManager.createInitialBall(this.paddle);
 
-        ScoreManager.getInstance().resetScore();
-        LifeManager.getInstance().reset();
+        if (gameManager.getCurrentMode()==GameModeEnum.LEVEL_MODE) {
+            ScoreManager.getInstance().resetScore();
+            LifeManager.getInstance().reset();
+        }
 
         this.scoreFont = new Font("Arial", 24);
 
@@ -91,6 +90,10 @@ public final class PlayingState implements GameState {
                 LifeLostEvent.class,
                 this::handleLifeLost
         );
+        EventManager.getInstance().subscribe(
+                LifeAddedEvent.class,
+                this::handleLifeAdded
+        );
     }
 
     private void handlePowerUpCollected(PowerUpCollectedEvent event) {
@@ -106,7 +109,7 @@ public final class PlayingState implements GameState {
         paddle.update(deltaTime);
         updateAttachedBallPosition();
 
-        laserManager.update(deltaTime, brickManager.getBricks());
+        laserManager.update(deltaTime);
         brickManager.update(deltaTime);
         ballManager.update(deltaTime);
         powerUpManager.update(deltaTime);
@@ -116,7 +119,8 @@ public final class PlayingState implements GameState {
                     ballManager.getActiveBalls(),
                     paddle,
                     brickManager.getBricks(),
-                    powerUpManager.getActivePowerUps()
+                    powerUpManager.getActivePowerUps(),
+                    laserManager.getLasers()
             );
         }
     }
@@ -269,6 +273,10 @@ public final class PlayingState implements GameState {
     private void handleLifeLost(LifeLostEvent event) {
         this.currentLives = event.getRemainingLives();
         ballManager.resetBalls(this.paddle);
+    }
+
+    private void handleLifeAdded(LifeAddedEvent event) {
+        this.currentLives = event.getRemainingLives();
     }
 
     public int getLevelNumber() {

@@ -2,7 +2,10 @@ package org.example.gamelogic.core;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import org.example.config.GameConstants;
+import org.example.data.EndlessLevelRepository;
+import org.example.data.FileLevelRepository;
 import org.example.data.ILevelRepository;
+import org.example.data.Score;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.events.*;
 import org.example.gamelogic.states.*;
@@ -28,6 +31,7 @@ public final class GameManager {
     private ILevelRepository levelRepository;
     private I_InputProvider inputProvider;
     private GameState currentState;
+    private GameModeEnum currentMode;
 
     private double accumulator = 0.0;
     private final double FIXED_TIMESTEP = GameConstants.FIXED_TIMESTEP;
@@ -76,6 +80,9 @@ public final class GameManager {
 
     public void setLevelRepository(ILevelRepository repo) {
         this.levelRepository = repo;
+        if (brickManager!=null) {
+            brickManager.setLevelRepository(repo);
+        }
     }
 
     public void init() {
@@ -125,6 +132,10 @@ public final class GameManager {
                 ChangeStateEvent.class,
                 this::handleStateChangeRequest
         );
+        EventManager.getInstance().subscribe(
+                ChangeGameModeEvent.class,
+                this::handleGameModeChange
+        );
     }
 
     private void resetBallAndPaddle() {
@@ -144,21 +155,25 @@ public final class GameManager {
             levelToLoad = (Integer) event.getPayload();
         }
 
-        if (currentState instanceof PlayingState && event.targetState != GameStateEnum.PAUSED && event.targetState != GameStateEnum.RESUME_GAME) {
+        if (currentState instanceof PlayingState && event.getTargetState() != GameStateEnum.PAUSED && event.getTargetState() != GameStateEnum.RESUME_GAME) {
             ((PlayingState) currentState).cleanUp();
             powerUpManager.clear();
             ballManager.clear();
+            laserManager.clear();
         }
 
-        switch (event.targetState) {
+        switch (event.getTargetState()) {
             case PLAYING:
                 if (currentState instanceof PlayingState) {
                     ((PlayingState) currentState).cleanUp();
                     powerUpManager.clear();
                     ballManager.clear();
+                    laserManager.clear();
                 }
+
                 newState = new PlayingState(this, levelToLoad);
                 break;
+
             case LEVEL_STATE:
                 newState = new LevelState();
                 break;
@@ -167,34 +182,69 @@ public final class GameManager {
                 newState = new RankingState();
                 break;
 
-            case MAIN_MENU:
+            case MAIN_MENU: {
                 if (currentState instanceof PlayingState) {
                     ((PlayingState) currentState).cleanUp();
                     powerUpManager.clear();
                     ballManager.clear();
+                    laserManager.clear();
                 }
+                int finalScore = ScoreManager.getInstance().getScore();
+                HighscoreManager.saveNewScore(finalScore);
+                ScoreManager.getInstance().resetScore();
+
                 newState = new MainMenuState();
                 break;
-            case GAME_OVER:
+            }
+
+            case LEVEL_COMPLETE: {
                 int currentLevel = 1;
 
                 if (currentState instanceof PlayingState) {
                     PlayingState playingState = (PlayingState) currentState;
                     currentLevel = playingState.getLevelNumber();
-                    int finalScore = ScoreManager.getInstance().getScore();
-                    HighscoreManager.saveNewScore(finalScore);
 
                     playingState.cleanUp();
                     powerUpManager.clear();
                     ballManager.clear();
+                    laserManager.clear();
                 }
+
+                if (currentMode==GameModeEnum.LEVEL_MODE) {
+                    newState = new VictoryLevelState(currentLevel);
+                }
+                else if (currentMode==GameModeEnum.ENDLESS_MODE) {
+                    newState = new VictoryEndlessState(currentLevel);
+                }
+                break;
+            }
+
+            case GAME_OVER: {
+                int currentLevel = 1;
+
+                if (currentState instanceof PlayingState) {
+                    PlayingState playingState = (PlayingState) currentState;
+                    currentLevel = playingState.getLevelNumber();
+
+                    playingState.cleanUp();
+                    powerUpManager.clear();
+                    ballManager.clear();
+                    laserManager.clear();
+                }
+                int finalScore = ScoreManager.getInstance().getScore();
+                HighscoreManager.saveNewScore(finalScore);
+                ScoreManager.getInstance().resetScore();
+
                 newState = new GameOverState(currentLevel);
                 break;
+            }
+
             case PAUSED:
                 if (currentState instanceof PlayingState) {
                     newState = new PauseState(this, currentState);
                 }
                 break;
+
             case RESUME_GAME:
                 if (currentState instanceof PauseState) {
                     newState = ((PauseState) currentState).getPreviousState();
@@ -204,6 +254,18 @@ public final class GameManager {
 
         if (newState != null && stateManager != null) {
             stateManager.setState(newState);
+        }
+    }
+
+    private void handleGameModeChange(ChangeGameModeEvent event) {
+        currentMode=event.getTargetMode();
+        switch(event.getTargetMode()) {
+            case LEVEL_MODE:
+                setLevelRepository(new FileLevelRepository());
+                break;
+            case ENDLESS_MODE:
+                setLevelRepository(new EndlessLevelRepository());
+                break;
         }
     }
 
@@ -239,5 +301,9 @@ public final class GameManager {
 
     public LaserManager getLaserManager() {
         return this.laserManager;
+    }
+
+    public GameModeEnum getCurrentMode() {
+        return currentMode;
     }
 }

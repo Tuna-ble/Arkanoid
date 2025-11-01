@@ -8,13 +8,12 @@ import org.example.gamelogic.events.BrickDestroyedEvent;
 
 
 public class HardBrick extends AbstractBrick {
-    private double durability;
+    private double durability; //do ben
 
-    public HardBrick(double x, double y, double width, double height) {
+    public HardBrick(double x, double y,double width, double height) {
         super(x, y, width, height);
         this.durability = GameConstants.HARD_BRICK_DURABILITY;
     }
-
 
     public void takeDamage(double damage) {
         if (isDestroyed()) {
@@ -38,9 +37,9 @@ public class HardBrick extends AbstractBrick {
             return;
         }
         if (this.durability > 2) {
-            gc.setFill(Color.GRAY);
-        } else if (this.durability <= 2 && this.durability > 1) {
             gc.setFill(Color.DARKGRAY);
+        } else if (this.durability <= 2 && this.durability > 1) {
+            gc.setFill(Color.GRAY);
         } else {
             gc.setFill(Color.LIGHTGRAY);
         }
@@ -49,8 +48,24 @@ public class HardBrick extends AbstractBrick {
         gc.strokeRect(x, y, width, height);
     }
 
+    public void takeDamage() {
+        if (isDestroyed()) {
+            return;
+        }
+
+        this.durability--;
+        if (this.durability <= 0) {
+            this.isActive = false;
+            EventManager.getInstance().publish(new BrickDestroyedEvent(this));
+        }
+    }
+
+    public int getScore() {
+        return 0;
+    }
+
     @Override
     public Brick clone() {
-        return new HardBrick(0, 0, this.width, this.height);
+        return new HardBrick(0,0,this.width,this.height);
     }
 }
