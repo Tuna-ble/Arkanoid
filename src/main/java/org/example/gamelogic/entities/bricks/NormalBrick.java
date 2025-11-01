@@ -7,16 +7,23 @@ import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.events.BrickDestroyedEvent;
 
 public class NormalBrick extends AbstractBrick {
+    private double durability;
+
     public NormalBrick(double x, double y, double width, double height) {
         super(x, y, width, height);
+        this.durability = GameConstants.BRICK_DURABILITY;
     }
 
-    public void takeDamage() {
+    public void takeDamage(double damage) {
         if (isDestroyed()) {
             return;
         }
-        this.isActive = false;
-        EventManager.getInstance().publish(new BrickDestroyedEvent(this));
+
+        this.durability -= damage;
+        if (this.durability <= 0) {
+            this.isActive = false;
+            EventManager.getInstance().publish(new BrickDestroyedEvent(this));
+        }
     }
 
     public int getScore() {

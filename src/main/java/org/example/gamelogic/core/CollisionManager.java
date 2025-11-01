@@ -151,7 +151,7 @@ public final class CollisionManager {
             }
 
             // Phát sự kiện cho viên gạch bị va chạm
-            EventManager.getInstance().publish(new BrickHitEvent(bestCollisionBrick, ball));
+            EventManager.getInstance().publish(new BallHitBrickEvent(bestCollisionBrick, ball));
         }
     }
 

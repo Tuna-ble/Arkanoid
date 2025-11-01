@@ -55,7 +55,7 @@ public final class GameConstants {
     public static final double BRICK_HEIGHT = 60;
     public static final double PADDING = 5;
     public static final double TOP_MARGIN = 50;
-    public static final int HARD_BRICK_DURABILITY = 3;
+    public static final double HARD_BRICK_DURABILITY = 3;
     public static final int POINTS_PER_HARD_BRICK = 50;
 
     // Gameplay tuning
@@ -76,4 +76,9 @@ public final class GameConstants {
 
     // Lives
     public static final int INITIAL_LIVES = 3;
+
+    // Damages
+    public static final double BALL_DAMAGE = 1;
+    public static final double EXPLOSIVE_BRICK_DAMAGE = 2;
+    public static final double LASER_BULLET_DAMAGE = 0.5;
 }

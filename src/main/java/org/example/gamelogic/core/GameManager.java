@@ -22,6 +22,7 @@ public final class GameManager {
     private SoundManager soundManager;
     private ScoreManager scoreManager;
     private LifeManager lifeManager;
+    private LaserManager laserManager;
 
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
@@ -83,6 +84,7 @@ public final class GameManager {
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
+        this.laserManager = new LaserManager();
         currentState = new MainMenuState();
         this.stateManager.setState(currentState);
 
@@ -233,5 +235,9 @@ public final class GameManager {
 
     public CollisionManager getCollisionManager() {
         return this.collisionManager;
+    }
+
+    public LaserManager getLaserManager() {
+        return this.laserManager;
     }
 }

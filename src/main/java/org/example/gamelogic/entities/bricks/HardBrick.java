@@ -8,11 +8,23 @@ import org.example.gamelogic.events.BrickDestroyedEvent;
 
 
 public class HardBrick extends AbstractBrick {
-    private int durability; //do ben
+    private double durability; //do ben
 
     public HardBrick(double x, double y,double width, double height) {
         super(x, y, width, height);
         this.durability = GameConstants.HARD_BRICK_DURABILITY;
+    }
+
+    public void takeDamage(double damage) {
+        if (isDestroyed()) {
+            return;
+        }
+
+        this.durability -= damage;
+        if (this.durability <= 0) {
+            this.isActive = false;
+            EventManager.getInstance().publish(new BrickDestroyedEvent(this));
+        }
     }
 
     public void update(double deltaTime) {
