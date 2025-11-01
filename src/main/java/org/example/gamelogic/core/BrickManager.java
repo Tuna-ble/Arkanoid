@@ -3,12 +3,16 @@ package org.example.gamelogic.core;
 import org.example.data.ILevelRepository;
 import org.example.data.LevelData;
 import org.example.gamelogic.entities.bricks.*;
+import org.example.gamelogic.events.BrickDamagedEvent;
+import org.example.gamelogic.events.ExplosiveBrickEvent;
+import org.example.gamelogic.events.BallHitBrickEvent;
 import org.example.gamelogic.factory.BrickFactory;
 import org.example.gamelogic.registry.BrickRegistry;
 import org.example.config.GameConstants;
 
 import javafx.scene.canvas.GraphicsContext;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public final class BrickManager {
@@ -22,15 +26,37 @@ public final class BrickManager {
         BrickRegistry registry = BrickRegistry.getInstance();
         registerBrickPrototypes(registry);
         this.brickFactory = new BrickFactory(registry);
+
+        subscribeToExplosiveBrickEvent();
+    }
+
+    private void subscribeToExplosiveBrickEvent() {
+        EventManager.getInstance().subscribe(
+                ExplosiveBrickEvent.class,
+                this::onBrickExploded
+        );
+    }
+
+    private void onBrickExploded(ExplosiveBrickEvent event) {
+        Iterator<Brick> iterator=bricks.iterator();
+        while(iterator.hasNext()) {
+            Brick other=iterator.next();
+            if (event.getExplosiveBrick().withinRangeOf(other)) {
+                EventManager.getInstance().
+                        publish(new BrickDamagedEvent(other, event.getExplosiveBrick().getGameObject()));
+            }
+        }
     }
 
     private void registerBrickPrototypes(BrickRegistry brickRegistry) {
         final double TILE_WIDTH = 60;
         final double TILE_HEIGHT = 20;
 
-        brickRegistry.register("N", new NormalBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
         brickRegistry.register("H", new HardBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
+        brickRegistry.register("N", new NormalBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
+        brickRegistry.register("U", new UnbreakableBrick(0, 0, TILE_WIDTH, TILE_HEIGHT));
         brickRegistry.register("E", new ExplosiveBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
+        /// HNUE :)))
     }
 
     public void update(double deltaTime) {

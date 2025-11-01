@@ -2,23 +2,23 @@ package org.example.gamelogic.entities.bricks;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import org.example.config.GameConstants;
+import org.example.gamelogic.core.EventManager;
+import org.example.gamelogic.events.BrickDestroyedEvent;
+import org.example.gamelogic.events.ExplosiveBrickEvent;
 
 public class ExplosiveBrick extends AbstractBrick {
-    @Override
-    public void render(GraphicsContext g) {
-        g.setFill(Color.RED);
-    }
-    public void takeDamage() {
-
+    public ExplosiveBrick(double x, double y, double width, double height) {
+        super(x, y, width, height);
     }
 
-    public int getScore() {
-        return 0;
-    }
-
-    @Override
-    public boolean isDestroyed() {
-        return false;
+    public void takeDamage(double damage) {
+        if (isDestroyed()) {
+            return;
+        }
+        this.isActive = false;
+        EventManager.getInstance().publish(new BrickDestroyedEvent(this));
+        EventManager.getInstance().publish(new ExplosiveBrickEvent(this));
     }
 
     @Override
@@ -26,14 +26,18 @@ public class ExplosiveBrick extends AbstractBrick {
 
     }
 
-    public ExplosiveBrick(double x, double y, double width, double height) {
-        super(x, y, width, height);
+    @Override
+    public void render(GraphicsContext gc) {
+        if (!isDestroyed()) {
+            gc.setFill(Color.RED);
+            gc.fillRect(x, y, width, height);
+            gc.setStroke(Color.BLACK);
+            gc.strokeRect(x, y, width, height);
+        }
     }
 
     @Override
     public Brick clone() {
-        return new ExplosiveBrick(0,0,this.width,this.height);
+        return new ExplosiveBrick(0, 0, this.width, this.height);
     }
-
-
 }
