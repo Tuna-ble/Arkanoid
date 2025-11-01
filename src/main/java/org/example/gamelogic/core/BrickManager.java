@@ -3,12 +3,15 @@ package org.example.gamelogic.core;
 import org.example.data.ILevelRepository;
 import org.example.data.LevelData;
 import org.example.gamelogic.entities.bricks.*;
+import org.example.gamelogic.events.BrickExplodedEvent;
+import org.example.gamelogic.events.BrickHitEvent;
 import org.example.gamelogic.factory.BrickFactory;
 import org.example.gamelogic.registry.BrickRegistry;
 import org.example.config.GameConstants;
 
 import javafx.scene.canvas.GraphicsContext;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public final class BrickManager {
@@ -22,6 +25,25 @@ public final class BrickManager {
         BrickRegistry registry = BrickRegistry.getInstance();
         registerBrickPrototypes(registry);
         this.brickFactory = new BrickFactory(registry);
+
+        subscribeToBrickExplodedEvent();
+    }
+
+    private void subscribeToBrickExplodedEvent() {
+        EventManager.getInstance().subscribe(
+                BrickExplodedEvent.class,
+                this::onBrickExploded
+        );
+    }
+
+    private void onBrickExploded(BrickExplodedEvent event) {
+        Iterator<Brick> iterator=bricks.iterator();
+        while(iterator.hasNext()) {
+            Brick other=iterator.next();
+            if (event.getExplosiveBrick().withinRangeOf(other)) {
+                EventManager.getInstance().publish(new BrickHitEvent(other, null));
+            }
+        }
     }
 
     private void registerBrickPrototypes(BrickRegistry brickRegistry) {

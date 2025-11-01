@@ -19,10 +19,6 @@ public class NormalBrick extends AbstractBrick {
         EventManager.getInstance().publish(new BrickDestroyedEvent(this));
     }
 
-    public int getScore() {
-        return 0;
-    }
-
     public void update(double deltaTime) {
 
     }

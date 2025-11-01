@@ -1,7 +1,9 @@
 package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Affine;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.*;
 import javafx.scene.text.Font;
@@ -13,6 +15,9 @@ import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.core.PowerUpManager;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
+import org.example.gamelogic.events.BallLostEvent;
+import org.example.gamelogic.events.ChangeStateEvent;
+import org.example.gamelogic.events.LifeLostEvent;
 import org.example.gamelogic.events.PowerUpCollectedEvent;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 import javafx.scene.input.KeyCode;
@@ -29,16 +34,20 @@ public final class PlayingState implements GameState {
     CollisionManager collisionManager;
     Paddle paddle;
     Font scoreFont;
+    Image pauseIcon;
+    private int currentLives;
 
     private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
+    private int levelNumber;
 
     public PlayingState(GameManager gameManager, int levelNumber) {
-        this.gameManager=gameManager;
+        this.gameManager = gameManager;
         this.brickManager = gameManager.getBrickManager();
         this.brickManager.loadLevel(levelNumber);
         this.powerUpManager = gameManager.getPowerUpManager();
         this.ballManager = gameManager.getBallManager();
         this.collisionManager = gameManager.getCollisionManager();
+
         this.paddle = new Paddle(
                 GameConstants.PADDLE_X,
                 GameConstants.PADDLE_Y,
@@ -50,15 +59,34 @@ public final class PlayingState implements GameState {
         this.ballManager.createInitialBall(this.paddle);
 
         ScoreManager.getInstance().resetScore();
+        LifeManager.getInstance().reset();
+
         this.scoreFont = new Font("Arial", 24);
 
-        subscribeToPowerUpCollectedEvent();
+        this.currentLives = LifeManager.getInstance().getLives();
+
+        try {
+            pauseIcon = new Image(getClass().getResourceAsStream("/GameIcon/pause.png"));
+        } catch (Exception e) {
+            System.err.println("Không thể tải ảnh pause.png từ resources!");
+            e.printStackTrace();
+        }
+        subscribeToEvents();
+        this.levelNumber = levelNumber;
     }
 
-    private void subscribeToPowerUpCollectedEvent() {
+    private void subscribeToEvents() {
+        EventManager.getInstance().subscribe(
+                BallLostEvent.class,
+                this::handleBallLost
+        );
         EventManager.getInstance().subscribe(
                 PowerUpCollectedEvent.class,
                 this::handlePowerUpCollected
+        );
+        EventManager.getInstance().subscribe(
+                LifeLostEvent.class,
+                this::handleLifeLost
         );
     }
 
@@ -91,6 +119,10 @@ public final class PlayingState implements GameState {
 
     @Override
     public void render(javafx.scene.canvas.GraphicsContext gc) {
+        gc.setTransform(new Affine());
+        gc.setTextAlign(TextAlignment.LEFT);
+        gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+
         gc.setFill(Color.PINK);
         gc.fillRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         //render
@@ -98,8 +130,19 @@ public final class PlayingState implements GameState {
         ballManager.render(gc);
         powerUpManager.render(gc);
         paddle.render(gc);
-
         renderScore(gc);
+
+        renderPauseButton(gc);
+        renderLives(gc);
+    }
+
+    private void renderPauseButton(GraphicsContext gc) {
+        if (pauseIcon == null) return;
+        double iconWidth = 40;
+        double iconHeight = 40;
+        double x = gc.getCanvas().getWidth() - iconWidth - 10;
+        double y = 10;
+        gc.drawImage(pauseIcon, x, y, iconWidth, iconHeight);
     }
 
     private void renderScore(GraphicsContext gc) {
@@ -109,6 +152,14 @@ public final class PlayingState implements GameState {
         gc.setFill(Color.WHITE);
         gc.setTextAlign(TextAlignment.LEFT);
         gc.fillText("Score: " + currentScore, 10, 25);
+    }
+
+    private void renderLives(GraphicsContext gc) {
+        gc.setFont(scoreFont);
+        gc.setFill(Color.WHITE);
+        gc.setTextAlign(TextAlignment.RIGHT);
+        gc.setTextAlign(TextAlignment.LEFT);
+        gc.fillText("Lives: " + this.currentLives, 10, GameConstants.SCREEN_HEIGHT - 10);
     }
 
     @Override
@@ -121,8 +172,38 @@ public final class PlayingState implements GameState {
             paddle.setVelocity(0, 0);
         }
 
-        if (input.isKeyPressed(KeyCode.SPACE) || input.isMouseClicked()) {
-            ballManager.releaseAttachedBalls(); // gọi hàm mới trong BallManager
+        if (input.isKeyPressed(KeyCode.P)) {
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.PAUSED)
+            );
+            return;
+        }
+
+        if (input.isMouseClicked()) {
+            int mouseX = input.getMouseX();
+            int mouseY = input.getMouseY();
+
+            double pauseIconX = GameConstants.SCREEN_WIDTH - 50;
+            double pauseIconY = 10;
+            double pauseIconSize = 40;
+
+            boolean clickOnPause =
+                    mouseX >= pauseIconX &&
+                            mouseX <= pauseIconX + pauseIconSize &&
+                            mouseY >= pauseIconY &&
+                            mouseY <= pauseIconY + pauseIconSize;
+
+            if (clickOnPause) {
+                EventManager.getInstance().publish(
+                        new ChangeStateEvent(GameStateEnum.PAUSED)
+                );
+                return;
+            } else {
+                ballManager.releaseAttachedBalls();
+            }
+        }
+        if (input.isKeyPressed(KeyCode.SPACE)) {
+            ballManager.releaseAttachedBalls();
         }
     }
 
@@ -165,5 +246,27 @@ public final class PlayingState implements GameState {
 
     public BallManager getBallManager() {
         return ballManager;
+    }
+
+    public void cleanUp() {
+        for (PowerUpStrategy strategy : activeStrategies) {
+            strategy.remove(this);
+        }
+        activeStrategies.clear();
+    }
+
+    private void handleBallLost(BallLostEvent event) {
+        if (ballManager.countActiveBalls() == 0) {
+            LifeManager.getInstance().loseLife();
+        }
+    }
+
+    private void handleLifeLost(LifeLostEvent event) {
+        this.currentLives = event.getRemainingLives();
+        ballManager.resetBalls(this.paddle);
+    }
+
+    public int getLevelNumber() {
+        return this.levelNumber;
     }
 }

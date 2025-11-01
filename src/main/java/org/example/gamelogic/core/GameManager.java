@@ -21,10 +21,12 @@ public final class GameManager {
     private CollisionManager collisionManager;
     private SoundManager soundManager;
     private ScoreManager scoreManager;
+    private LifeManager lifeManager;
 
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
     private I_InputProvider inputProvider;
+    private GameState currentState;
 
     private double accumulator = 0.0;
     private final double FIXED_TIMESTEP = GameConstants.FIXED_TIMESTEP;
@@ -81,11 +83,12 @@ public final class GameManager {
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
-        GameState currentState = new MainMenuState();
+        currentState = new MainMenuState();
         this.stateManager.setState(currentState);
 
         this.soundManager = SoundManager.getInstance();
         this.scoreManager = ScoreManager.getInstance();
+        this.lifeManager = LifeManager.getInstance();
 
         subscribeToEvents();
     }
@@ -117,45 +120,83 @@ public final class GameManager {
 
     private void subscribeToEvents() {
         EventManager.getInstance().subscribe(
-                BallLostEvent.class,
-                this::handleBallLost
-        );
-        EventManager.getInstance().subscribe(
                 ChangeStateEvent.class,
                 this::handleStateChangeRequest
         );
     }
 
     private void resetBallAndPaddle() {
-        GameState currentState = stateManager.getState();
+        currentState = stateManager.getState();
         if (currentState instanceof PlayingState) {
             PlayingState playingState = (PlayingState) currentState;
             ballManager.resetBalls(playingState.getPaddle());
         }
     }
 
-    private void handleBallLost(BallLostEvent event) {
-        if (ballManager.countActiveBalls() == 0) {
-            gameOver();
-        }
-    }
-
-    public void gameOver() {
-        GameState gameOverState = new GameOverState();
-        stateManager.setState(gameOverState);
-    }
-
     public void handleStateChangeRequest(ChangeStateEvent event) {
         GameState newState = null;
+        GameState currentState = stateManager.getState();
+
+        int levelToLoad = 1;
+        if (event.getPayload() != null && event.getPayload() instanceof Integer) {
+            levelToLoad = (Integer) event.getPayload();
+        }
+
+        if (currentState instanceof PlayingState && event.targetState != GameStateEnum.PAUSED && event.targetState != GameStateEnum.RESUME_GAME) {
+            ((PlayingState) currentState).cleanUp();
+            powerUpManager.clear();
+            ballManager.clear();
+        }
+
         switch (event.targetState) {
             case PLAYING:
-                newState = new PlayingState(this, 1);
+                if (currentState instanceof PlayingState) {
+                    ((PlayingState) currentState).cleanUp();
+                    powerUpManager.clear();
+                    ballManager.clear();
+                }
+                newState = new PlayingState(this, levelToLoad);
                 break;
+            case LEVEL_STATE:
+                newState = new LevelState();
+                break;
+
+            case RANKING_STATE:
+                newState = new RankingState();
+                break;
+
             case MAIN_MENU:
+                if (currentState instanceof PlayingState) {
+                    ((PlayingState) currentState).cleanUp();
+                    powerUpManager.clear();
+                    ballManager.clear();
+                }
                 newState = new MainMenuState();
                 break;
             case GAME_OVER:
-                newState = new GameOverState();
+                int currentLevel = 1;
+
+                if (currentState instanceof PlayingState) {
+                    PlayingState playingState = (PlayingState) currentState;
+                    currentLevel = playingState.getLevelNumber();
+                    int finalScore = ScoreManager.getInstance().getScore();
+                    HighscoreManager.saveNewScore(finalScore);
+
+                    playingState.cleanUp();
+                    powerUpManager.clear();
+                    ballManager.clear();
+                }
+                newState = new GameOverState(currentLevel);
+                break;
+            case PAUSED:
+                if (currentState instanceof PlayingState) {
+                    newState = new PauseState(this, currentState);
+                }
+                break;
+            case RESUME_GAME:
+                if (currentState instanceof PauseState) {
+                    newState = ((PauseState) currentState).getPreviousState();
+                }
                 break;
         }
 

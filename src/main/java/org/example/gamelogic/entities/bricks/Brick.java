@@ -6,13 +6,15 @@ import org.example.gamelogic.entities.GameObject;
 public interface Brick {
     void takeDamage();
     boolean isDestroyed();
-    int getScore();
+
     void setPosition(double x, double y);
     double getX();
     double getY();
     double getWidth();
     double getHeight();
     Brick clone();
+
+    boolean withinRangeOf(Brick other);
 
     void update(double deltaTime);
     void render(GraphicsContext gc);

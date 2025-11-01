@@ -48,10 +48,6 @@ public class HardBrick extends AbstractBrick {
         }
     }
 
-    public int getScore() {
-        return 0;
-    }
-
     @Override
     public Brick clone() {
         return new HardBrick(0,0,this.width,this.height);
