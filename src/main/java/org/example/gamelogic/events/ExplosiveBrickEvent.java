@@ -2,10 +2,10 @@ package org.example.gamelogic.events;
 
 import org.example.gamelogic.entities.bricks.Brick;
 
-public final class BrickExplodedEvent extends GameEvent {
+public final class ExplosiveBrickEvent extends GameEvent {
     private final Brick explosiveBrick;
 
-    public BrickExplodedEvent(Brick explosiveBrick) {
+    public ExplosiveBrickEvent(Brick explosiveBrick) {
         this.explosiveBrick = explosiveBrick;
     }
 

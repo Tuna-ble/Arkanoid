@@ -7,16 +7,23 @@ import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.events.BrickDestroyedEvent;
 
 public class NormalBrick extends AbstractBrick {
+    private double durability;
+
     public NormalBrick(double x, double y, double width, double height) {
         super(x, y, width, height);
+        this.durability = GameConstants.BRICK_DURABILITY;
     }
 
-    public void takeDamage() {
+    public void takeDamage(double damage) {
         if (isDestroyed()) {
             return;
         }
-        this.isActive = false;
-        EventManager.getInstance().publish(new BrickDestroyedEvent(this));
+
+        this.durability -= damage;
+        if (this.durability <= 0) {
+            this.isActive = false;
+            EventManager.getInstance().publish(new BrickDestroyedEvent(this));
+        }
     }
 
     public void update(double deltaTime) {
@@ -26,7 +33,7 @@ public class NormalBrick extends AbstractBrick {
     @Override
     public void render(GraphicsContext gc) {
         if (!isDestroyed()) {
-            gc.setFill(Color.AQUAMARINE);
+            gc.setFill(Color.LIGHTGREEN);
             gc.fillRect(x, y, width, height);
             //duong vien
             gc.setStroke(Color.BLACK);
@@ -36,6 +43,6 @@ public class NormalBrick extends AbstractBrick {
 
     @Override
     public Brick clone() {
-        return new NormalBrick(0,0,this.width,this.height);
+        return new NormalBrick(0, 0, this.width, this.height);
     }
 }

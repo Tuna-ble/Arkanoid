@@ -5,24 +5,25 @@ import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.events.BrickDestroyedEvent;
-import org.example.gamelogic.events.BrickExplodedEvent;
+import org.example.gamelogic.events.ExplosiveBrickEvent;
 
 public class ExplosiveBrick extends AbstractBrick {
     public ExplosiveBrick(double x, double y, double width, double height) {
         super(x, y, width, height);
     }
 
-    public void takeDamage() {
+    public void takeDamage(double damage) {
         if (isDestroyed()) {
             return;
         }
         this.isActive = false;
         EventManager.getInstance().publish(new BrickDestroyedEvent(this));
-        EventManager.getInstance().publish(new BrickExplodedEvent(this));
+        EventManager.getInstance().publish(new ExplosiveBrickEvent(this));
     }
 
     @Override
     public void update(double deltaTime) {
+
     }
 
     @Override

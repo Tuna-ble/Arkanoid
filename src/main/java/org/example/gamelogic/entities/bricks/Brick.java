@@ -4,7 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 import org.example.gamelogic.entities.GameObject;
 
 public interface Brick {
-    void takeDamage();
+    void takeDamage(double damage);
     boolean isDestroyed();
 
     void setPosition(double x, double y);

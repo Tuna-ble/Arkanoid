@@ -15,6 +15,7 @@ import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.core.PowerUpManager;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
+import org.example.gamelogic.entities.powerups.PowerUp;
 import org.example.gamelogic.events.BallLostEvent;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.events.LifeLostEvent;
@@ -32,6 +33,7 @@ public final class PlayingState implements GameState {
     GameManager gameManager;
     BallManager ballManager;
     CollisionManager collisionManager;
+    LaserManager laserManager;
     Paddle paddle;
     Font scoreFont;
     Image pauseIcon;
@@ -47,6 +49,7 @@ public final class PlayingState implements GameState {
         this.powerUpManager = gameManager.getPowerUpManager();
         this.ballManager = gameManager.getBallManager();
         this.collisionManager = gameManager.getCollisionManager();
+        this.laserManager=gameManager.getLaserManager();
 
         this.paddle = new Paddle(
                 GameConstants.PADDLE_X,
@@ -103,6 +106,7 @@ public final class PlayingState implements GameState {
         paddle.update(deltaTime);
         updateAttachedBallPosition();
 
+        laserManager.update(deltaTime, brickManager.getBricks());
         brickManager.update(deltaTime);
         ballManager.update(deltaTime);
         powerUpManager.update(deltaTime);
@@ -129,6 +133,7 @@ public final class PlayingState implements GameState {
         brickManager.render(gc);
         ballManager.render(gc);
         powerUpManager.render(gc);
+        laserManager.render(gc);
         paddle.render(gc);
         renderScore(gc);
 

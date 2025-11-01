@@ -1,16 +1,11 @@
 package org.example.gamelogic.core;
 
 import javafx.scene.canvas.GraphicsContext;
-import org.example.gamelogic.entities.powerups.ExpandPaddlePowerUp;
-import org.example.gamelogic.entities.powerups.FastBallPowerUp;
-import org.example.gamelogic.entities.powerups.MultiBallPowerUp;
-import org.example.gamelogic.entities.powerups.PowerUp;
+import org.example.gamelogic.entities.powerups.*;
 import org.example.gamelogic.events.BrickDestroyedEvent;
 import org.example.gamelogic.factory.PowerUpFactory;
 import org.example.gamelogic.registry.PowerUpRegistry;
-import org.example.gamelogic.strategy.powerup.ExpandPaddleStrategy;
-import org.example.gamelogic.strategy.powerup.FastBallStrategy;
-import org.example.gamelogic.strategy.powerup.MultiBallStrategy;
+import org.example.gamelogic.strategy.powerup.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,7 +27,7 @@ public final class PowerUpManager {
     private final Random random = new Random();
     private static final double POWERUP_DROP_CHANCE = 0.3;
 
-    private static final String[] POWERUP_TYPES = {"E", "F", "M"};
+    private static final String[] POWERUP_TYPES = {"E", "F", "M", "L", "B"};
 
     public PowerUpManager() {
         PowerUpRegistry registry = PowerUpRegistry.getInstance();
@@ -65,13 +60,19 @@ public final class PowerUpManager {
         final double POWERUP_HEIGHT = 40;
 
         powerUpRegistry.register("E", new ExpandPaddlePowerUp(0.0, 0.0, POWERUP_WIDTH,
-                POWERUP_HEIGHT, 0.0, 3.0, new ExpandPaddleStrategy()));
+                POWERUP_HEIGHT, 0.0, 2.0, new ExpandPaddleStrategy()));
 
         powerUpRegistry.register("F", new FastBallPowerUp(0.0, 0.0, POWERUP_WIDTH,
                 POWERUP_HEIGHT, 0.0, 2.0, new FastBallStrategy()));
 
         powerUpRegistry.register("M", new MultiBallPowerUp(0.0, 0.0, POWERUP_WIDTH,
                 POWERUP_HEIGHT, 0.0, 2.0, new MultiBallStrategy()));
+
+        powerUpRegistry.register("L", new ExtraLifePowerUp(0.0, 0.0, POWERUP_WIDTH,
+                POWERUP_HEIGHT, 0.0, 2.0, new ExtraLifeStrategy()));
+
+        powerUpRegistry.register("B", new LaserPaddlePowerUp(0.0, 0.0, POWERUP_WIDTH,
+                POWERUP_HEIGHT, 0.0, 2.0, new LaserPaddleStrategy()));
     }
 
     public void spawnPowerUp(String type, double x, double y) {
