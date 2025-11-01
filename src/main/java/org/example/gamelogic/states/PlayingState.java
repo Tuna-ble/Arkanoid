@@ -107,7 +107,7 @@ public final class PlayingState implements GameState {
         paddle.update(deltaTime);
         updateAttachedBallPosition();
 
-        laserManager.update(deltaTime, brickManager.getBricks());
+        laserManager.update(deltaTime);
         brickManager.update(deltaTime);
         ballManager.update(deltaTime);
         powerUpManager.update(deltaTime);
@@ -117,7 +117,8 @@ public final class PlayingState implements GameState {
                     ballManager.getActiveBalls(),
                     paddle,
                     brickManager.getBricks(),
-                    powerUpManager.getActivePowerUps()
+                    powerUpManager.getActivePowerUps(),
+                    laserManager.getLasers()
             );
         }
     }

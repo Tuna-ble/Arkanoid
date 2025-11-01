@@ -30,20 +30,11 @@ public class LaserManager {
         lasers.add(new LaserBullet(rightX, y));
     }
 
-    public void update(double deltaTime, List<Brick> bricks) {
+    public void update(double deltaTime) {
         Iterator<LaserBullet> iterator= lasers.iterator();
         while (iterator.hasNext()) {
             LaserBullet laser=iterator.next();
             laser.update(deltaTime);
-
-            for (Brick brick : bricks) {
-                if (!brick.isDestroyed() && laser.intersects(brick.getGameObject())) {
-                    EventManager.getInstance().
-                            publish(new BrickDamagedEvent(brick, laser.getGameObject()));
-                    laser.setActive(false);
-                    break;
-                }
-            }
 
             if (!laser.isActive()) {
                 iterator.remove();
@@ -55,5 +46,9 @@ public class LaserManager {
         for (LaserBullet laser : lasers) {
             laser.render(gc);
         }
+    }
+
+    public List<LaserBullet> getLasers() {
+        return lasers;
     }
 }

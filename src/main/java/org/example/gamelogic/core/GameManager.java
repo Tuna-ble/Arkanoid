@@ -84,13 +84,13 @@ public final class GameManager {
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
-        this.laserManager = new LaserManager();
         currentState = new MainMenuState();
         this.stateManager.setState(currentState);
 
         this.soundManager = SoundManager.getInstance();
         this.scoreManager = ScoreManager.getInstance();
         this.lifeManager = LifeManager.getInstance();
+        this.laserManager = LaserManager.getInstance();
 
         subscribeToEvents();
     }
