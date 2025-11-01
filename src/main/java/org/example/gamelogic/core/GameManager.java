@@ -222,6 +222,9 @@ public final class GameManager {
                     newState = ((PauseState) currentState).getPreviousState();
                 }
                 break;
+            case SETTINGS:
+                newState = new SettingsState();
+                break;
         }
 
         if (newState != null && stateManager != null) {
