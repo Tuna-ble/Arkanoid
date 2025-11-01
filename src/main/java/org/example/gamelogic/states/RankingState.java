@@ -35,7 +35,6 @@ public final class RankingState implements GameState {
 
     public RankingState() {
         this.highscores = HighscoreManager.loadHighscores();
-
         double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
         double btnY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 60;
         this.backButton = new Button(btnX, btnY, "Back to Menu");

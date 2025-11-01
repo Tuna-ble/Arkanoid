@@ -16,14 +16,23 @@ import org.example.config.GameConstants;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.events.ChangeStateEvent;
+import org.example.gamelogic.graphics.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class MainMenuState implements GameState {
     private Image mainMenuImage;
+    private Button startButton;
+    private Button levelButton;
+    private Button rankingButton;
     private double elapsedTime = 0;
+    private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
+    private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 15;
 
     public MainMenuState() {
         mainMenuImage = new Image(getClass().getResourceAsStream("/GameIcon/MainMenu.png"));
+        startButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 0, "Start");
+        levelButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 80, "Level");
+        rankingButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 160, "Ranking");
     }
 
     @Override
@@ -59,18 +68,12 @@ public final class MainMenuState implements GameState {
                 titleShadow
         );
 
-        // Subtext
-        gc.setFont(new Font("Arial", 20));
-        gc.setFill(Color.WHITE);
-        gc.fillText("Click or Press SPACE to Start", GameConstants.SCREEN_WIDTH / 2.0, 300);
+        // Buttons
+        if (startButton != null) startButton.render(gc);
+        if (levelButton != null) levelButton.render(gc);
+        if (rankingButton != null) rankingButton.render(gc);
 
-        gc.setFont(new Font("Arial", 18));
-        gc.setFill(Color.WHITE);
-        gc.fillText("Press L to Select Level", GameConstants.SCREEN_WIDTH / 2.0, 350);
-
-        gc.fillText("Press R for Ranking", GameConstants.SCREEN_WIDTH / 2.0, 390);
-
-        // Blinking text
+        // Nháy nhẹ phần gợi ý thoát
         if ((int) (elapsedTime * 2) % 2 == 0) {
             gc.setFont(new Font("Arial", 16));
             gc.setFill(Color.WHITE);
@@ -83,23 +86,32 @@ public final class MainMenuState implements GameState {
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
 
-        if (inputProvider.isKeyPressed(KeyCode.ESCAPE)) {
-            System.exit(0);
-        }
-        if (inputProvider.isKeyPressed(KeyCode.SPACE) || inputProvider.isMouseClicked()) {
+        updateButtons(inputProvider);
+
+        if ((startButton != null && startButton.isClicked())
+                || inputProvider.isKeyPressed(KeyCode.SPACE)) {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.PLAYING, 1)
             );
-        }
-        if (inputProvider.isKeyPressed(KeyCode.L)) {
+        } else if (levelButton != null && levelButton.isClicked()) {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.LEVEL_STATE)
             );
-        }
-        if (inputProvider.isKeyPressed(KeyCode.R)) {
+        } else if (rankingButton != null && rankingButton.isClicked()) {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.RANKING_STATE)
             );
+        } else if (inputProvider.isKeyPressed(KeyCode.ESCAPE)) {
+            System.exit(0);
         }
     }
+
+    private void updateButtons(I_InputProvider inputProvider) {
+        if (startButton != null) startButton.update(inputProvider);
+        if (levelButton != null) levelButton.update(inputProvider);
+        if (rankingButton != null) rankingButton.update(inputProvider);
+    }
+
 }
+
+
