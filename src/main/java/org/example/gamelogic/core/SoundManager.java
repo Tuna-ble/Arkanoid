@@ -4,7 +4,7 @@ import org.example.data.AssetManager;
 import org.example.gamelogic.events.*;
 import javax.sound.sampled.Clip;
 
-public class SoundManager {
+public final class SoundManager {
     private AssetManager assetManager;
 
     private static class SingletonHolder {
@@ -41,6 +41,8 @@ public class SoundManager {
     }
 
     private void playSound(String name) {
+        if (!SettingsManager.getInstance().isSfxEnabled()) return;
+
         Clip clip = assetManager.getSound(name);
         if (clip != null) {
             if (clip.isRunning()) {
@@ -52,6 +54,8 @@ public class SoundManager {
     }
 
     private void loopMusic(String name) {
+        if (!SettingsManager.getInstance().isMusicEnabled()) return;
+
         Clip clip = assetManager.getSound(name);
         if (clip != null) {
             if (!clip.isRunning()) {
