@@ -57,6 +57,7 @@ public final class BrickManager {
         brickRegistry.register("U", new UnbreakableBrick(0, 0, TILE_WIDTH, TILE_HEIGHT));
         brickRegistry.register("E", new ExplosiveBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
         /// HNUE :)))
+        /// bựa
     }
 
     public void update(double deltaTime) {
