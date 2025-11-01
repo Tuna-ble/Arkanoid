@@ -32,11 +32,9 @@ public final class SettingsManager {
     public void loadSettings() {
         File settingsFile = new File(SETTINGS_FILE_PATH);
 
-        // Nếu file không tồn tại, dùng giá trị mặc định
         if (!settingsFile.exists()) {
             this.sfxEnabled = true;
             this.musicEnabled = true;
-            // Lưu file mặc định lần đầu
             saveSettings();
             return;
         }
@@ -45,13 +43,11 @@ public final class SettingsManager {
         try (FileReader reader = new FileReader(settingsFile)) {
             properties.load(reader);
 
-            // Đọc giá trị, nếu không thấy key thì dùng "true" làm mặc định
             this.sfxEnabled = Boolean.parseBoolean(properties.getProperty("sfxEnabled", "true"));
             this.musicEnabled = Boolean.parseBoolean(properties.getProperty("musicEnabled", "true"));
 
         } catch (IOException e) {
             System.err.println("Lỗi khi đọc file settings: " + e.getMessage());
-            // Lỗi thì dùng mặc định
             this.sfxEnabled = true;
             this.musicEnabled = true;
         }
@@ -59,7 +55,6 @@ public final class SettingsManager {
 
     public void saveSettings() {
         try (FileWriter writer = new FileWriter(SETTINGS_FILE_PATH)) {
-            // Cập nhật properties từ biến hiện tại
             properties.setProperty("sfxEnabled", String.valueOf(this.sfxEnabled));
             properties.setProperty("musicEnabled", String.valueOf(this.musicEnabled));
 
