@@ -56,10 +56,15 @@ public final class BrickManager {
         brickRegistry.register("N", new NormalBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
         brickRegistry.register("U", new UnbreakableBrick(0, 0, TILE_WIDTH, TILE_HEIGHT));
         brickRegistry.register("E", new ExplosiveBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
+        brickRegistry.register("R", new HealingBrick(0, 0, TILE_WIDTH, TILE_HEIGHT));
         /// HNUE :)))
     }
 
     public void update(double deltaTime) {
+
+        for (Brick brick : bricks) {
+            brick.update(deltaTime);
+        }
         bricks.removeIf(Brick::isDestroyed);
     }
 
@@ -105,7 +110,12 @@ public final class BrickManager {
     }
 
     public boolean isLevelComplete() {
-        return bricks.isEmpty();
+        for (Brick brick : bricks) {
+            if (brick.isBreakable()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public List<Brick> getBricks() {

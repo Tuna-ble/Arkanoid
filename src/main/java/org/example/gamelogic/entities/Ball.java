@@ -7,16 +7,36 @@ import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import org.example.config.GameConstants;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Ball extends MovableObject implements IBall {
     private double radius;
     private double speed;
     private boolean attachedToPaddle;
+
+    private static class GhostSnapshot {
+        double x, y, width, height;
+
+        GhostSnapshot(double x, double y, double width, double height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+    }
+    private final List<GhostSnapshot> trail = new LinkedList<>();
+    private final int MAX_GHOSTS = 8;
+    private double lastGhostX, lastGhostY;
 
     public Ball(double x, double y, double radius) {
         super(x, y, radius * 2, radius * 2, 0, 0);
         this.radius = radius;
         this.speed = GameConstants.BALL_INITIAL_SPEED;
         this.attachedToPaddle = true;
+
+        this.lastGhostX = x;
+        this.lastGhostY = y;
     }
 
     public double getCenterX() {
@@ -29,11 +49,29 @@ public class Ball extends MovableObject implements IBall {
         if (isActive) { // bóng rời paddle
 
             if (!attachedToPaddle) {
-                // Logic di chuyển tự do
+
                 ensureMinimumVelocity();
                 limitMaximumSpeed();
                 this.x += dx * deltaTime;
                 this.y += dy * deltaTime;
+
+                double distanceMoved = Math.hypot(x - lastGhostX, y - lastGhostY);
+
+                if (distanceMoved > 2.0) {
+
+                    trail.addFirst(new GhostSnapshot(x, y, width, height));
+                    this.lastGhostX = x;
+                    this.lastGhostY = y;
+
+                    if (trail.size() > MAX_GHOSTS) {
+                        trail.removeLast();
+                    }
+                }
+
+            } else {
+                trail.clear();
+                this.lastGhostX = x;
+                this.lastGhostY = y;
             }
         }
     }
@@ -41,6 +79,30 @@ public class Ball extends MovableObject implements IBall {
     @Override
     public void render(GraphicsContext gc) {
         if (isActive) {
+
+            gc.save();
+            for (int i = 0; i < trail.size(); i++) {
+                GhostSnapshot ghost = trail.get(i);
+
+                double progress = 1.0 - (double)i / MAX_GHOSTS;
+
+                double opacity = 0.5 * progress;
+
+                double scale = 0.5 + (0.5 * progress);
+
+                double ghostWidth = ghost.width * scale;
+                double ghostHeight = ghost.height * scale;
+
+                double ghostX = ghost.x + (ghost.width - ghostWidth) / 2.0;
+                double ghostY = ghost.y + (ghost.height - ghostHeight) / 2.0;
+
+                gc.setGlobalAlpha(opacity);
+                gc.setFill(GameConstants.BALL_COLOR);
+                gc.fillOval(ghostX, ghostY, ghostWidth, ghostHeight);
+            }
+
+            gc.restore();
+
             // Tạo gradient nhẹ để bóng có cảm giác 3D
             RadialGradient gradient = new RadialGradient(
                     0, 0,                // focus angle, focus distance
@@ -88,6 +150,10 @@ public class Ball extends MovableObject implements IBall {
         this.dx = 0;
         this.dy = 0;
         this.speed = GameConstants.BALL_INITIAL_SPEED;
+
+        this.trail.clear();
+        this.lastGhostX = this.x;
+        this.lastGhostY = this.y;
     }
 
     @Override

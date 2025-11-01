@@ -10,5 +10,6 @@ public enum GameStateEnum {
     HIGHS_SCORES,
     RESUME_GAME,
     LEVEL_STATE,
-    RANKING_STATE
+    RANKING_STATE,
+    VICTORY
 }

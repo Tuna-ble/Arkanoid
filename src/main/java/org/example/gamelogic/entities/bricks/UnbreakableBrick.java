@@ -14,6 +14,11 @@ public class UnbreakableBrick extends AbstractBrick {
     }
 
     @Override
+    public boolean isBreakable() {
+        return false;
+    }
+
+    @Override
     public void update(double deltaTime) {
 
     }

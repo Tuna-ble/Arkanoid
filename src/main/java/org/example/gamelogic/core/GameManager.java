@@ -175,12 +175,32 @@ public final class GameManager {
                 }
                 newState = new MainMenuState();
                 break;
+
+            case VICTORY:
+                if (currentState instanceof PlayingState) {
+                    PlayingState playingState = (PlayingState) currentState;
+
+                    int livesLeft = playingState.getCurrentLives();
+                    int levelCompleted = playingState.getLevelNumber();
+                    int finalScore = ScoreManager.getInstance().getScore();
+
+                    HighscoreManager.saveNewScore(finalScore);
+
+                    playingState.cleanUp();
+                    powerUpManager.clear();
+                    ballManager.clear();
+
+                    newState = new VictoryState(livesLeft, levelCompleted);
+                }
+                break;
+
             case GAME_OVER:
-                int currentLevel = 1;
+                int currentLevel = levelToLoad;
 
                 if (currentState instanceof PlayingState) {
                     PlayingState playingState = (PlayingState) currentState;
                     currentLevel = playingState.getLevelNumber();
+
                     int finalScore = ScoreManager.getInstance().getScore();
                     HighscoreManager.saveNewScore(finalScore);
 
@@ -188,8 +208,10 @@ public final class GameManager {
                     powerUpManager.clear();
                     ballManager.clear();
                 }
+
                 newState = new GameOverState(currentLevel);
                 break;
+
             case PAUSED:
                 if (currentState instanceof PlayingState) {
                     newState = new PauseState(this, currentState);
