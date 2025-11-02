@@ -20,6 +20,8 @@ public class AssetManager {
             loadSound("brick_hit", "/sounds/brick_hit.wav");
             loadSound("paddle_hit", "/sounds/paddle_hit.wav");
             loadSound("ball_lost", "/sounds/ball_lost.wav");
+            loadSound("glass", "/sounds/glass.wav");
+            loadSound("powerup", "/sounds/powerup.wav");
         } catch (Exception e) {
             System.err.println("Không thể tải file âm thanh: " + e.getMessage());
             e.printStackTrace();

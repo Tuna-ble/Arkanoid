@@ -3,6 +3,9 @@ package org.example.gamelogic.core;
 import org.example.data.AssetManager;
 import org.example.gamelogic.events.*;
 import javax.sound.sampled.Clip;
+import org.example.gamelogic.entities.bricks.Brick;
+import org.example.gamelogic.entities.bricks.UnbreakableBrick;
+import org.example.gamelogic.events.PowerUpCollectedEvent;
 
 public final class SoundManager {
     private AssetManager assetManager;
@@ -38,7 +41,16 @@ public final class SoundManager {
                 GameOverEvent.class,
                 this::onGameOver
         );
+        EventManager.getInstance().subscribe(
+                BallHitBrickEvent.class,
+                this::onBallHitBrick
+        );
+        EventManager.getInstance().subscribe(
+                PowerUpCollectedEvent.class,
+                this::onPowerUpCollected
+        );
     }
+
 
     private void playSound(String name) {
         if (!SettingsManager.getInstance().isSfxEnabled()) return;
@@ -77,9 +89,24 @@ public final class SoundManager {
         playSound("ball_lost");
     }
 
+
     public void onGameOver(GameOverEvent event) {
         // playSound("game_over");
         // Dừng nhạc nền (neu co)
         // stopSound
+    }
+
+    private void onBallHitBrick(BallHitBrickEvent event) {
+        if (event == null || event.getBrick() == null) {
+            return;
+        }
+
+        Brick brick = event.getBrick();
+        if (brick instanceof UnbreakableBrick) {
+            playSound("glass");
+        }
+    }
+    private void onPowerUpCollected(PowerUpCollectedEvent event) {
+        playSound("powerup");
     }
 }
