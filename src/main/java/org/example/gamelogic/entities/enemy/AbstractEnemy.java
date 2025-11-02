@@ -6,6 +6,7 @@ import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.entities.GameObject;
 import org.example.gamelogic.entities.LaserBullet;
 import org.example.gamelogic.entities.MovableObject;
+import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.events.*;
 
 public abstract class AbstractEnemy extends MovableObject implements Enemy {
@@ -79,6 +80,11 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
     public void setPosition(double x, double y) {
         this.x = x;
         this.y = y;
+    }
+
+    @Override
+    public void setHasEnteredScreen(boolean hasEnteredScreen) {
+        this.hasEnteredScreen = hasEnteredScreen;
     }
 
     @Override

@@ -127,11 +127,26 @@ public final class PlayingState implements GameState {
                     enemyManager.getActiveEnemies()
             );
         }
-        if (!hasWon && brickManager.isLevelComplete()) {
-            this.hasWon = true;
-            EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.VICTORY)
-            );
+        handleVictory();
+    }
+
+    private void handleVictory() {
+        if (this.hasWon || LifeManager.getInstance().getLives() <= 0) {
+            return;
+        }
+        if (this.levelNumber == 5) {
+            if (enemyManager.hasBossSpawned() && enemyManager.isBossDefeated()) {
+                EventManager.getInstance().publish(
+                        new ChangeStateEvent(GameStateEnum.VICTORY)
+                );
+            }
+        } else {
+            if (brickManager.isLevelComplete()) {
+                this.hasWon = true;
+                EventManager.getInstance().publish(
+                        new ChangeStateEvent(GameStateEnum.VICTORY)
+                );
+            }
         }
     }
 
@@ -229,9 +244,7 @@ public final class PlayingState implements GameState {
 
     private void updateAttachedBallPosition() {
         for (IBall ball : ballManager.getActiveBalls()) {
-            // Kiểm tra xem bóng có đang dính không
             if (ball.isAttachedToPaddle()) {
-                // Tính toán và đặt lại vị trí bóng dựa trên paddle
                 ball.setPosition(
                         paddle.getX() + (paddle.getWidth() / 2.0) - (ball.getGameObject().getWidth() / 2.0),
                         paddle.getY() - ball.getGameObject().getHeight()

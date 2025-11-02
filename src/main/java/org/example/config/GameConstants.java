@@ -61,6 +61,9 @@ public final class GameConstants {
     // Enemies
     public static final double ENEMY_WIDTH = 40;
     public static final double ENEMY_HEIGHT = 40;
+    public static final double BOSS_WIDTH = 200;
+    public static final double BOSS_HEIGHT = 100;
+    public static final double BOSS_HEATLTH = 10.0;
 
     // Gameplay tuning
     public static final double BALL_INITIAL_ANGLE_RANDOM_RANGE = 15.0; // ±15 degrees

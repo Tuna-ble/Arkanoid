@@ -96,6 +96,7 @@ public final class GameManager {
         this.laserManager = LaserManager.getInstance();
         this.particleManager = ParticleManager.getInstance();
 
+        this.enemyManager.setBrickManager(this.brickManager);
 
         subscribeToEvents();
     }

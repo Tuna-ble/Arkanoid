@@ -1,6 +1,7 @@
 package org.example.gamelogic.core;
 
 import org.example.config.GameConstants;
+import org.example.gamelogic.entities.BulletFrom;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.LaserBullet;
 import org.example.gamelogic.entities.Paddle;
@@ -39,19 +40,15 @@ public final class CollisionManager {
         for (Enemy enemy : enemies) {
             if (!enemy.isActive()) continue;
 
-            // BƯỚC A: Ưu tiên check va chạm Gạch TRƯỚC
-            // (Hàm này giờ trả về 'true' nếu có va chạm)
             boolean didCollideWithBrick = checkEnemyBrickCollisions(enemy, bricks);
 
-            // BƯỚC B: NẾU KHÔNG va chạm gạch, MỚI check va chạm tường
             if (!didCollideWithBrick) {
                 checkEnemyBoundsCollisions(enemy);
             }
         }
-        // 4. Thanh đỡ vs PowerUp
         checkPaddlePowerUpCollisions(paddle, fallingPowerUps);
 
-        checkLaserCollisions(lasers, bricks, enemies);
+        checkLaserCollisions(lasers, bricks, enemies, paddle);
     }
 
     private void checkBallBoundsCollisions(IBall ball) {
@@ -191,37 +188,46 @@ public final class CollisionManager {
         }
     }
 
-    private void checkLaserCollisions(List<LaserBullet> lasers, List<Brick> bricks, List<Enemy> enemies) {
+    private void checkLaserCollisions(List<LaserBullet> lasers, List<Brick> bricks, List<Enemy> enemies, Paddle paddle) {
         Iterator<LaserBullet> iterator = lasers.iterator();
         while (iterator.hasNext()) {
             LaserBullet laser = iterator.next();
 
-            for (Brick brick : bricks) {
-                if (!brick.isDestroyed() && laser.intersects(brick.getGameObject())) {
-                    EventManager.getInstance().
-                            publish(new BrickDamagedEvent(brick, laser.getGameObject()));
-                    laser.setActive(false);
-                    break;
-                }
-            }
-
-            if (laser.isActive()) {
-                for (Enemy enemy : enemies) {
-                    if (!enemy.isDestroyed() && laser.intersects(enemy.getGameObject())) {
+            if (laser.getFaction() == BulletFrom.PLAYER) {
+                for (Brick brick : bricks) {
+                    if (!brick.isDestroyed() && laser.intersects(brick.getGameObject())) {
                         EventManager.getInstance().
-                                publish(new EnemyDamagedEvent(enemy, laser.getGameObject()));
+                                publish(new BrickDamagedEvent(brick, laser.getGameObject()));
                         laser.setActive(false);
                         break;
                     }
+                }
+
+                if (laser.isActive()) {
+                    for (Enemy enemy : enemies) {
+                        if (!enemy.isDestroyed() && laser.intersects(enemy.getGameObject())) {
+                            EventManager.getInstance().
+                                    publish(new EnemyDamagedEvent(enemy, laser.getGameObject()));
+                            laser.setActive(false);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                if (paddle.intersects(laser.getGameObject())) {
+                    // (Bạn cần tạo sự kiện mới, ví dụ 'PaddleHitEvent')
+                    // EventManager.getInstance().publish(new PaddleHitEvent(paddle));
+                    LifeManager.getInstance().loseLife();
+                    laser.setActive(false);
                 }
             }
         }
     }
 
     private void checkBallEnemyCollisions(IBall ball, List<Enemy> enemies) {
-        Enemy bestCollisionEnemy = null; // Viên gạch va chạm "tốt nhất"
-        double maxOverlap = -1.0;          // Độ lún lớn nhất tìm thấy
-        boolean collisionIsHorizontal = false; // Hướng va chạm chính
+        Enemy bestCollisionEnemy = null;
+        double maxOverlap = -1.0;
+        boolean collisionIsHorizontal = false;
 
         for (Enemy enemy : enemies) {
             if (!enemy.isDestroyed() && ball.getGameObject().intersects(enemy.getGameObject())) {

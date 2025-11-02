@@ -31,4 +31,5 @@ public interface Enemy {
     void reverseDirY();
 
     boolean getHasEnteredScreen();
+    void setHasEnteredScreen(boolean hasEnteredScreen);
 }

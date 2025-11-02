@@ -1,6 +1,7 @@
 package org.example.gamelogic.core;
 
 import javafx.scene.canvas.GraphicsContext;
+import org.example.gamelogic.entities.BulletFrom;
 import org.example.gamelogic.entities.LaserBullet;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.entities.bricks.Brick;
@@ -21,13 +22,8 @@ public final class LaserManager {
 
     private final List<LaserBullet> lasers=new ArrayList<>();
 
-    public void shoot(Paddle paddle) {
-        double leftX=paddle.getX()+10;
-        double rightX= paddle.getX()+ paddle.getWidth()-14;
-        double y= paddle.getY()-16;
-
-        lasers.add(new LaserBullet(leftX, y));
-        lasers.add(new LaserBullet(rightX, y));
+    public void createBullet(double x, double y, double dy, BulletFrom faction) {
+        lasers.add(new LaserBullet(x, y, dy, faction));
     }
 
     public void update(double deltaTime) {

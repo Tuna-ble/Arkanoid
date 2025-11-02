@@ -2,21 +2,11 @@ package org.example.gamelogic.core;
 
 import javafx.scene.canvas.GraphicsContext;
 import org.example.config.GameConstants;
-import org.example.gamelogic.entities.Paddle;
-import org.example.gamelogic.entities.bricks.Brick;
-import org.example.gamelogic.entities.enemy.Enemy;
-import org.example.gamelogic.entities.enemy.Enemy1;
-import org.example.gamelogic.entities.enemy.Enemy2;
-import org.example.gamelogic.entities.powerups.*;
-import org.example.gamelogic.events.BrickDestroyedEvent;
+import org.example.gamelogic.entities.enemy.*;
 import org.example.gamelogic.factory.EnemyFactory;
-import org.example.gamelogic.factory.PowerUpFactory;
 import org.example.gamelogic.registry.EnemyRegistry;
-import org.example.gamelogic.registry.PowerUpRegistry;
-import org.example.gamelogic.strategy.powerup.*;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public final class EnemyManager {
@@ -30,6 +20,10 @@ public final class EnemyManager {
 
     private final EnemyFactory enemyFactory;
     private List<Enemy> activeEnemies = new ArrayList<>();
+    private List<Enemy> enemiesToSpawn = new ArrayList<>();
+
+    private GameManager gameManager;
+    private BrickManager brickManager;
 
     private static final String[] ENEMY_TYPES = {"E1", "E2"};
 
@@ -37,11 +31,13 @@ public final class EnemyManager {
     private int enemiesSpawned = 0;
     private final int MAX_ENEMIES_PER_LEVEL = 5;
     private int currentLevelNumber;
+    private boolean bossSpawned;
 
     public EnemyManager() {
         EnemyRegistry registry = EnemyRegistry.getInstance();
         registerEnemyPrototypes(registry);
         this.enemyFactory = new EnemyFactory(registry);
+        this.bossSpawned = false;
     }
 
     private void registerEnemyPrototypes(EnemyRegistry enemyRegistry) {
@@ -53,11 +49,21 @@ public final class EnemyManager {
 
         enemyRegistry.register("E2", new Enemy2(0.0, 0.0, GameConstants.ENEMY_WIDTH,
                 GameConstants.ENEMY_HEIGHT, 25.0, 50.0));
+        enemyRegistry.register("MINION", new BossMinion(0.0, 0.0, GameConstants.ENEMY_WIDTH,
+                GameConstants.ENEMY_HEIGHT, 25.0, 50.0));
+        enemyRegistry.register("BOSS", new Boss(0, 0, 0, 50));
     }
 
-    public void spawnEnemy(String type, double x, double y) {
-        Enemy newEnemy = enemyFactory.createEnemy(type, x, y);
-        activeEnemies.add(newEnemy);
+    public void spawnEnemy(String type, double centerX, double centerY) {
+        Enemy newEnemy = enemyFactory.createEnemy(type, 0, 0);
+
+        double spawnX = centerX - (newEnemy.getWidth() / 2.0);
+        double spawnY = centerY - (newEnemy.getHeight() / 2.0);
+
+        newEnemy.setPosition(spawnX, spawnY);
+        newEnemy.setHasEnteredScreen(true);
+
+        this.enemiesToSpawn.add(newEnemy);
     }
 
     public void spawnEnemy(String type) {
@@ -67,14 +73,12 @@ public final class EnemyManager {
         double startY = -newEnemy.getHeight();
         newEnemy.setPosition(startX, startY);
 
-        double horizontalSpeed = newEnemy.getDx(); // Lấy tốc độ ngang (ví dụ: 150)
+        double horizontalSpeed = newEnemy.getDx();
 
-        // Quyết định 50/50
         if (Math.random() < 0.5) {
-            // Nếu random < 0.5, cho đi sang trái
-            newEnemy.setDx(-horizontalSpeed); // Đặt dx = -150
+            newEnemy.setDx(-horizontalSpeed);
         }
-        this.activeEnemies.add(newEnemy);
+        this.enemiesToSpawn.add(newEnemy);
     }
 
     public void loadLevelScript(int levelNumber) {
@@ -82,7 +86,12 @@ public final class EnemyManager {
         this.levelTimer = 0.0;
         this.enemiesSpawned = 0;
 
+        this.bossSpawned = false;
         this.activeEnemies.clear();
+    }
+
+    public void setBrickManager(BrickManager brickManager) {
+        this.brickManager = brickManager;
     }
 
     public void update(double deltaTime) {
@@ -104,10 +113,21 @@ public final class EnemyManager {
                     spawnEnemy("E2");
                 }
                 break;
+            case 5:
+                if (this.brickManager != null && brickManager.isLevelComplete() && !this.bossSpawned) {
+                    spawnEnemy("BOSS");
+                    this.bossSpawned = true;
+                }
+                break;
         }
         activeEnemies.removeIf(Enemy::isDestroyed);
         for (Enemy enemy : activeEnemies) {
             enemy.update(deltaTime);
+        }
+
+        if (!enemiesToSpawn.isEmpty()) {
+            activeEnemies.addAll(enemiesToSpawn);
+            enemiesToSpawn.clear();
         }
     }
 
@@ -123,5 +143,18 @@ public final class EnemyManager {
 
     public List<Enemy> getActiveEnemies() {
         return activeEnemies;
+    }
+
+    public boolean isBossDefeated() {
+        for (Enemy enemy : activeEnemies) {
+            if (enemy instanceof Boss) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean hasBossSpawned() {
+        return this.bossSpawned;
     }
 }
