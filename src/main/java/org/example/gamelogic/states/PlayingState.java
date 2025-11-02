@@ -81,7 +81,8 @@ public final class PlayingState implements GameState {
         subscribeToEvents();
         this.levelNumber = levelNumber;
 
-        powerUpManager.spawnPowerUp("F", 400, 400);
+        powerUpManager.spawnPowerUp("P", 400, 300);
+        powerUpManager.spawnPowerUp("M", 400, 400);
     }
 
     private void subscribeToEvents() {

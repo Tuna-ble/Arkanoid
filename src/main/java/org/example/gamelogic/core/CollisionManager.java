@@ -1,6 +1,7 @@
 package org.example.gamelogic.core;
 
 import org.example.config.GameConstants;
+import org.example.gamelogic.entities.Ball;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.LaserBullet;
 import org.example.gamelogic.entities.Paddle;
@@ -94,6 +95,34 @@ public final class CollisionManager {
     }
 
     private void checkBallBrickCollisions(IBall ball, List<Brick> bricks) {
+        boolean isPiercing=ball.getPierceLeft()>0;
+        if (isPiercing) {
+            handlePiercingBrickCollision(ball, bricks);
+        }
+        else {
+            handleNormalBrickCollision(ball, bricks);
+        }
+    }
+    private void handlePiercingBrickCollision(IBall ball, List<Brick> bricks) {
+        for (Brick brick : bricks) {
+            if (brick.isDestroyed()) continue;
+            if (!ball.getGameObject().intersects(brick.getGameObject())) continue;
+
+            // skip repeated damage on the same brick
+            if (!brick.equals(ball.getPiercingBrick())) {
+                ball.setPierceLeft(ball.getPierceLeft() - 1);
+                ball.setPiercingBrick(brick);
+                EventManager.getInstance().publish(new BallHitBrickEvent(brick, ball));
+            }
+        }
+
+        // clear piercingBrick if ball is no longer overlapping
+        if (ball.getPiercingBrick() != null &&
+                !ball.getGameObject().intersects(ball.getPiercingBrick().getGameObject())) {
+            ball.setPiercingBrick(null);
+        }
+    }
+    private void handleNormalBrickCollision(IBall ball, List<Brick> bricks) {
         Brick bestCollisionBrick = null; // Viên gạch va chạm "tốt nhất"
         double maxOverlap = -1.0;          // Độ lún lớn nhất tìm thấy
         boolean collisionIsHorizontal = false; // Hướng va chạm chính

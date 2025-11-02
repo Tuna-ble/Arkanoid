@@ -34,4 +34,9 @@ public interface IBall {
 
     void setDx(double v);
     void setDy(double v);
+
+    void setPierceLeft(int pierceLeft);
+    int getPierceLeft();
+    void setPiercingBrick(Brick piercingBrick);
+    Brick getPiercingBrick();
 }

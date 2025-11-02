@@ -6,14 +6,17 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import org.example.config.GameConstants;
+import org.example.gamelogic.entities.bricks.Brick;
 
 import java.util.LinkedList;
-import java.util.List;
 
 public class Ball extends MovableObject implements IBall {
     private double radius;
     private double speed;
     private boolean attachedToPaddle;
+
+    private int pierceLeft;
+    private Brick piercingBrick;
 
     private static class GhostSnapshot {
         double x, y, width, height;
@@ -25,6 +28,7 @@ public class Ball extends MovableObject implements IBall {
             this.height = height;
         }
     }
+
     private final LinkedList<GhostSnapshot> trail = new LinkedList<>();
     private final int MAX_GHOSTS = 8;
     private double lastGhostX, lastGhostY;
@@ -35,8 +39,24 @@ public class Ball extends MovableObject implements IBall {
         this.speed = GameConstants.BALL_INITIAL_SPEED;
         this.attachedToPaddle = true;
 
+        this.pierceLeft = 0;
+        this.piercingBrick = null;
+
         this.lastGhostX = x;
         this.lastGhostY = y;
+    }
+
+    public void setPierceLeft(int pierceLeft) {
+        this.pierceLeft = pierceLeft;
+    }
+    public int getPierceLeft() {
+        return pierceLeft;
+    }
+    public void setPiercingBrick(Brick piercingBrick) {
+        this.piercingBrick = piercingBrick;
+    }
+    public Brick getPiercingBrick() {
+        return piercingBrick;
     }
 
     public double getCenterX() {
@@ -84,7 +104,7 @@ public class Ball extends MovableObject implements IBall {
             for (int i = 0; i < trail.size(); i++) {
                 GhostSnapshot ghost = trail.get(i);
 
-                double progress = 1.0 - (double)i / MAX_GHOSTS;
+                double progress = 1.0 - (double) i / MAX_GHOSTS;
 
                 double opacity = 0.5 * progress;
 
@@ -203,7 +223,9 @@ public class Ball extends MovableObject implements IBall {
         dx += paddledx * GameConstants.PADDLE_MOVE_INFLUENCE;
         dx += speed * hitPosition * 0.5;
 
-        if (dy > 0) { dy = -Math.abs(dy); }
+        if (dy > 0) {
+            dy = -Math.abs(dy);
+        }
 
         double currentSpeed = Math.sqrt(dx * dx + dy * dy);
         double targetSpeed = speed * GameConstants.BALL_RESTITUTION;
@@ -218,8 +240,13 @@ public class Ball extends MovableObject implements IBall {
     }
 
     // getter
-    public double getRadius() { return radius; }
-    public double getSpeed() { return speed; }
+    public double getRadius() {
+        return radius;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
 
     public void incrementSpeed() {
         speed = Math.min(speed + GameConstants.BALL_SPEED_INCREMENT_PER_BRICK, GameConstants.BALL_MAX_SPEED);
@@ -290,7 +317,7 @@ public class Ball extends MovableObject implements IBall {
                 double factor = GameConstants.BALL_MIN_SPEED / currentSpeed;
                 dx *= factor;
                 dy *= factor;
-            } else if (speed > 0){ // Nếu đang đứng yên nhưng speed > 0 (ví dụ sau reset)
+            } else if (speed > 0) { // Nếu đang đứng yên nhưng speed > 0 (ví dụ sau reset)
                 // Có thể đặt lại một vận tốc ngẫu nhiên nhỏ hoặc theo hướng mặc định
                 // Ví dụ: Đặt lại theo góc -75 độ
                 double baseAngle = Math.toRadians(-75);
@@ -299,6 +326,7 @@ public class Ball extends MovableObject implements IBall {
             }
         }
     }
+
     private void limitMaximumSpeed() {
         double currentSpeedSq = dx * dx + dy * dy;
         double maxSpeedSq = GameConstants.BALL_MAX_SPEED * GameConstants.BALL_MAX_SPEED;
@@ -313,6 +341,7 @@ public class Ball extends MovableObject implements IBall {
             speed = GameConstants.BALL_MAX_SPEED;
         }
     }
+
     private void updateVelocityWithSpeed() {
         if (!attachedToPaddle) {
             double currentSpeed = Math.sqrt(dx * dx + dy * dy);
