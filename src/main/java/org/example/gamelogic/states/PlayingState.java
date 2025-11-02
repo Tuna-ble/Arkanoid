@@ -31,6 +31,7 @@ public final class PlayingState implements GameState {
     BallManager ballManager;
     CollisionManager collisionManager;
     LaserManager laserManager;
+    EnemyManager enemyManager;
     Paddle paddle;
     Font scoreFont;
     Image pauseIcon;
@@ -46,6 +47,7 @@ public final class PlayingState implements GameState {
         this.brickManager.loadLevel(levelNumber);
         this.powerUpManager = gameManager.getPowerUpManager();
         this.ballManager = gameManager.getBallManager();
+        this.enemyManager = gameManager.getEnemyManager();
         this.collisionManager = gameManager.getCollisionManager();
         this.laserManager = gameManager.getLaserManager();
 
@@ -74,6 +76,7 @@ public final class PlayingState implements GameState {
         }
         subscribeToEvents();
         this.levelNumber = levelNumber;
+        this.enemyManager.loadLevelScript(this.levelNumber);
     }
 
     private void subscribeToEvents() {
@@ -112,6 +115,7 @@ public final class PlayingState implements GameState {
         brickManager.update(deltaTime);
         ballManager.update(deltaTime);
         powerUpManager.update(deltaTime);
+        enemyManager.update(deltaTime);
 
         if (collisionManager != null) {
             collisionManager.checkCollisions(
@@ -119,7 +123,8 @@ public final class PlayingState implements GameState {
                     paddle,
                     brickManager.getBricks(),
                     powerUpManager.getActivePowerUps(),
-                    laserManager.getLasers()
+                    laserManager.getLasers(),
+                    enemyManager.getActiveEnemies()
             );
         }
         if (!hasWon && brickManager.isLevelComplete()) {
@@ -143,6 +148,7 @@ public final class PlayingState implements GameState {
         ballManager.render(gc);
         powerUpManager.render(gc);
         laserManager.render(gc);
+        enemyManager.render(gc);
         paddle.render(gc);
         renderScore(gc);
 

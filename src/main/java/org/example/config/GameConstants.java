@@ -58,6 +58,10 @@ public final class GameConstants {
     public static final double HARD_BRICK_DURABILITY = 3;
     public static final int POINTS_PER_HARD_BRICK = 50;
 
+    // Enemies
+    public static final double ENEMY_WIDTH = 40;
+    public static final double ENEMY_HEIGHT = 40;
+
     // Gameplay tuning
     public static final double BALL_INITIAL_ANGLE_RANDOM_RANGE = 15.0; // ±15 degrees
     public static final double BALL_SPEED_SCALE_ON_HIT = 1.02; // speed increase on hit

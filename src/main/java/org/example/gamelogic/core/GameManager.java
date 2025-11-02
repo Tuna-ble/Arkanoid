@@ -23,6 +23,7 @@ public final class GameManager {
     private ScoreManager scoreManager;
     private LifeManager lifeManager;
     private LaserManager laserManager;
+    private EnemyManager enemyManager;
 
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
@@ -88,6 +89,7 @@ public final class GameManager {
         currentState = new MainMenuState();
         this.stateManager.setState(currentState);
 
+        this.enemyManager = EnemyManager.getInstance();
         this.soundManager = SoundManager.getInstance();
         this.scoreManager = ScoreManager.getInstance();
         this.lifeManager = LifeManager.getInstance();
@@ -291,5 +293,9 @@ public final class GameManager {
     }
     public ParticleManager getParticleManager() {
         return this.particleManager;
+    }
+
+    public EnemyManager getEnemyManager() {
+        return this.enemyManager;
     }
 }
