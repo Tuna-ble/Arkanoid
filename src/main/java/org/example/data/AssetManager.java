@@ -17,11 +17,13 @@ public class AssetManager {
 
     public void loadAssets() {
         try {
-            loadSound("brick_hit", "/sounds/brick_hit.wav");
+            loadSound("brick_destroyed", "/sounds/brick_destroyed.wav");
             loadSound("paddle_hit", "/sounds/paddle_hit.wav");
             loadSound("ball_lost", "/sounds/ball_lost.wav");
             loadSound("glass", "/sounds/glass.wav");
             loadSound("powerup", "/sounds/powerup.wav");
+            loadSound("brick_hit", "/sounds/brick_hit.wav");
+            loadSound("bomb", "/sounds/bomb.wav");
         } catch (Exception e) {
             System.err.println("Không thể tải file âm thanh: " + e.getMessage());
             e.printStackTrace();
@@ -46,9 +48,12 @@ public class AssetManager {
     public void loadSounds() {
         try {
 
-            loadSound("brick_hit", "/sounds/brick_hit.wav");
+            loadSound("brick_destroyed", "/sounds/brick_destroyed.wav");
             loadSound("paddle_hit", "/sounds/paddle_hit.wav");
             loadSound("ball_lost", "/sounds/ball_lost.wav");
+            loadSound("powerup", "/sounds/powerup.wav");
+            loadSound("brick_hit", "/sounds/brick_hit.wav");
+            loadSound("bomb", "/sounds/bomb.wav");
 
         } catch (Exception e) {
             System.err.println("Không thể tải file âm thanh: " + e.getMessage());

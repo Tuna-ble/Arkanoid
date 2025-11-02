@@ -4,8 +4,13 @@ import org.example.data.AssetManager;
 import org.example.gamelogic.events.*;
 import javax.sound.sampled.Clip;
 import org.example.gamelogic.entities.bricks.Brick;
+import org.example.gamelogic.entities.bricks.ExplosiveBrick;
+import org.example.gamelogic.entities.bricks.NormalBrick;
+import org.example.gamelogic.entities.bricks.HardBrick;
+import org.example.gamelogic.entities.bricks.HealingBrick;
 import org.example.gamelogic.entities.bricks.UnbreakableBrick;
 import org.example.gamelogic.events.PowerUpCollectedEvent;
+
 
 public final class SoundManager {
     private AssetManager assetManager;
@@ -78,7 +83,12 @@ public final class SoundManager {
     }
 
     public void onBrickDestroyed(BrickDestroyedEvent event) {
-        playSound("brick_hit");
+
+        stopSound("brick_hit");
+        playSound("brick_destroyed");
+    }
+
+    private void stopSound(String brickHit) {
     }
 
     public void onPaddleHit(BallHitPaddleEvent event) {
@@ -97,14 +107,23 @@ public final class SoundManager {
     }
 
     private void onBallHitBrick(BallHitBrickEvent event) {
+
         if (event == null || event.getBrick() == null) {
             return;
         }
 
         Brick brick = event.getBrick();
+
         if (brick instanceof UnbreakableBrick) {
             playSound("glass");
         }
+        else if (brick instanceof ExplosiveBrick) {
+            playSound("bomb");
+        }
+        else if (brick instanceof HardBrick || brick instanceof HealingBrick) {
+            playSound("brick_hit");
+        }
+
     }
     private void onPowerUpCollected(PowerUpCollectedEvent event) {
         playSound("powerup");
