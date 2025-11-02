@@ -15,7 +15,6 @@ import org.example.gamelogic.graphics.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class PauseState implements GameState {
-    private final GameManager gameManager;
     private final GameState previousState;
     private final Font titleFont = new Font("Arial", 48);
     private final Font buttonFont = new Font("Arial", 28);
@@ -27,10 +26,10 @@ public final class PauseState implements GameState {
 
     // Button instances
     private Button resumeButton;
+    private Button settingsButton;
     private Button quitButton;
 
-    public PauseState(GameManager gameManager, GameState previousState) {
-        this.gameManager = gameManager;
+    public PauseState(GameState previousState) {
         this.previousState = previousState;
     }
 
@@ -59,7 +58,7 @@ public final class PauseState implements GameState {
 
         // Draw pause panel (card)
         double panelWidth = 300;
-        double panelHeight = 250;
+        double panelHeight = 350;
         double panelX = centerX - panelWidth / 2;
         double panelY = centerY - panelHeight / 2;
 
@@ -88,8 +87,10 @@ public final class PauseState implements GameState {
         // Calculate button positions
         double resumeX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
         double resumeY = panelY + 100;
+        double settingsX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
+        double settingsY = resumeY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_SPACING;
         double quitX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
-        double quitY = resumeY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_SPACING;
+        double quitY = settingsY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_SPACING;
 
         // Initialize buttons if not already created
         if (resumeButton == null) {
@@ -122,8 +123,24 @@ public final class PauseState implements GameState {
             quitButton.setY(quitY);
         }
 
+        if (settingsButton == null) {
+            settingsButton = new Button(settingsX, settingsY, "Settings");
+            settingsButton.setFont(buttonFont);
+            settingsButton.setColors(
+                    Color.web("#444"),
+                    Color.web("#555"),
+                    Color.WHITE,
+                    Color.WHITE,
+                    Color.WHITE
+            );
+        } else {
+            settingsButton.setX(settingsX);
+            settingsButton.setY(settingsY);
+        }
+
         // Render buttons
         if (resumeButton != null) resumeButton.render(gc);
+        if (settingsButton != null) settingsButton.render(gc);
         if (quitButton != null) quitButton.render(gc);
         gc.setTextAlign(TextAlignment.LEFT);
     }
@@ -135,12 +152,17 @@ public final class PauseState implements GameState {
         
         // Update buttons to check hover and click states
         if (resumeButton != null) resumeButton.update(inputProvider);
+        if (settingsButton != null) settingsButton.update(inputProvider);
         if (quitButton != null) quitButton.update(inputProvider);
         
         // Handle button clicks
         if (resumeButton != null && resumeButton.isClicked()) {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.RESUME_GAME)
+            );
+        } else if (settingsButton != null && settingsButton.isClicked()) {
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.SETTINGS)
             );
         } else if (quitButton != null && quitButton.isClicked()) {
             EventManager.getInstance().publish(

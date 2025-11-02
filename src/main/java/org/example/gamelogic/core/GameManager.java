@@ -214,16 +214,18 @@ public final class GameManager {
 
             case PAUSED:
                 if (currentState instanceof PlayingState) {
-                    newState = new PauseState(this, currentState);
+                    newState = new PauseState(currentState);
                 }
                 break;
             case RESUME_GAME:
                 if (currentState instanceof PauseState) {
                     newState = ((PauseState) currentState).getPreviousState();
+                } else if (currentState instanceof SettingsState) {
+                    newState = ((SettingsState) currentState).getPreviousState();
                 }
                 break;
             case SETTINGS:
-                newState = new SettingsState();
+                newState = new SettingsState(currentState);
                 break;
         }
 
