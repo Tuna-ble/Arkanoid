@@ -51,4 +51,8 @@ public final class LaserManager {
     public List<LaserBullet> getLasers() {
         return lasers;
     }
+
+    public void clear() {
+        lasers.clear();
+    }
 }

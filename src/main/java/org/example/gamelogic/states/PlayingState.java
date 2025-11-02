@@ -2,27 +2,23 @@ package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
+import org.example.config.GameConstants;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.*;
-import javafx.scene.text.Font;
-import javafx.scene.paint.Color;
-import org.example.config.GameConstants;
-import org.example.gamelogic.core.BallManager;
-import org.example.gamelogic.core.BrickManager;
-import org.example.gamelogic.core.GameManager;
-import org.example.gamelogic.core.PowerUpManager;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
-import org.example.gamelogic.entities.powerups.PowerUp;
 import org.example.gamelogic.events.*;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
-import javafx.scene.input.KeyCode;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 public final class PlayingState implements GameState {
     BrickManager brickManager;
@@ -39,6 +35,11 @@ public final class PlayingState implements GameState {
 
     private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
     private int levelNumber;
+
+    private final Consumer<BallLostEvent> handleBallLost;
+    private final Consumer<PowerUpCollectedEvent> handlePowerUpCollected;
+    private final Consumer<LifeLostEvent> handleLifeLost;
+    private final Consumer<LifeAddedEvent> handleLifeAdded;
 
     public PlayingState(GameManager gameManager, int levelNumber) {
         this.gameManager = gameManager;
@@ -59,6 +60,11 @@ public final class PlayingState implements GameState {
 
         this.ballManager.createInitialBall(this.paddle);
 
+        handleBallLost = this::handleBallLost;
+        handlePowerUpCollected = this::handlePowerUpCollected;
+        handleLifeLost = this::handleLifeLost;
+        handleLifeAdded = this::handleLifeAdded;
+
         ScoreManager.getInstance().resetScore();
         LifeManager.getInstance().reset();
 
@@ -74,24 +80,27 @@ public final class PlayingState implements GameState {
         }
         subscribeToEvents();
         this.levelNumber = levelNumber;
+
+        powerUpManager.spawnPowerUp("M", 400, 200);
+        powerUpManager.spawnPowerUp("M", 400, 300);
     }
 
     private void subscribeToEvents() {
         EventManager.getInstance().subscribe(
                 BallLostEvent.class,
-                this::handleBallLost
+                handleBallLost
         );
         EventManager.getInstance().subscribe(
                 PowerUpCollectedEvent.class,
-                this::handlePowerUpCollected
+                handlePowerUpCollected
         );
         EventManager.getInstance().subscribe(
                 LifeLostEvent.class,
-                this::handleLifeLost
+                handleLifeLost
         );
         EventManager.getInstance().subscribe(
                 LifeAddedEvent.class,
-                this::handleLifeAdded
+                handleLifeAdded
         );
     }
 
@@ -263,10 +272,31 @@ public final class PlayingState implements GameState {
     }
 
     public void cleanUp() {
+        EventManager.getInstance().unsubscribe(
+                BallLostEvent.class,
+                handleBallLost
+        );
+        EventManager.getInstance().unsubscribe(
+                PowerUpCollectedEvent.class,
+                handlePowerUpCollected
+        );
+        EventManager.getInstance().unsubscribe(
+                LifeLostEvent.class,
+                handleLifeLost
+        );
+        EventManager.getInstance().unsubscribe(
+                LifeAddedEvent.class,
+                handleLifeAdded
+        );
+
         for (PowerUpStrategy strategy : activeStrategies) {
             strategy.remove(this);
         }
         activeStrategies.clear();
+
+        ballManager.clear();
+        powerUpManager.clear();
+        laserManager.clear();
     }
 
     private void handleBallLost(BallLostEvent event) {
@@ -287,5 +317,8 @@ public final class PlayingState implements GameState {
     public int getLevelNumber() {
         return this.levelNumber;
     }
-    public int getCurrentLives() { return this.currentLives; }
+
+    public int getCurrentLives() {
+        return this.currentLives;
+    }
 }

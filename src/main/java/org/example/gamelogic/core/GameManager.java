@@ -146,16 +146,12 @@ public final class GameManager {
 
         if (currentState instanceof PlayingState && event.targetState != GameStateEnum.PAUSED && event.targetState != GameStateEnum.RESUME_GAME) {
             ((PlayingState) currentState).cleanUp();
-            powerUpManager.clear();
-            ballManager.clear();
         }
 
         switch (event.targetState) {
             case PLAYING:
                 if (currentState instanceof PlayingState) {
                     ((PlayingState) currentState).cleanUp();
-                    powerUpManager.clear();
-                    ballManager.clear();
                 }
                 newState = new PlayingState(this, levelToLoad);
                 break;
@@ -170,8 +166,9 @@ public final class GameManager {
             case MAIN_MENU:
                 if (currentState instanceof PlayingState) {
                     ((PlayingState) currentState).cleanUp();
-                    powerUpManager.clear();
-                    ballManager.clear();
+                }
+                else if (currentState instanceof PauseState) {
+                    ((PauseState) currentState).cleanUp();
                 }
                 newState = new MainMenuState();
                 break;
@@ -187,8 +184,6 @@ public final class GameManager {
                     HighscoreManager.saveNewScore(finalScore);
 
                     playingState.cleanUp();
-                    powerUpManager.clear();
-                    ballManager.clear();
 
                     newState = new VictoryState(livesLeft, levelCompleted);
                 }
@@ -205,10 +200,7 @@ public final class GameManager {
                     HighscoreManager.saveNewScore(finalScore);
 
                     playingState.cleanUp();
-                    powerUpManager.clear();
-                    ballManager.clear();
                 }
-
                 newState = new GameOverState(currentLevel);
                 break;
 

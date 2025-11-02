@@ -106,7 +106,7 @@ public final class PauseState implements GameState {
             resumeButton.setX(resumeX);
             resumeButton.setY(resumeY);
         }
-        
+
         if (quitButton == null) {
             quitButton = new Button(quitX, quitY, "Quit");
             quitButton.setFont(buttonFont);
@@ -132,11 +132,11 @@ public final class PauseState implements GameState {
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
-        
+
         // Update buttons to check hover and click states
         if (resumeButton != null) resumeButton.update(inputProvider);
         if (quitButton != null) quitButton.update(inputProvider);
-        
+
         // Handle button clicks
         if (resumeButton != null && resumeButton.isClicked()) {
             EventManager.getInstance().publish(
@@ -151,5 +151,12 @@ public final class PauseState implements GameState {
 
     public GameState getPreviousState() {
         return previousState;
+    }
+
+    public void cleanUp() {
+        System.out.println("[CLEANUP] Nullifying previousState reference");
+        if (previousState instanceof PlayingState) {
+            ((PlayingState) previousState).cleanUp();
+        }
     }
 }
