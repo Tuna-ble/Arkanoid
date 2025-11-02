@@ -63,6 +63,12 @@ public final class EnemyManager {
         newEnemy.setPosition(spawnX, spawnY);
         newEnemy.setHasEnteredScreen(true);
 
+        double horizontalSpeed = newEnemy.getDx();
+
+        if (Math.random() < 0.5) {
+            newEnemy.setDx(-horizontalSpeed);
+        }
+
         this.enemiesToSpawn.add(newEnemy);
     }
 
