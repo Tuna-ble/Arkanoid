@@ -7,7 +7,7 @@ import org.example.gamelogic.states.PlayingState;
 
 public class ExpandPaddleStrategy implements PowerUpStrategy {
     private final double expansionFactor = 1.5;
-    private double remainingTime = 5.0;
+    private double remainingTime = 10.0;
     private double originalWidth;
 
     @Override
@@ -43,6 +43,11 @@ public class ExpandPaddleStrategy implements PowerUpStrategy {
 
     @Override
     public void reset() {
-        remainingTime = 5.0;
+        remainingTime = 10.0;
+    }
+
+    @Override
+    public PowerUpStrategy clone() {
+        return new ExpandPaddleStrategy();
     }
 }

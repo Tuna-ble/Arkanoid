@@ -2,6 +2,7 @@ package org.example.gamelogic.entities.powerups;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import org.example.gamelogic.strategy.powerup.ExtraLifeStrategy;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public class ExtraLifePowerUp extends AbstractPowerUp {
@@ -12,7 +13,7 @@ public class ExtraLifePowerUp extends AbstractPowerUp {
 
     @Override
     public PowerUp clone() {
-        return new ExtraLifePowerUp(0.0, 0.0, this.width, this.height, this.dx, this.dy, super.getStrategy());
+        return new ExtraLifePowerUp(0.0, 0.0, this.width, this.height, this.dx, this.dy, getStrategy().clone());
     }
 
     @Override

@@ -150,8 +150,8 @@ public final class GameManager {
 
         switch (event.targetState) {
             case PLAYING:
-                if (currentState instanceof PlayingState) {
-                    ((PlayingState) currentState).cleanUp();
+                if (currentState instanceof PauseState) {
+                    ((PauseState) currentState).cleanUp();
                 }
                 newState = new PlayingState(this, levelToLoad);
                 break;

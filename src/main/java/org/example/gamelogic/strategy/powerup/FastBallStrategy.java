@@ -47,4 +47,9 @@ public class FastBallStrategy implements PowerUpStrategy {
     public void reset() {
         remainingTime = 10.0;
     }
+
+    @Override
+    public PowerUpStrategy clone() {
+        return new FastBallStrategy();
+    }
 }

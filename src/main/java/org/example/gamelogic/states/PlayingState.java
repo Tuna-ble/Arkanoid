@@ -81,8 +81,7 @@ public final class PlayingState implements GameState {
         subscribeToEvents();
         this.levelNumber = levelNumber;
 
-        powerUpManager.spawnPowerUp("M", 400, 200);
-        powerUpManager.spawnPowerUp("M", 400, 300);
+        powerUpManager.spawnPowerUp("F", 400, 400);
     }
 
     private void subscribeToEvents() {
@@ -244,7 +243,14 @@ public final class PlayingState implements GameState {
     }
 
     public void addStrategy(PowerUpStrategy strategy) {
-        strategy.reset();
+        Iterator<PowerUpStrategy> iterator = activeStrategies.iterator();
+        while (iterator.hasNext()) {
+            PowerUpStrategy now = iterator.next();
+            if (now.getClass().equals(strategy.getClass())) {
+                now.reset();
+                return;
+            }
+        }
         activeStrategies.add(strategy);
         strategy.apply(this);
     }

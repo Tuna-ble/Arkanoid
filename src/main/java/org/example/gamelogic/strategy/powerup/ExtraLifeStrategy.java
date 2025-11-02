@@ -34,4 +34,9 @@ public class ExtraLifeStrategy implements PowerUpStrategy {
     public void reset() {
 
     }
+
+    @Override
+    public PowerUpStrategy clone() {
+        return new ExtraLifeStrategy();
+    }
 }

@@ -9,4 +9,5 @@ public interface PowerUpStrategy {
     void remove(PlayingState playingState);
     boolean isExpired();
     void reset();
+    PowerUpStrategy clone();
 }
