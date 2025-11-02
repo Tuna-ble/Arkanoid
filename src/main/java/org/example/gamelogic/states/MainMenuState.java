@@ -22,7 +22,6 @@ import org.example.gamelogic.graphics.TextRenderer;
 public final class MainMenuState implements GameState {
     private Image mainMenuImage;
     private Button startButton;
-    private Button levelButton;
     private Button rankingButton;
     private Button settingsButton;
     private double elapsedTime = 0;
@@ -31,10 +30,10 @@ public final class MainMenuState implements GameState {
 
     public MainMenuState() {
         mainMenuImage = new Image(getClass().getResourceAsStream("/GameIcon/MainMenu.png"));
-        startButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 0, "Start");
-        levelButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 70, "Level");
-        rankingButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 140, "Ranking");
-        settingsButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 210, "Settings");
+        double buttonGap = 70;
+        startButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 0), "Start");
+        rankingButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 1), "Ranking");
+        settingsButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 2), "Settings");
     }
 
     @Override
@@ -72,7 +71,6 @@ public final class MainMenuState implements GameState {
 
         // Buttons
         if (startButton != null) startButton.render(gc);
-        if (levelButton != null) levelButton.render(gc);
         if (rankingButton != null) rankingButton.render(gc);
         if (settingsButton != null) settingsButton.render(gc);
 
@@ -94,13 +92,9 @@ public final class MainMenuState implements GameState {
         if ((startButton != null && startButton.isClicked())
                 || inputProvider.isKeyPressed(KeyCode.SPACE)) {
             EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.PLAYING, 1)
+                    new ChangeStateEvent(GameStateEnum.GAME_MODE)
             );
-        } else if (levelButton != null && levelButton.isClicked()) {
-            EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.LEVEL_STATE)
-            );
-        } else if (rankingButton != null && rankingButton.isClicked()) {
+        }  else if (rankingButton != null && rankingButton.isClicked()) {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.RANKING_STATE)
             );
@@ -115,7 +109,6 @@ public final class MainMenuState implements GameState {
 
     private void updateButtons(I_InputProvider inputProvider) {
         if (startButton != null) startButton.update(inputProvider);
-        if (levelButton != null) levelButton.update(inputProvider);
         if (rankingButton != null) rankingButton.update(inputProvider);
         if (settingsButton != null) settingsButton.update(inputProvider);
     }

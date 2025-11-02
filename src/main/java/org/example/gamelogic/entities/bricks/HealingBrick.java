@@ -2,6 +2,9 @@ package org.example.gamelogic.entities.bricks;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import org.example.gamelogic.core.EventManager;
+import org.example.gamelogic.core.ParticleManager;
+import org.example.gamelogic.events.BrickDestroyedEvent;
 
 public class HealingBrick extends AbstractBrick {
 
@@ -31,8 +34,9 @@ public class HealingBrick extends AbstractBrick {
 
 
         } else if (currentState == State.DAMAGED) {
+            ParticleManager.getInstance().spawnBrickDebris(this.x, this.y, this.damagedColor);
             this.isActive = false;
-
+            EventManager.getInstance().publish(new BrickDestroyedEvent(this));
         }
     }
 

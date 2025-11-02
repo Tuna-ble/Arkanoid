@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.events.BrickDestroyedEvent;
+import org.example.gamelogic.core.ParticleManager;
 
 
 public class HardBrick extends AbstractBrick {
@@ -22,6 +23,7 @@ public class HardBrick extends AbstractBrick {
 
         this.durability -= damage;
         if (this.durability <= 0) {
+            ParticleManager.getInstance().spawnBrickDebris(this.x, this.y, Color.LIGHTGRAY);
             this.isActive = false;
             EventManager.getInstance().publish(new BrickDestroyedEvent(this));
         }
@@ -43,6 +45,7 @@ public class HardBrick extends AbstractBrick {
         } else {
             gc.setFill(Color.LIGHTGRAY);
         }
+
         gc.fillRect(x, y, width, height);
         gc.setStroke(Color.BLACK);
         gc.strokeRect(x, y, width, height);
@@ -55,6 +58,7 @@ public class HardBrick extends AbstractBrick {
 
         this.durability--;
         if (this.durability <= 0) {
+            ParticleManager.getInstance().spawnBrickDebris(this.x, this.y, Color.LIGHTGRAY);
             this.isActive = false;
             EventManager.getInstance().publish(new BrickDestroyedEvent(this));
         }

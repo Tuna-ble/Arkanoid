@@ -31,6 +31,7 @@ public final class GameManager {
 
     private double accumulator = 0.0;
     private final double FIXED_TIMESTEP = GameConstants.FIXED_TIMESTEP;
+    private ParticleManager particleManager;
 
     private GameManager() {
         this.gameLoop = new AnimationTimer() {
@@ -91,6 +92,8 @@ public final class GameManager {
         this.scoreManager = ScoreManager.getInstance();
         this.lifeManager = LifeManager.getInstance();
         this.laserManager = LaserManager.getInstance();
+        this.particleManager = ParticleManager.getInstance();
+
 
         subscribeToEvents();
     }
@@ -100,6 +103,10 @@ public final class GameManager {
             stateManager.handleInput(inputProvider);
             stateManager.update(deltaTime);
         }
+        if (particleManager != null) {
+            particleManager.update(deltaTime);
+        }
+
         if (inputProvider != null) {
             inputProvider.resetMouseClick();
         }
@@ -109,6 +116,9 @@ public final class GameManager {
         GameState currentState = stateManager.getState();
         if (currentState != null && gc != null) {
             currentState.render(gc);
+        }
+        if (particleManager != null && gc != null) {
+            particleManager.render(gc);
         }
     }
 
@@ -148,6 +158,7 @@ public final class GameManager {
             ((PlayingState) currentState).cleanUp();
             powerUpManager.clear();
             ballManager.clear();
+            particleManager.clear();
         }
 
         switch (event.targetState) {
@@ -156,11 +167,19 @@ public final class GameManager {
                     ((PlayingState) currentState).cleanUp();
                     powerUpManager.clear();
                     ballManager.clear();
+                    particleManager.clear();
                 }
                 newState = new PlayingState(this, levelToLoad);
                 break;
             case LEVEL_STATE:
                 newState = new LevelState();
+                break;
+
+            case GAME_MODE:
+                newState = new GameModeState();
+                break;
+            case INFINITE_MODE:
+                newState = new InfiniteModeState();
                 break;
 
             case RANKING_STATE:
@@ -172,6 +191,7 @@ public final class GameManager {
                     ((PlayingState) currentState).cleanUp();
                     powerUpManager.clear();
                     ballManager.clear();
+                    particleManager.clear();
                 }
                 newState = new MainMenuState();
                 break;
@@ -189,6 +209,7 @@ public final class GameManager {
                     playingState.cleanUp();
                     powerUpManager.clear();
                     ballManager.clear();
+                    particleManager.clear();
 
                     newState = new VictoryState(livesLeft, levelCompleted);
                 }
@@ -207,6 +228,7 @@ public final class GameManager {
                     playingState.cleanUp();
                     powerUpManager.clear();
                     ballManager.clear();
+                    particleManager.clear();
                 }
 
                 newState = new GameOverState(currentLevel);
@@ -266,5 +288,8 @@ public final class GameManager {
 
     public LaserManager getLaserManager() {
         return this.laserManager;
+    }
+    public ParticleManager getParticleManager() {
+        return this.particleManager;
     }
 }

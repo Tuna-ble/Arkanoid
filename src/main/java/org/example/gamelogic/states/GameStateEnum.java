@@ -6,10 +6,11 @@ public enum GameStateEnum {
     PAUSED,
     GAME_OVER,
     SETTINGS,
-    LEVEL_COMPLETE,
     HIGHS_SCORES,
     RESUME_GAME,
     LEVEL_STATE,
     RANKING_STATE,
-    VICTORY
+    VICTORY,
+    GAME_MODE,
+    INFINITE_MODE
 }
