@@ -6,7 +6,7 @@ import org.example.gamelogic.entities.GameObject;
 public interface Brick {
     void takeDamage(double damage);
     boolean isDestroyed();
-
+    boolean isBreakable();
     void setPosition(double x, double y);
     double getX();
     double getY();

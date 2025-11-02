@@ -18,25 +18,20 @@ import org.example.gamelogic.graphics.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class GameOverState implements GameState {
-    private double elapsedTime = 0;
     private Image gameOverGif;
-    
-    
+    private final int levelToRestart;
+    private double elapsedTime = 0;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
     private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 30;
-    
+
     // Button instances
     private Button restartButton;
     private Button menuButton;
     private Button exitButton;
 
-    private final int levelToRestart;
-
     public GameOverState(int levelToRestart) {
         this.levelToRestart = levelToRestart;
         gameOverGif = new Image("/GameIcon/gameOverBackground.gif");
-        
-        // Initialize buttons
         restartButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 0, "Restart");
         menuButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 80, "Menu");
         exitButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 160, "Exit");
@@ -45,12 +40,6 @@ public final class GameOverState implements GameState {
     @Override
     public void update(double deltaTime) {
         elapsedTime += deltaTime;
-    }
-    
-    private void updateButtons(I_InputProvider inputProvider) {
-        if (restartButton != null) restartButton.update(inputProvider);
-        if (menuButton != null) menuButton.update(inputProvider);
-        if (exitButton != null) exitButton.update(inputProvider);
     }
 
     @Override
@@ -92,7 +81,7 @@ public final class GameOverState implements GameState {
                 new DropShadow(8, Color.color(0,0,0,0.6))
         );
 
-        // Các nút
+        // Button
         if (restartButton != null) restartButton.render(gc);
         if (menuButton != null) menuButton.render(gc);
         if (exitButton != null) exitButton.render(gc);
@@ -135,5 +124,11 @@ public final class GameOverState implements GameState {
         } else if (exitButton != null && exitButton.isClicked()) {
             System.exit(0);
         }
+    }
+
+    private void updateButtons(I_InputProvider inputProvider) {
+        if (restartButton != null) restartButton.update(inputProvider);
+        if (menuButton != null) menuButton.update(inputProvider);
+        if (exitButton != null) exitButton.update(inputProvider);
     }
 }

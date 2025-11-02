@@ -36,9 +36,9 @@ public class HardBrick extends AbstractBrick {
         if (isDestroyed()) {
             return;
         }
-        if (this.durability > 2) {
+        if (this.durability == 3) {
             gc.setFill(Color.DARKGRAY);
-        } else if (this.durability <= 2 && this.durability > 1) {
+        } else if (this.durability == 2) {
             gc.setFill(Color.GRAY);
         } else {
             gc.setFill(Color.LIGHTGRAY);

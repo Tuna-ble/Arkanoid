@@ -48,6 +48,10 @@ public abstract class AbstractBrick extends GameObject implements Brick {
     }
 
     @Override
+    public boolean isBreakable() {
+        return true;
+    }
+    @Override
     public abstract Brick clone();
 
     @Override

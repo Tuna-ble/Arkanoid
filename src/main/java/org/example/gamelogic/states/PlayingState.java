@@ -35,6 +35,7 @@ public final class PlayingState implements GameState {
     Font scoreFont;
     Image pauseIcon;
     private int currentLives;
+    private boolean hasWon = false;
 
     private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
     private int levelNumber;
@@ -58,10 +59,8 @@ public final class PlayingState implements GameState {
 
         this.ballManager.createInitialBall(this.paddle);
 
-        if (gameManager.getCurrentMode()==GameModeEnum.LEVEL_MODE) {
-            ScoreManager.getInstance().resetScore();
-            LifeManager.getInstance().reset();
-        }
+        ScoreManager.getInstance().resetScore();
+        LifeManager.getInstance().reset();
 
         this.scoreFont = new Font("Arial", 24);
 
@@ -121,6 +120,12 @@ public final class PlayingState implements GameState {
                     brickManager.getBricks(),
                     powerUpManager.getActivePowerUps(),
                     laserManager.getLasers()
+            );
+        }
+        if (!hasWon && brickManager.isLevelComplete()) {
+            this.hasWon = true;
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.VICTORY)
             );
         }
     }
@@ -282,4 +287,5 @@ public final class PlayingState implements GameState {
     public int getLevelNumber() {
         return this.levelNumber;
     }
+    public int getCurrentLives() { return this.currentLives; }
 }

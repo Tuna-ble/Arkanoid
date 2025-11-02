@@ -4,8 +4,8 @@ import org.example.gamelogic.states.GameState;
 import org.example.gamelogic.states.GameStateEnum;
 
 public class ChangeStateEvent extends GameEvent {
-    private final GameStateEnum targetState;;
-    private final Object payload;
+    public final GameStateEnum targetState;;
+    public final Object payload;
 
     public ChangeStateEvent(GameStateEnum state) {
         this.targetState = state;

@@ -4,7 +4,6 @@ import org.example.data.ILevelRepository;
 import org.example.data.LevelData;
 import org.example.gamelogic.entities.bricks.*;
 import org.example.gamelogic.events.BrickDamagedEvent;
-import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.events.ExplosiveBrickEvent;
 import org.example.gamelogic.events.BallHitBrickEvent;
 import org.example.gamelogic.factory.BrickFactory;
@@ -12,14 +11,12 @@ import org.example.gamelogic.registry.BrickRegistry;
 import org.example.config.GameConstants;
 
 import javafx.scene.canvas.GraphicsContext;
-import org.example.gamelogic.states.GameStateEnum;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public final class BrickManager {
-    private ILevelRepository levelRepository;
+    private final ILevelRepository levelRepository;
     private final BrickFactory brickFactory;
     private List<Brick> bricks;
 
@@ -59,16 +56,17 @@ public final class BrickManager {
         brickRegistry.register("N", new NormalBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
         brickRegistry.register("U", new UnbreakableBrick(0, 0, TILE_WIDTH, TILE_HEIGHT));
         brickRegistry.register("E", new ExplosiveBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
+        brickRegistry.register("R", new HealingBrick(0, 0, TILE_WIDTH, TILE_HEIGHT));
         /// HNUE :)))
+        /// bựa
     }
 
     public void update(double deltaTime) {
-        bricks.removeIf(Brick::isDestroyed);
-        if (isLevelComplete()) {
-            EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.LEVEL_COMPLETE)
-            );
+
+        for (Brick brick : bricks) {
+            brick.update(deltaTime);
         }
+        bricks.removeIf(Brick::isDestroyed);
     }
 
     public void render(GraphicsContext gc) {
@@ -113,20 +111,15 @@ public final class BrickManager {
     }
 
     public boolean isLevelComplete() {
-        if (bricks.isEmpty()) return true;
-
-        Iterator<Brick> iterator= bricks.iterator();
-        while (iterator.hasNext()) {
-            if (!(iterator.next() instanceof UnbreakableBrick)) return false;
+        for (Brick brick : bricks) {
+            if (brick.isBreakable()) {
+                return false;
+            }
         }
         return true;
     }
 
     public List<Brick> getBricks() {
         return bricks;
-    }
-
-    public void setLevelRepository(ILevelRepository levelRepository) {
-        this.levelRepository = levelRepository;
     }
 }

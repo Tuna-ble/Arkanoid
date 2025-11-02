@@ -1,14 +1,15 @@
 package org.example.gamelogic.states;
 
 public enum GameStateEnum {
-    MAIN_MENU,      // Màn hình menu chính
-    PLAYING,        // Đang chơi game
-    PAUSED,         // Tạm dừng
-    GAME_OVER, // Thua cuộc
+    MAIN_MENU,
+    PLAYING,
+    PAUSED,
+    GAME_OVER,
     SETTINGS,
-    LEVEL_COMPLETE,  // Hoàn thành màn chơi
+    LEVEL_COMPLETE,
     HIGHS_SCORES,
     RESUME_GAME,
     LEVEL_STATE,
-    RANKING_STATE
+    RANKING_STATE,
+    VICTORY
 }

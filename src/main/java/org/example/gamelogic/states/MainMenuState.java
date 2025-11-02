@@ -15,16 +15,26 @@ import javafx.scene.effect.DropShadow;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.I_InputProvider;
-import org.example.gamelogic.events.ChangeGameModeEvent;
 import org.example.gamelogic.events.ChangeStateEvent;
+import org.example.gamelogic.graphics.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class MainMenuState implements GameState {
     private Image mainMenuImage;
+    private Button startButton;
+    private Button levelButton;
+    private Button rankingButton;
+    private Button settingsButton;
     private double elapsedTime = 0;
+    private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
+    private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 30;
 
     public MainMenuState() {
         mainMenuImage = new Image(getClass().getResourceAsStream("/GameIcon/MainMenu.png"));
+        startButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 0, "Start");
+        levelButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 70, "Level");
+        rankingButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 140, "Ranking");
+        settingsButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 210, "Settings");
     }
 
     @Override
@@ -52,7 +62,7 @@ public final class MainMenuState implements GameState {
                 gc,
                 "ARKANOID",
                 GameConstants.SCREEN_WIDTH / 2.0,
-                250,
+                230,
                 titleFont,
                 titleFill,
                 Color.color(0, 0, 0, 0.8),
@@ -60,20 +70,13 @@ public final class MainMenuState implements GameState {
                 titleShadow
         );
 
-        // Subtext
-        gc.setFont(new Font("Arial", 20));
-        gc.setFill(Color.WHITE);
-        gc.fillText("Click or Press SPACE to Start", GameConstants.SCREEN_WIDTH / 2.0, 300);
+        // Buttons
+        if (startButton != null) startButton.render(gc);
+        if (levelButton != null) levelButton.render(gc);
+        if (rankingButton != null) rankingButton.render(gc);
+        if (settingsButton != null) settingsButton.render(gc);
 
-        gc.setFont(new Font("Arial", 18));
-        gc.setFill(Color.WHITE);
-        gc.fillText("Press L to Select Level", GameConstants.SCREEN_WIDTH / 2.0, 350);
-
-        gc.fillText("Press E to Enter Endless mode", GameConstants.SCREEN_WIDTH / 2.0, 390);
-
-        gc.fillText("Press R for Ranking", GameConstants.SCREEN_WIDTH / 2.0, 430);
-
-        // Blinking text
+        // Nháy nhẹ phần gợi ý thoát
         if ((int) (elapsedTime * 2) % 2 == 0) {
             gc.setFont(new Font("Arial", 16));
             gc.setFill(Color.WHITE);
@@ -86,37 +89,37 @@ public final class MainMenuState implements GameState {
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
 
-        if (inputProvider.isKeyPressed(KeyCode.ESCAPE)) {
-            System.exit(0);
-        }
-        if (inputProvider.isKeyPressed(KeyCode.SPACE) || inputProvider.isMouseClicked()) {
-            EventManager.getInstance().publish(
-                    new ChangeGameModeEvent(GameModeEnum.LEVEL_MODE)
-            );
+        updateButtons(inputProvider);
+
+        if ((startButton != null && startButton.isClicked())
+                || inputProvider.isKeyPressed(KeyCode.SPACE)) {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.PLAYING, 1)
             );
-        }
-        if (inputProvider.isKeyPressed(KeyCode.L)) {
-            EventManager.getInstance().publish(
-                    new ChangeGameModeEvent(GameModeEnum.LEVEL_MODE)
-            );
+        } else if (levelButton != null && levelButton.isClicked()) {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.LEVEL_STATE)
             );
-        }
-        if (inputProvider.isKeyPressed(KeyCode.E)) {
-            EventManager.getInstance().publish(
-                    new ChangeGameModeEvent(GameModeEnum.ENDLESS_MODE)
-            );
-            EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.PLAYING)
-            );
-        }
-        if (inputProvider.isKeyPressed(KeyCode.R)) {
+        } else if (rankingButton != null && rankingButton.isClicked()) {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.RANKING_STATE)
             );
+        } else if (settingsButton != null && settingsButton.isClicked()) {
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.SETTINGS)
+            );
+        } else if (inputProvider.isKeyPressed(KeyCode.ESCAPE)) {
+            System.exit(0);
         }
     }
+
+    private void updateButtons(I_InputProvider inputProvider) {
+        if (startButton != null) startButton.update(inputProvider);
+        if (levelButton != null) levelButton.update(inputProvider);
+        if (rankingButton != null) rankingButton.update(inputProvider);
+        if (settingsButton != null) settingsButton.update(inputProvider);
+    }
+
 }
+
+

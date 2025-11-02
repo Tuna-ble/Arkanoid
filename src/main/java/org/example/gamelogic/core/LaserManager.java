@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class LaserManager {
+public final class LaserManager {
     private static class SingletonHolder {
         private static final LaserManager INSTANCE = new LaserManager();
     }
@@ -50,9 +50,5 @@ public class LaserManager {
 
     public List<LaserBullet> getLasers() {
         return lasers;
-    }
-
-    public void clear() {
-        lasers.clear();
     }
 }
