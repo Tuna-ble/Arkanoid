@@ -4,6 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class UnbreakableBrick extends AbstractBrick {
+    /// type: U
     public UnbreakableBrick(double x, double y, double width, double height) {
         super(x, y, width, height);
     }

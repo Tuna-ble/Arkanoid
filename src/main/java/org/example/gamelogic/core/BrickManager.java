@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public final class BrickManager {
-    private final ILevelRepository levelRepository;
+    private ILevelRepository levelRepository;
     private final BrickFactory brickFactory;
     private List<Brick> bricks;
 
@@ -62,6 +62,7 @@ public final class BrickManager {
     }
 
     public void update(double deltaTime) {
+        System.out.println("there are "+bricks.size()+" exits");
         for (Brick brick : bricks) {
             brick.update(deltaTime);
         }
@@ -116,6 +117,10 @@ public final class BrickManager {
             }
         }
         return true;
+    }
+
+    public void setLevelRepository(ILevelRepository repo) {
+        this.levelRepository = repo;
     }
 
     public List<Brick> getBricks() {

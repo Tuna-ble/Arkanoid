@@ -9,6 +9,7 @@ import org.example.gamelogic.events.ExplosiveBrickEvent;
 import org.example.gamelogic.core.ParticleManager;
 
 public class ExplosiveBrick extends AbstractBrick {
+    /// type: E
     private Color color = Color.RED;
     public ExplosiveBrick(double x, double y, double width, double height) {
         super(x, y, width, height);

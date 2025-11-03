@@ -8,6 +8,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
 import org.example.config.GameConstants;
+import org.example.data.FileLevelRepository;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.*;
 import org.example.gamelogic.entities.IBall;
@@ -68,8 +69,10 @@ public final class PlayingState implements GameState {
         handleLifeLost = this::handleLifeLost;
         handleLifeAdded = this::handleLifeAdded;
 
-        ScoreManager.getInstance().resetScore();
-        LifeManager.getInstance().reset();
+        if (gameManager.getLevelRepository() instanceof FileLevelRepository) {
+            ScoreManager.getInstance().resetScore();
+            LifeManager.getInstance().reset();
+        }
 
         this.scoreFont = new Font("Arial", 24);
 

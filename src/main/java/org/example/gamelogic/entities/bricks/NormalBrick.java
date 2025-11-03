@@ -8,6 +8,7 @@ import org.example.gamelogic.core.ParticleManager;
 import org.example.gamelogic.events.BrickDestroyedEvent;
 
 public class NormalBrick extends AbstractBrick {
+    /// type: N
     private double durability;
     private Color color = Color.AQUAMARINE;
 

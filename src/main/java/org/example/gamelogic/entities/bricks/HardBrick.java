@@ -9,6 +9,7 @@ import org.example.gamelogic.core.ParticleManager;
 
 
 public class HardBrick extends AbstractBrick {
+    /// type: H
     private double durability;
 
     public HardBrick(double x, double y, double width, double height) {

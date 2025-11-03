@@ -1,15 +1,14 @@
 package org.example.gamelogic.core;
+
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import org.example.config.GameConstants;
+import org.example.data.FileLevelRepository;
 import org.example.data.ILevelRepository;
+import org.example.data.InfiniteLevelRepository;
 import org.example.gamelogic.I_InputProvider;
-import org.example.gamelogic.events.*;
+import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.states.*;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
 
 //singleton (co dung Bill Pugh Idiom de xu li multithreading)
 public final class GameManager {
@@ -72,12 +71,14 @@ public final class GameManager {
     public void setInputProvider(I_InputProvider provider) {
         this.inputProvider = provider;
     }
+
     public void setGraphicsContext(GraphicsContext gc) {
         this.gc = gc;
     }
 
     public void setLevelRepository(ILevelRepository repo) {
         this.levelRepository = repo;
+        this.brickManager.setLevelRepository(repo);
     }
 
     public void init() {
@@ -168,14 +169,18 @@ public final class GameManager {
                 }
                 newState = new PlayingState(this, levelToLoad);
                 break;
-            case LEVEL_STATE:
-                newState = new LevelState();
-                break;
 
             case GAME_MODE:
                 newState = new GameModeState();
                 break;
+
+            case LEVEL_STATE:
+                this.setLevelRepository(new FileLevelRepository());
+                newState = new LevelState();
+                break;
+
             case INFINITE_MODE:
+                this.setLevelRepository(new InfiniteLevelRepository());
                 newState = new InfiniteModeState();
                 break;
 
@@ -186,8 +191,7 @@ public final class GameManager {
             case MAIN_MENU:
                 if (currentState instanceof PlayingState) {
                     ((PlayingState) currentState).cleanUp();
-                }
-                else if (currentState instanceof PauseState) {
+                } else if (currentState instanceof PauseState) {
                     ((PauseState) currentState).cleanUp();
                 }
                 newState = new MainMenuState();
@@ -229,6 +233,7 @@ public final class GameManager {
                     newState = new PauseState(currentState);
                 }
                 break;
+
             case RESUME_GAME:
                 if (currentState instanceof PauseState) {
                     newState = ((PauseState) currentState).getPreviousState();
@@ -236,6 +241,7 @@ public final class GameManager {
                     newState = ((SettingsState) currentState).getPreviousState();
                 }
                 break;
+
             case SETTINGS:
                 newState = new SettingsState(currentState);
                 break;
@@ -254,6 +260,10 @@ public final class GameManager {
     public void goToMainMenu() {
         GameState mainMenuState = new MainMenuState();
         stateManager.setState(mainMenuState);
+    }
+
+    public ILevelRepository getLevelRepository() {
+        return levelRepository;
     }
 
     public BrickManager getBrickManager() {
@@ -279,6 +289,7 @@ public final class GameManager {
     public LaserManager getLaserManager() {
         return this.laserManager;
     }
+
     public ParticleManager getParticleManager() {
         return this.particleManager;
     }

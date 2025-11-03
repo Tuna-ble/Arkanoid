@@ -112,22 +112,24 @@ public final class CollisionManager {
     }
 
     private void handlePiercingBrickCollision(IBall ball, List<Brick> bricks) {
+        // ConcurrentModificationException is the worst
         for (Brick brick : bricks) {
             if (brick.isDestroyed()) continue;
             if (!ball.getGameObject().intersects(brick.getGameObject())) continue;
 
-            if (ball.getPiercingObjects().isEmpty()) {
-                ball.getPiercingObjects().add(brick.getGameObject());
-                EventManager.getInstance().publish(new BallHitBrickEvent(brick, ball));
-                continue;
-            }
+            boolean alreadyPierced=false;
 
             // skip repeated damage on the same brick
             for (GameObject piercingObject : ball.getPiercingObjects()) {
-                if (!brick.getGameObject().equals(piercingObject)) {
-                    ball.getPiercingObjects().add(brick.getGameObject());
-                    EventManager.getInstance().publish(new BallHitBrickEvent(brick, ball));
+                if (brick.getGameObject().equals(piercingObject)) {
+                    alreadyPierced=true;
+                    break;
                 }
+            }
+
+            if (!alreadyPierced) {
+                ball.getPiercingObjects().add(brick.getGameObject());
+                EventManager.getInstance().publish(new BallHitBrickEvent(brick, ball));
             }
         }
 
@@ -273,22 +275,23 @@ public final class CollisionManager {
     }
 
     private void handlePiercingEnemyCollision(IBall ball, List<Enemy> enemies) {
+        // ConcurrentModificationException is the worst
         for (Enemy enemy : enemies) {
             if (enemy.isDestroyed()) continue;
             if (!ball.getGameObject().intersects(enemy.getGameObject())) continue;
 
-            if (ball.getPiercingObjects().isEmpty()) {
-                ball.getPiercingObjects().add(enemy.getGameObject());
-                EventManager.getInstance().publish(new BallHitEnemyEvent(enemy, ball));
-                continue;
-            }
+            boolean alreadyPierced=false;
 
             // skip repeated damage on the same enemy
             for (GameObject piercingObject : ball.getPiercingObjects()) {
-                if (!enemy.getGameObject().equals(piercingObject)) {
-                    ball.getPiercingObjects().add(enemy.getGameObject());
-                    EventManager.getInstance().publish(new BallHitEnemyEvent(enemy, ball));
+                if (enemy.getGameObject().equals(piercingObject)) {
+                    alreadyPierced=true;
                 }
+            }
+
+            if (!alreadyPierced) {
+                ball.getPiercingObjects().add(enemy.getGameObject());
+                EventManager.getInstance().publish(new BallHitEnemyEvent(enemy, ball));
             }
         }
 

@@ -7,7 +7,7 @@ import org.example.gamelogic.core.ParticleManager;
 import org.example.gamelogic.events.BrickDestroyedEvent;
 
 public class HealingBrick extends AbstractBrick {
-
+    /// type: R
     private enum State {
         VISIBLE,
         DAMAGED
