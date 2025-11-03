@@ -1,10 +1,7 @@
 package org.example.gamelogic.core;
 
 import org.example.config.GameConstants;
-import org.example.gamelogic.entities.BulletFrom;
-import org.example.gamelogic.entities.IBall;
-import org.example.gamelogic.entities.LaserBullet;
-import org.example.gamelogic.entities.Paddle;
+import org.example.gamelogic.entities.*;
 import org.example.gamelogic.entities.bricks.Brick;
 import org.example.gamelogic.entities.enemy.Enemy;
 import org.example.gamelogic.entities.powerups.PowerUp;
@@ -107,33 +104,48 @@ public final class CollisionManager {
     }
 
     private void checkBallBrickCollisions(IBall ball, List<Brick> bricks) {
-        boolean isPiercing=ball.getPierceLeft()>0;
-        if (isPiercing) {
+        if (ball.getPierceLeft() > 0) {
             handlePiercingBrickCollision(ball, bricks);
-        }
-        else {
+        } else {
             handleNormalBrickCollision(ball, bricks);
         }
     }
+
     private void handlePiercingBrickCollision(IBall ball, List<Brick> bricks) {
         for (Brick brick : bricks) {
             if (brick.isDestroyed()) continue;
             if (!ball.getGameObject().intersects(brick.getGameObject())) continue;
 
-            // skip repeated damage on the same brick
-            if (!brick.equals(ball.getPiercingBrick())) {
-                ball.setPierceLeft(ball.getPierceLeft() - 1);
-                ball.setPiercingBrick(brick);
+            if (ball.getPiercingObjects().isEmpty()) {
+                ball.getPiercingObjects().add(brick.getGameObject());
                 EventManager.getInstance().publish(new BallHitBrickEvent(brick, ball));
+                continue;
+            }
+
+            // skip repeated damage on the same brick
+            for (GameObject piercingObject : ball.getPiercingObjects()) {
+                if (!brick.getGameObject().equals(piercingObject)) {
+                    ball.getPiercingObjects().add(brick.getGameObject());
+                    EventManager.getInstance().publish(new BallHitBrickEvent(brick, ball));
+                }
             }
         }
 
-        // clear piercingBrick if ball is no longer overlapping
-        if (ball.getPiercingBrick() != null &&
-                !ball.getGameObject().intersects(ball.getPiercingBrick().getGameObject())) {
-            ball.setPiercingBrick(null);
+        // clear piercing if brick is destroyed or ball is no longer overlapping
+        if (!ball.getPiercingObjects().isEmpty()) {
+            Iterator<GameObject> iterator = ball.getPiercingObjects().iterator();
+            while (iterator.hasNext()) {
+                GameObject now = iterator.next();
+                if (now instanceof Brick brick) {
+                    if (brick.isDestroyed() || !ball.getGameObject().intersects(brick.getGameObject())) {
+                        ball.setPierceLeft(ball.getPierceLeft() - 1);
+                        iterator.remove();
+                    }
+                }
+            }
         }
     }
+
     private void handleNormalBrickCollision(IBall ball, List<Brick> bricks) {
         Brick bestCollisionBrick = null; // Viên gạch va chạm "tốt nhất"
         double maxOverlap = -1.0;          // Độ lún lớn nhất tìm thấy
@@ -253,6 +265,49 @@ public final class CollisionManager {
     }
 
     private void checkBallEnemyCollisions(IBall ball, List<Enemy> enemies) {
+        if (ball.getPierceLeft() > 0) {
+            handlePiercingEnemyCollision(ball, enemies);
+        } else {
+            handleNormalEnemyCollision(ball, enemies);
+        }
+    }
+
+    private void handlePiercingEnemyCollision(IBall ball, List<Enemy> enemies) {
+        for (Enemy enemy : enemies) {
+            if (enemy.isDestroyed()) continue;
+            if (!ball.getGameObject().intersects(enemy.getGameObject())) continue;
+
+            if (ball.getPiercingObjects().isEmpty()) {
+                ball.getPiercingObjects().add(enemy.getGameObject());
+                EventManager.getInstance().publish(new BallHitEnemyEvent(enemy, ball));
+                continue;
+            }
+
+            // skip repeated damage on the same enemy
+            for (GameObject piercingObject : ball.getPiercingObjects()) {
+                if (!enemy.getGameObject().equals(piercingObject)) {
+                    ball.getPiercingObjects().add(enemy.getGameObject());
+                    EventManager.getInstance().publish(new BallHitEnemyEvent(enemy, ball));
+                }
+            }
+        }
+
+        // clear piercing if enemy is destroyed or ball is no longer overlapping
+        if (!ball.getPiercingObjects().isEmpty()) {
+            Iterator<GameObject> iterator = ball.getPiercingObjects().iterator();
+            while (iterator.hasNext()) {
+                GameObject now = iterator.next();
+                if (now instanceof Enemy enemy) {
+                    if (enemy.isDestroyed() || !ball.getGameObject().intersects(enemy.getGameObject())) {
+                        ball.setPierceLeft(ball.getPierceLeft() - 1);
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+    }
+
+    private void handleNormalEnemyCollision(IBall ball, List<Enemy> enemies) {
         Enemy bestCollisionEnemy = null;
         double maxOverlap = -1.0;
         boolean collisionIsHorizontal = false;

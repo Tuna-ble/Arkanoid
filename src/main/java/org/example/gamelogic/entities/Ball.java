@@ -1,5 +1,6 @@
 package org.example.gamelogic.entities;
 
+import com.sun.glass.ui.SystemClipboard;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -8,6 +9,8 @@ import javafx.scene.paint.Stop;
 import org.example.config.GameConstants;
 import org.example.gamelogic.entities.bricks.Brick;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,6 +18,10 @@ public class Ball extends MovableObject implements IBall {
     private double radius;
     private double speed;
     private boolean attachedToPaddle;
+    private Color currentColor;
+
+    private int pierceLeft;
+    private List<GameObject> piercingObjects;
 
     private static class GhostSnapshot {
         double x, y, width, height;
@@ -26,7 +33,8 @@ public class Ball extends MovableObject implements IBall {
             this.height = height;
         }
     }
-    private final List<GhostSnapshot> trail = new LinkedList<>();
+
+    private final LinkedList<GhostSnapshot> trail = new LinkedList<>();
     private final int MAX_GHOSTS = 8;
     private double lastGhostX, lastGhostY;
 
@@ -35,9 +43,10 @@ public class Ball extends MovableObject implements IBall {
         this.radius = radius;
         this.speed = GameConstants.BALL_INITIAL_SPEED;
         this.attachedToPaddle = true;
+        this.currentColor = GameConstants.NORMAL_BALL_COLOR;
 
         this.pierceLeft = 0;
-        this.piercingBrick = null;
+        this.piercingObjects = new ArrayList<GameObject>();
 
         this.lastGhostX = x;
         this.lastGhostY = y;
@@ -46,14 +55,13 @@ public class Ball extends MovableObject implements IBall {
     public void setPierceLeft(int pierceLeft) {
         this.pierceLeft = pierceLeft;
     }
+
     public int getPierceLeft() {
         return pierceLeft;
     }
-    public void setPiercingBrick(Brick piercingBrick) {
-        this.piercingBrick = piercingBrick;
-    }
-    public Brick getPiercingBrick() {
-        return piercingBrick;
+
+    public List<GameObject> getPiercingObjects() {
+        return piercingObjects;
     }
 
     public double getCenterX() {
@@ -64,6 +72,10 @@ public class Ball extends MovableObject implements IBall {
     @Override
     public void update(double deltaTime) {
         if (isActive) { // bóng rời paddle
+
+            currentColor = (pierceLeft > 0 ?
+                    GameConstants.PIERCING_BALL_COLOR :
+                    GameConstants.NORMAL_BALL_COLOR);
 
             if (!attachedToPaddle) {
                 // Logic di chuyển tự do
@@ -114,7 +126,7 @@ public class Ball extends MovableObject implements IBall {
                 double ghostY = ghost.y + (ghost.height - ghostHeight) / 2.0;
 
                 gc.setGlobalAlpha(opacity);
-                gc.setFill(GameConstants.BALL_COLOR);
+                gc.setFill(currentColor);
                 gc.fillOval(ghostX, ghostY, ghostWidth, ghostHeight);
             }
 
@@ -128,7 +140,7 @@ public class Ball extends MovableObject implements IBall {
                     false,                // proportional = false -> dùng pixel
                     CycleMethod.NO_CYCLE,
                     new Stop(0, Color.WHITE),          // vùng sáng
-                    new Stop(1, GameConstants.BALL_COLOR) // vùng tối
+                    new Stop(1, currentColor) // vùng tối
             );
 
             // tô hình tròn bằng gradient

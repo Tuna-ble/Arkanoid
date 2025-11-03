@@ -3,6 +3,8 @@ package org.example.gamelogic.entities;
 import javafx.scene.canvas.GraphicsContext;
 import org.example.gamelogic.entities.bricks.Brick;
 
+import java.util.List;
+
 public interface IBall {
     boolean isDestroyed();
     boolean isAttachedToPaddle();
@@ -37,6 +39,5 @@ public interface IBall {
 
     void setPierceLeft(int pierceLeft);
     int getPierceLeft();
-    void setPiercingBrick(Brick piercingBrick);
-    Brick getPiercingBrick();
+    List<GameObject> getPiercingObjects();
 }
