@@ -6,13 +6,21 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.scene.image.Image;
+import javafx.scene.text.Font;
+import javafx.scene.effect.Effect;
+import javafx.scene.paint.Paint;
 
 public class AssetManager {
     private Map<String, Clip> sounds = new HashMap<>();
     private Map<String, Image> images = new HashMap<>();
+    private Map<String, Font> fonts = new HashMap<>();
+    private Map<String, Effect> effects = new HashMap<>();
+    private Map<String, Paint> gradients = new HashMap<>();
+    
+    private boolean resourcesPreloaded = false;
 
     private AssetManager() {
-        loadAssets();
+        loadAssets();  // Load assets ngay khi khởi tạo
     }
 
     public void loadAssets() {
@@ -23,7 +31,7 @@ public class AssetManager {
             loadSound("glass", "/sounds/glass.wav");
             loadSound("powerup", "/sounds/powerup.wav");
             loadSound("brick_hit", "/sounds/brick_hit.wav");
-            loadSound("bomb", "/sounds/bomb.wav");
+            loadSound("bomb", "/sounds/Bomb.wav");
         } catch (Exception e) {
             System.err.println("Không thể tải file âm thanh: " + e.getMessage());
             e.printStackTrace();
@@ -102,5 +110,54 @@ public class AssetManager {
             System.err.println("Yêu cầu hình ảnh không tồn tại: " + name);
         }
         return img;
+    }
+
+    public void cacheFont(String name, Font font) {
+        fonts.put(name, font);
+    }
+
+    public Font getFont(String name) {
+        Font font = fonts.get(name);
+        if (font == null) {
+            System.err.println("Yêu cầu font không tồn tại: " + name);
+        }
+        return font;
+    }
+
+    public void cacheEffect(String name, Effect effect) {
+        effects.put(name, effect);
+    }
+
+    public Effect getEffect(String name) {
+        Effect effect = effects.get(name);
+        if (effect == null) {
+            System.err.println("Yêu cầu effect không tồn tại: " + name);
+        }
+        return effect;
+    }
+
+    public void cacheGradient(String name, Paint gradient) {
+        gradients.put(name, gradient);
+    }
+
+    public Paint getGradient(String name) {
+        Paint gradient = gradients.get(name);
+        if (gradient == null) {
+            System.err.println("Yêu cầu gradient không tồn tại: " + name);
+        }
+        return gradient;
+    }
+
+    public void preloadResources() {
+        if (resourcesPreloaded) return;
+        
+        loadAssets();
+        
+        // Cache common fonts
+        cacheFont("title", new Font("Arial", 70));
+        cacheFont("score", new Font("Arial", 40));
+        cacheFont("rank", new Font("Arial", 32));
+        
+        resourcesPreloaded = true;
     }
 }

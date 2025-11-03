@@ -81,6 +81,7 @@ public final class LevelState implements GameState {
             }
         }
 
+        /*
         if ((int)(elapsedTime * 2) % 2 == 0) {
             gc.setTextAlign(TextAlignment.CENTER);
             TextRenderer.drawOutlinedText(
@@ -95,6 +96,7 @@ public final class LevelState implements GameState {
                     new DropShadow(5, Color.color(0,0,0,0.5))
             );
         }
+         */
     }
 
     @Override
