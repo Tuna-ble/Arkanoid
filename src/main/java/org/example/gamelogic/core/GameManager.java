@@ -23,6 +23,7 @@ public final class GameManager {
     private ScoreManager scoreManager;
     private LifeManager lifeManager;
     private LaserManager laserManager;
+    private EnemyManager enemyManager;
 
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
@@ -31,6 +32,7 @@ public final class GameManager {
 
     private double accumulator = 0.0;
     private final double FIXED_TIMESTEP = GameConstants.FIXED_TIMESTEP;
+    private ParticleManager particleManager;
 
     private GameManager() {
         this.gameLoop = new AnimationTimer() {
@@ -87,10 +89,14 @@ public final class GameManager {
         currentState = new MainMenuState();
         this.stateManager.setState(currentState);
 
+        this.enemyManager = EnemyManager.getInstance();
         this.soundManager = SoundManager.getInstance();
         this.scoreManager = ScoreManager.getInstance();
         this.lifeManager = LifeManager.getInstance();
         this.laserManager = LaserManager.getInstance();
+        this.particleManager = ParticleManager.getInstance();
+
+        this.enemyManager.setBrickManager(this.brickManager);
 
         subscribeToEvents();
     }
@@ -100,6 +106,10 @@ public final class GameManager {
             stateManager.handleInput(inputProvider);
             stateManager.update(deltaTime);
         }
+        if (particleManager != null) {
+            particleManager.update(deltaTime);
+        }
+
         if (inputProvider != null) {
             inputProvider.resetMouseClick();
         }
@@ -109,6 +119,9 @@ public final class GameManager {
         GameState currentState = stateManager.getState();
         if (currentState != null && gc != null) {
             currentState.render(gc);
+        }
+        if (particleManager != null && gc != null) {
+            particleManager.render(gc);
         }
     }
 
@@ -159,6 +172,13 @@ public final class GameManager {
                 newState = new LevelState();
                 break;
 
+            case GAME_MODE:
+                newState = new GameModeState();
+                break;
+            case INFINITE_MODE:
+                newState = new InfiniteModeState();
+                break;
+
             case RANKING_STATE:
                 newState = new RankingState();
                 break;
@@ -206,16 +226,18 @@ public final class GameManager {
 
             case PAUSED:
                 if (currentState instanceof PlayingState) {
-                    newState = new PauseState(this, currentState);
+                    newState = new PauseState(currentState);
                 }
                 break;
             case RESUME_GAME:
                 if (currentState instanceof PauseState) {
                     newState = ((PauseState) currentState).getPreviousState();
+                } else if (currentState instanceof SettingsState) {
+                    newState = ((SettingsState) currentState).getPreviousState();
                 }
                 break;
             case SETTINGS:
-                newState = new SettingsState();
+                newState = new SettingsState(currentState);
                 break;
         }
 
@@ -256,5 +278,12 @@ public final class GameManager {
 
     public LaserManager getLaserManager() {
         return this.laserManager;
+    }
+    public ParticleManager getParticleManager() {
+        return this.particleManager;
+    }
+
+    public EnemyManager getEnemyManager() {
+        return this.enemyManager;
     }
 }

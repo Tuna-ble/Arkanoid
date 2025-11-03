@@ -6,8 +6,10 @@ import org.example.config.GameConstants;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.events.BrickDestroyedEvent;
 import org.example.gamelogic.events.ExplosiveBrickEvent;
+import org.example.gamelogic.core.ParticleManager;
 
 public class ExplosiveBrick extends AbstractBrick {
+    private Color color = Color.RED;
     public ExplosiveBrick(double x, double y, double width, double height) {
         super(x, y, width, height);
     }
@@ -16,6 +18,7 @@ public class ExplosiveBrick extends AbstractBrick {
         if (isDestroyed()) {
             return;
         }
+        ParticleManager.getInstance().spawnBrickDebris(this.x, this.y, this.color);
         this.isActive = false;
         EventManager.getInstance().publish(new BrickDestroyedEvent(this));
         EventManager.getInstance().publish(new ExplosiveBrickEvent(this));
@@ -29,7 +32,7 @@ public class ExplosiveBrick extends AbstractBrick {
     @Override
     public void render(GraphicsContext gc) {
         if (!isDestroyed()) {
-            gc.setFill(Color.RED);
+            gc.setFill(this.color);
             gc.fillRect(x, y, width, height);
             gc.setStroke(Color.BLACK);
             gc.strokeRect(x, y, width, height);

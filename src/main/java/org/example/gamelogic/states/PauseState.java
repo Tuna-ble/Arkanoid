@@ -15,7 +15,6 @@ import org.example.gamelogic.graphics.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class PauseState implements GameState {
-    private final GameManager gameManager;
     private final GameState previousState;
     private final Font titleFont = new Font("Arial", 48);
     private final Font buttonFont = new Font("Arial", 28);
@@ -27,11 +26,10 @@ public final class PauseState implements GameState {
 
     // Button instances
     private Button resumeButton;
-    private Button restartButton;
+    private Button settingsButton;
     private Button quitButton;
 
-    public PauseState(GameManager gameManager, GameState previousState) {
-        this.gameManager = gameManager;
+    public PauseState(GameState previousState) {
         this.previousState = previousState;
     }
 
@@ -89,8 +87,8 @@ public final class PauseState implements GameState {
         // Calculate button positions
         double buttonX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
         double resumeY = panelY + 100;
-        double restartY = resumeY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_SPACING;
-        double quitY = restartY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_SPACING;
+        double settingsY = resumeY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_SPACING;
+        double quitY = settingsY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_SPACING;
 
         // Initialize buttons if not already created
         if (resumeButton == null) {
@@ -108,21 +106,6 @@ public final class PauseState implements GameState {
             resumeButton.setY(resumeY);
         }
 
-        if (restartButton == null) {
-            restartButton = new Button(buttonX, restartY, "Restart");
-            restartButton.setFont(buttonFont);
-            restartButton.setColors(
-                    Color.web("#444"),
-                    Color.web("#555"),
-                    Color.WHITE,
-                    Color.WHITE,
-                    Color.WHITE
-            );
-        } else {
-            restartButton.setX(buttonX);
-            restartButton.setY(restartY);
-        }
-
         if (quitButton == null) {
             quitButton = new Button(buttonX, quitY, "Quit");
             quitButton.setFont(buttonFont);
@@ -138,9 +121,24 @@ public final class PauseState implements GameState {
             quitButton.setY(quitY);
         }
 
+        if (settingsButton == null) {
+            settingsButton = new Button(buttonX, settingsY, "Settings");
+            settingsButton.setFont(buttonFont);
+            settingsButton.setColors(
+                    Color.web("#444"),
+                    Color.web("#555"),
+                    Color.WHITE,
+                    Color.WHITE,
+                    Color.WHITE
+            );
+        } else {
+            settingsButton.setX(buttonX);
+            settingsButton.setY(settingsY);
+        }
+
         // Render buttons
         if (resumeButton != null) resumeButton.render(gc);
-        if (restartButton != null) restartButton.render(gc);
+        if (settingsButton != null) settingsButton.render(gc);
         if (quitButton != null) quitButton.render(gc);
         gc.setTextAlign(TextAlignment.LEFT);
     }
@@ -152,7 +150,7 @@ public final class PauseState implements GameState {
 
         // Update buttons to check hover and click states
         if (resumeButton != null) resumeButton.update(inputProvider);
-        if (restartButton != null) restartButton.update(inputProvider);
+        if (settingsButton != null) settingsButton.update(inputProvider);
         if (quitButton != null) quitButton.update(inputProvider);
 
         // Handle button clicks
@@ -160,9 +158,9 @@ public final class PauseState implements GameState {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.RESUME_GAME)
             );
-        } else if (restartButton != null && restartButton.isClicked()) {
+        } else if (settingsButton != null && settingsButton.isClicked()) {
             EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.PLAYING)
+                    new ChangeStateEvent(GameStateEnum.SETTINGS)
             );
         } else if (quitButton != null && quitButton.isClicked()) {
             EventManager.getInstance().publish(

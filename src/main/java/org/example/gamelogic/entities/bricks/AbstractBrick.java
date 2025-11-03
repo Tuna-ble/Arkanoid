@@ -44,7 +44,7 @@ public abstract class AbstractBrick extends GameObject implements Brick {
 
     @Override
     public boolean isDestroyed() {
-        return !this.isAlive();
+        return !this.isActive();
     }
 
     @Override

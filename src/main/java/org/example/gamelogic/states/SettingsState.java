@@ -13,12 +13,14 @@ import org.example.gamelogic.graphics.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class SettingsState implements GameState {
+    private GameState previousState;
     private Button musicButton;
     private Button sfxButton;
     private Button backButton;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
-    public SettingsState() {
+    public SettingsState(GameState previousState) {
+        this.previousState = previousState;
         double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
         boolean musicOn = SettingsManager.getInstance().isMusicEnabled();
         boolean sfxOn = SettingsManager.getInstance().isSfxEnabled();
@@ -77,8 +79,12 @@ public final class SettingsState implements GameState {
 
             // Quay về Main Menu
             EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.MAIN_MENU)
+                    new ChangeStateEvent(GameStateEnum.RESUME_GAME)
             );
         }
+    }
+
+    public GameState getPreviousState() {
+        return this.previousState;
     }
 }

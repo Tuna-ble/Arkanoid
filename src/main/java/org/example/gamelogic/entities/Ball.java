@@ -9,14 +9,12 @@ import org.example.config.GameConstants;
 import org.example.gamelogic.entities.bricks.Brick;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class Ball extends MovableObject implements IBall {
     private double radius;
     private double speed;
     private boolean attachedToPaddle;
-
-    private int pierceLeft;
-    private Brick piercingBrick;
 
     private static class GhostSnapshot {
         double x, y, width, height;
@@ -28,8 +26,7 @@ public class Ball extends MovableObject implements IBall {
             this.height = height;
         }
     }
-
-    private final LinkedList<GhostSnapshot> trail = new LinkedList<>();
+    private final List<GhostSnapshot> trail = new LinkedList<>();
     private final int MAX_GHOSTS = 8;
     private double lastGhostX, lastGhostY;
 
@@ -69,7 +66,7 @@ public class Ball extends MovableObject implements IBall {
         if (isActive) { // bóng rời paddle
 
             if (!attachedToPaddle) {
-
+                // Logic di chuyển tự do
                 ensureMinimumVelocity();
                 limitMaximumSpeed();
                 this.x += dx * deltaTime;

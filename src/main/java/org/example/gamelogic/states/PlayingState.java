@@ -13,6 +13,7 @@ import org.example.gamelogic.core.*;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.events.*;
+import org.example.gamelogic.entities.powerups.PowerUp;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public final class PlayingState implements GameState {
     BallManager ballManager;
     CollisionManager collisionManager;
     LaserManager laserManager;
+    EnemyManager enemyManager;
     Paddle paddle;
     Font scoreFont;
     Image pauseIcon;
@@ -47,6 +49,7 @@ public final class PlayingState implements GameState {
         this.brickManager.loadLevel(levelNumber);
         this.powerUpManager = gameManager.getPowerUpManager();
         this.ballManager = gameManager.getBallManager();
+        this.enemyManager = gameManager.getEnemyManager();
         this.collisionManager = gameManager.getCollisionManager();
         this.laserManager = gameManager.getLaserManager();
 
@@ -80,6 +83,7 @@ public final class PlayingState implements GameState {
         }
         subscribeToEvents();
         this.levelNumber = levelNumber;
+        this.enemyManager.loadLevelScript(this.levelNumber);
 
         powerUpManager.spawnPowerUp("P", 400, 300);
         powerUpManager.spawnPowerUp("M", 400, 400);
@@ -102,6 +106,10 @@ public final class PlayingState implements GameState {
                 LifeAddedEvent.class,
                 handleLifeAdded
         );
+        EventManager.getInstance().subscribe(
+                LifeAddedEvent.class,
+                this::handleLifeAdded
+        );
     }
 
     private void handlePowerUpCollected(PowerUpCollectedEvent event) {
@@ -121,6 +129,7 @@ public final class PlayingState implements GameState {
         brickManager.update(deltaTime);
         ballManager.update(deltaTime);
         powerUpManager.update(deltaTime);
+        enemyManager.update(deltaTime);
 
         if (collisionManager != null) {
             collisionManager.checkCollisions(
@@ -128,14 +137,30 @@ public final class PlayingState implements GameState {
                     paddle,
                     brickManager.getBricks(),
                     powerUpManager.getActivePowerUps(),
-                    laserManager.getLasers()
+                    laserManager.getLasers(),
+                    enemyManager.getActiveEnemies()
             );
         }
-        if (!hasWon && brickManager.isLevelComplete()) {
-            this.hasWon = true;
-            EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.VICTORY)
-            );
+        handleVictory();
+    }
+
+    private void handleVictory() {
+        if (this.hasWon || LifeManager.getInstance().getLives() <= 0) {
+            return;
+        }
+        if (this.levelNumber == 5) {
+            if (enemyManager.hasBossSpawned() && enemyManager.isBossDefeated()) {
+                EventManager.getInstance().publish(
+                        new ChangeStateEvent(GameStateEnum.VICTORY)
+                );
+            }
+        } else {
+            if (brickManager.isLevelComplete()) {
+                this.hasWon = true;
+                EventManager.getInstance().publish(
+                        new ChangeStateEvent(GameStateEnum.VICTORY)
+                );
+            }
         }
     }
 
@@ -152,6 +177,7 @@ public final class PlayingState implements GameState {
         ballManager.render(gc);
         powerUpManager.render(gc);
         laserManager.render(gc);
+        enemyManager.render(gc);
         paddle.render(gc);
         renderScore(gc);
 
@@ -232,9 +258,7 @@ public final class PlayingState implements GameState {
 
     private void updateAttachedBallPosition() {
         for (IBall ball : ballManager.getActiveBalls()) {
-            // Kiểm tra xem bóng có đang dính không
             if (ball.isAttachedToPaddle()) {
-                // Tính toán và đặt lại vị trí bóng dựa trên paddle
                 ball.setPosition(
                         paddle.getX() + (paddle.getWidth() / 2.0) - (ball.getGameObject().getWidth() / 2.0),
                         paddle.getY() - ball.getGameObject().getHeight()

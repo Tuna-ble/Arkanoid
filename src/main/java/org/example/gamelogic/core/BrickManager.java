@@ -62,7 +62,6 @@ public final class BrickManager {
     }
 
     public void update(double deltaTime) {
-
         for (Brick brick : bricks) {
             brick.update(deltaTime);
         }
