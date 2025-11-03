@@ -1,6 +1,5 @@
 package org.example.gamelogic.strategy.powerup;
 
-import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.states.GameState;
 import org.example.gamelogic.states.PlayingState;

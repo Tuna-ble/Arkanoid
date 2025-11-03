@@ -6,6 +6,7 @@ import org.example.gamelogic.strategy.powerup.MultiBallStrategy;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public class MultiBallPowerUp extends AbstractPowerUp {
+    /// type: M
     public MultiBallPowerUp(double x, double y, double width, double height,
                            double dx, double dy, PowerUpStrategy strategy) {
         super(x, y, width, height, dx, dy, strategy);

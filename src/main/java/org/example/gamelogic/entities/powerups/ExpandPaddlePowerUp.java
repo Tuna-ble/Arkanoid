@@ -6,6 +6,7 @@ import org.example.gamelogic.strategy.powerup.ExpandPaddleStrategy;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public class ExpandPaddlePowerUp extends AbstractPowerUp {
+    /// type: E
     public ExpandPaddlePowerUp(double x, double y, double width, double height,
                                double dx, double dy, PowerUpStrategy strategy) {
         super(x, y, width, height, dx, dy, strategy);

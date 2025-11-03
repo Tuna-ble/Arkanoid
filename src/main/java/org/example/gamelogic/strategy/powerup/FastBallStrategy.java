@@ -1,7 +1,6 @@
 package org.example.gamelogic.strategy.powerup;
 
 import org.example.gamelogic.core.BallManager;
-import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.entities.Ball;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;

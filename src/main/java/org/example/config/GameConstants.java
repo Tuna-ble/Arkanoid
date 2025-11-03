@@ -8,17 +8,18 @@ import javafx.scene.paint.Paint;
 
 public final class GameConstants {
 
-    public static final Color BALL_COLOR = Color.RED;
-    public static final Color PADDLE_COLOR = Color.CYAN;
-    public static final Color PADDLE_BORDER_COLOR = Color.DARKBLUE;
-    public static final int POINTS_PER_EXPLOSIVE_BRICK = 30;
-
     // Prevent instantiation
     private GameConstants() {}
 
     // Screen
     public static final double SCREEN_WIDTH = 800;
     public static final double SCREEN_HEIGHT = 600;
+
+    // Color
+    public static final Color NORMAL_BALL_COLOR = Color.RED;
+    public static final Color PIERCING_BALL_COLOR = Color.CYAN;
+    public static final Color PADDLE_COLOR = Color.CYAN;
+    public static final Color PADDLE_BORDER_COLOR = Color.DARKBLUE;
 
     // Paddle
     public static final double PADDLE_X = SCREEN_WIDTH / 2;
@@ -57,6 +58,7 @@ public final class GameConstants {
     public static final double TOP_MARGIN = 50;
     public static final double HARD_BRICK_DURABILITY = 3;
     public static final int POINTS_PER_HARD_BRICK = 50;
+    public static final int POINTS_PER_EXPLOSIVE_BRICK = 30;
 
     // Enemies
     public static final double ENEMY_WIDTH = 40;

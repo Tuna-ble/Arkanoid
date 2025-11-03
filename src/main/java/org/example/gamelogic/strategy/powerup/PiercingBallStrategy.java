@@ -6,7 +6,7 @@ import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.states.PlayingState;
 
 public class PiercingBallStrategy implements PowerUpStrategy {
-    private final int pierceLimit = 2;
+    private final int pierceLimit = 3;
     private PlayingState playingState; // stored reference
 
     @Override

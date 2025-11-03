@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public class PiercingBallPowerUp extends AbstractPowerUp {
+    /// type: P
     public PiercingBallPowerUp(double x, double y, double width, double height,
                             double dx, double dy, PowerUpStrategy strategy) {
         super(x, y, width, height, dx, dy, strategy);

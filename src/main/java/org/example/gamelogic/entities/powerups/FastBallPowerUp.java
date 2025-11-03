@@ -6,6 +6,7 @@ import org.example.gamelogic.strategy.powerup.FastBallStrategy;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public class FastBallPowerUp extends AbstractPowerUp {
+    /// type: F
     public FastBallPowerUp(double x, double y, double width, double height,
                            double dx, double dy, PowerUpStrategy strategy) {
         super(x, y, width, height, dx, dy, strategy);
