@@ -160,4 +160,13 @@ public class AssetManager {
         
         resourcesPreloaded = true;
     }
+
+    /**
+     * Public wrapper to load an image into the internal cache. Safe to call
+     * from initialization code. If loading fails it will throw an exception
+     * to the caller so they can decide how to handle it.
+     */
+    public synchronized void loadImageResource(String name, String path) throws Exception {
+        loadImage(name, path);
+    }
 }

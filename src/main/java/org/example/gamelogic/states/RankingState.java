@@ -25,23 +25,21 @@ public final class RankingState implements GameState {
     private final List<Integer> highscores;
     private final Button backButton;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
-    private final Image rankingIcon;
+    private Image rankingIcon;
 
-    // Pre-initialize all fonts and effects to avoid runtime allocation
     private final Font titleFont = new Font("Arial", 70);
     private final Font scoreFont = new Font("Arial", 40);
     private final Font rankFont = new Font("Arial", 32);
     private double elapsed = 0.0;
 
-    // Colors theme
-    private final Color bgStart = Color.web("#FFF0F5");    // Lavender blush
-    private final Color bgEnd = Color.web("#FFE4E1");      // Misty Rose
-    private final Color scoreNormalColor = Color.web("#ffdd44");  // Bright gold
-    private final Color scoreHighlightColor = Color.web("#ffff44");  // Bright yellow
+    private final Color bgStart = Color.web("#FFF0F5");
+    private final Color bgEnd = Color.web("#FFE4E1");
+    private final Color scoreNormalColor = Color.web("#ffdd44");
+    private final Color scoreHighlightColor = Color.web("#ffff44");
     private final LinearGradient titleGradient = new LinearGradient(
             0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-            new Stop(0, Color.web("#ffff88")),  // Bright yellow
-            new Stop(1, Color.web("#ffcc44"))   // Golden yellow
+            new Stop(0, Color.web("#ffff88")),
+            new Stop(1, Color.web("#ffcc44"))
     );
 
     // Pre-create effects
@@ -95,11 +93,27 @@ public final class RankingState implements GameState {
     }
 
     public RankingState() {
-        // Initialize state
         this.highscores = HighscoreManager.loadHighscores();
-        this.rankingIcon = new Image(getClass().getResourceAsStream("/GameIcon/ranking.png"));
+        org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
+        Image pre = am.getImage("ranking");
+        if (pre != null) {
+            this.rankingIcon = pre;
+        } else {
+            try {
+                java.net.URL res = getClass().getResource("/GameIcon/ranking.png");
+                if (res != null) {
+                    this.rankingIcon = new Image(res.toExternalForm(), true);
+                } else {
+                    this.rankingIcon = null;
+                }
+            } catch (Exception e) {
+                System.err.println("Không thể tải ảnh ranking.png từ resources!");
+                e.printStackTrace();
+                this.rankingIcon = null;
+            }
+        }
         double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
-        double btnY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 60;
+        double btnY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 40;
         this.backButton = new Button(btnX, btnY, "Back to Menu");
     }
 
@@ -111,7 +125,9 @@ public final class RankingState implements GameState {
     @Override
     public void render(GraphicsContext gc) {
         gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
-        gc.drawImage(rankingIcon, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        if (rankingIcon != null) {
+            gc.drawImage(rankingIcon, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        }
 
         gc.setTextAlign(TextAlignment.CENTER);
         double pulse = 0.75 + 0.25 * Math.abs(Math.sin(elapsed * 1.8));
@@ -139,7 +155,7 @@ public final class RankingState implements GameState {
                     centerX,
                     scoreY,
                     scoreFont, 
-                    scoreNormalColor,  // Use gold color
+                    scoreNormalColor, 
                     Color.web("#4A0404", 0.8), 
                     2.0, 
                     null
@@ -148,7 +164,7 @@ public final class RankingState implements GameState {
             int maxToShow = Math.min(highscores.size(), 5);
             for (int i = 0; i < maxToShow; i++) {
                 double x = centerX - listWidth / 2.0;
-                double y = scoreY + (i * 90);  // Slightly reduced spacing
+                double y = scoreY + (i * 90); 
                 drawScoreEntry(gc, x, y, listWidth, 70, i + 1, highscores.get(i));
             }
         }
@@ -161,6 +177,7 @@ public final class RankingState implements GameState {
         if (inputProvider == null) return;
         backButton.update(inputProvider);
         if (backButton.isClicked()) {
+            rankingIcon = null;
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.MAIN_MENU)
             );

@@ -69,7 +69,17 @@ public final class PlayingState implements GameState {
         this.currentLives = LifeManager.getInstance().getLives();
 
         try {
-            pauseIcon = new Image(getClass().getResourceAsStream("/GameIcon/pause.png"));
+            // Prefer preloaded pause icon
+            org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
+            Image pre = am.getImage("pause");
+            if (pre != null) {
+                pauseIcon = pre;
+            } else {
+                java.net.URL res = getClass().getResource("/GameIcon/pause.png");
+                if (res != null) {
+                    pauseIcon = new Image(res.toExternalForm(), true);
+                }
+            }
         } catch (Exception e) {
             System.err.println("Không thể tải ảnh pause.png từ resources!");
             e.printStackTrace();

@@ -49,7 +49,7 @@ public final class PauseState implements GameState {
         centerX = width / 2;
         centerY = height / 2;
 
-        // Render previous frame (frozen gameplay)
+        // Render previous frame
         previousState.render(gc);
 
         // Semi-transparent dark overlay

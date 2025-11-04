@@ -29,7 +29,21 @@ public final class MainMenuState implements GameState {
     private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 30;
 
     public MainMenuState() {
-        mainMenuImage = new Image(getClass().getResourceAsStream("/GameIcon/MainMenu.png"));
+        org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
+        Image pre = am.getImage("mainMenu");
+        if (pre != null) {
+            mainMenuImage = pre;
+        } else {
+            try {
+                java.net.URL res = getClass().getResource("/GameIcon/MainMenu.png");
+                if (res != null) {
+                    mainMenuImage = new Image(res.toExternalForm(), true);
+                }
+            } catch (Exception e) {
+                System.err.println("Không thể tải ảnh MainMenu.png từ resources!");
+                e.printStackTrace();
+            }
+        }
         double buttonGap = 70;
         startButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 0), "Start");
         rankingButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 1), "Ranking");
@@ -47,7 +61,12 @@ public final class MainMenuState implements GameState {
         gc.setTextAlign(TextAlignment.LEFT);
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         // Background
-        gc.drawImage(mainMenuImage, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        if (mainMenuImage != null) {
+            gc.drawImage(mainMenuImage, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        } else {
+            gc.setFill(Color.BLACK);
+            gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        }
         // Title (outlined with subtle shadow and gradient)
         gc.setTextAlign(TextAlignment.CENTER);
         LinearGradient titleFill = new LinearGradient(
@@ -86,7 +105,7 @@ public final class MainMenuState implements GameState {
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
-
+        
         updateButtons(inputProvider);
 
         if ((startButton != null && startButton.isClicked())
