@@ -7,8 +7,8 @@ import org.example.gamelogic.strategy.powerup.ExpandPaddleStrategy;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public class ExpandPaddlePowerUp extends AbstractPowerUp {
-    private static final Image expand = new Image(
-            ExpandPaddlePowerUp.class.getResource("/GameIcon/expandpaddle.png").toExternalForm()
+    private final Image expand = new Image(
+            getClass().getResourceAsStream("/GameIcon/expandpaddle.png")
     );
 
     /// type: E

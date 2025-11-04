@@ -88,8 +88,8 @@ public final class PlayingState implements GameState {
         this.levelNumber = levelNumber;
         this.enemyManager.loadLevelScript(this.levelNumber);
 
-        powerUpManager.spawnPowerUp("P", 400, 300);
-        powerUpManager.spawnPowerUp("M", 400, 400);
+        powerUpManager.spawnPowerUp("H", 400, 300);
+        powerUpManager.spawnPowerUp("E", 400, 400);
     }
 
     private void subscribeToEvents() {

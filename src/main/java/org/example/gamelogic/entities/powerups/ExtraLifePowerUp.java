@@ -1,11 +1,16 @@
 package org.example.gamelogic.entities.powerups;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import org.example.gamelogic.strategy.powerup.ExtraLifeStrategy;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public class ExtraLifePowerUp extends AbstractPowerUp {
+    private final Image extra = new Image(
+            getClass().getResourceAsStream("/GameIcon/extra.png")
+    );
+
     /// type: H
     public ExtraLifePowerUp(double x, double y, double width, double height,
                            double dx, double dy, PowerUpStrategy strategy) {
@@ -19,9 +24,6 @@ public class ExtraLifePowerUp extends AbstractPowerUp {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.WHITE);
-        gc.fillRect(x, y, width, height);
-        gc.setStroke(Color.BLACK);
-        gc.strokeRect(x, y, width, height);
+        gc.drawImage(extra, x, y, 30, 30);
     }
 }
