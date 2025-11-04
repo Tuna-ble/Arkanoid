@@ -80,7 +80,18 @@ public final class VictoryState implements GameState {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.drawImage(victory, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        double scale = GameConstants.SCREEN_HEIGHT / victory.getHeight();
+        double scaledWidth = victory.getWidth() * scale;
+
+        double cropStartX = scaledWidth - GameConstants.SCREEN_WIDTH;
+
+        gc.drawImage(
+                victory,
+                cropStartX / scale, 0, // sx, sy
+                GameConstants.SCREEN_WIDTH / scale, victory.getHeight(), // sw, sh (crop gốc)
+                0, 0, // dx, dy
+                GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT // dw, dh (vẽ full screen)
+        );
 
         gc.setTextAlign(TextAlignment.CENTER);
         TextRenderer.drawOutlinedText(

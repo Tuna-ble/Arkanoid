@@ -2,6 +2,7 @@ package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -18,12 +19,15 @@ import org.example.gamelogic.graphics.TextRenderer;
 public final class LevelState implements GameState {
 
     private static final int NUM_LEVELS = 5;
+    private final Image level;
     private double elapsedTime = 0;
 
     private final Button[] levelButtons;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
     public LevelState() {
+
+        this.level = new Image("/GameIcon/level.gif");
         this.levelButtons = new Button[NUM_LEVELS];
         double baseY = 180;
 
@@ -51,8 +55,7 @@ public final class LevelState implements GameState {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        gc.drawImage(level, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
         gc.setTextAlign(TextAlignment.CENTER);
         LinearGradient titleFill = new LinearGradient(

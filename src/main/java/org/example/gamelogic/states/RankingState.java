@@ -99,7 +99,7 @@ public final class RankingState implements GameState {
         this.highscores = HighscoreManager.loadHighscores();
         this.rankingIcon = new Image(getClass().getResourceAsStream("/GameIcon/ranking.png"));
         double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
-        double btnY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 60;
+        double btnY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 40;
         this.backButton = new Button(btnX, btnY, "Back to Menu");
     }
 
