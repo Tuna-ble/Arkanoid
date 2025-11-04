@@ -1,6 +1,7 @@
 package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -18,6 +19,7 @@ public final class SettingsState implements GameState {
     private Button sfxButton;
     private Button backButton;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
+    private final Image settings;
 
     public SettingsState(GameState previousState) {
         this.previousState = previousState;
@@ -28,6 +30,8 @@ public final class SettingsState implements GameState {
         this.musicButton = new Button(btnX, 200, "Music: " + (musicOn ? "ON" : "OFF"));
         this.sfxButton = new Button(btnX, 300, "SFX: " + (sfxOn ? "ON" : "OFF"));
         this.backButton = new Button(btnX, 400, "Back");
+
+        this.settings = new Image(getClass().getResourceAsStream("/GameIcon/settings.png"));
     }
 
     @Override
@@ -37,9 +41,8 @@ public final class SettingsState implements GameState {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
-
+        gc.drawImage(settings, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         gc.setTextAlign(TextAlignment.CENTER);
         TextRenderer.drawOutlinedText(
                 gc, "SETTINGS", centerX, 110,

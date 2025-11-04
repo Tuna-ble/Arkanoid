@@ -2,6 +2,7 @@ package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -27,6 +28,7 @@ public final class VictoryState implements GameState {
 
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
+
     private final Font titleFont = new Font("Arial", 70);
     private final Font starFont = new Font("Arial", 60);
     private final DropShadow titleShadow = new DropShadow(14, Color.color(0, 0, 0, 0.7));
@@ -35,6 +37,8 @@ public final class VictoryState implements GameState {
             new Stop(0, Color.web("#88ff88")),
             new Stop(1, Color.web("#44cc44"))
     );
+
+    private Image victory;
 
     public VictoryState(int livesLeft, int levelCompleted) {
         this.livesLeft = livesLeft;
@@ -60,6 +64,7 @@ public final class VictoryState implements GameState {
         this.menuButton = new Button(menuX, buttonY, buttonWidth, GameConstants.UI_BUTTON_HEIGHT, "Menu");
         this.nextButton = new Button(nextX, buttonY, buttonWidth, GameConstants.UI_BUTTON_HEIGHT, "Next Level");
 
+        victory = new Image("/GameIcon/victory.gif");
     }
 
     @Override
@@ -75,8 +80,18 @@ public final class VictoryState implements GameState {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        double scale = GameConstants.SCREEN_HEIGHT / victory.getHeight();
+        double scaledWidth = victory.getWidth() * scale;
+
+        double cropStartX = scaledWidth - GameConstants.SCREEN_WIDTH;
+
+        gc.drawImage(
+                victory,
+                cropStartX / scale, 0, // sx, sy
+                GameConstants.SCREEN_WIDTH / scale, victory.getHeight(), // sw, sh (crop gốc)
+                0, 0, // dx, dy
+                GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT // dw, dh (vẽ full screen)
+        );
 
         gc.setTextAlign(TextAlignment.CENTER);
         TextRenderer.drawOutlinedText(

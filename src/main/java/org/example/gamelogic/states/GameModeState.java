@@ -7,6 +7,7 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
+import javafx.scene.input.KeyCode;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
 import org.example.gamelogic.I_InputProvider;
@@ -14,7 +15,6 @@ import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.Button;
 import org.example.gamelogic.graphics.TextRenderer;
-import javafx.scene.input.KeyCode;
 
 public final class GameModeState implements GameState {
 
@@ -50,15 +50,13 @@ public final class GameModeState implements GameState {
 
         this.backButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
-                GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 80,
+                buttonY + 2 * (GameConstants.UI_BUTTON_HEIGHT + buttonSpacing),
                 "Back"
         );
     }
 
     @Override
-    public void update(double deltaTime) {
-
-    }
+    public void update(double deltaTime) { }
 
     private void updateButtons(I_InputProvider inputProvider) {
         infiniteButton.update(inputProvider);

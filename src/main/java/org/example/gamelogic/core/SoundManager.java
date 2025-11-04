@@ -87,7 +87,12 @@ public final class SoundManager {
         playSound("brick_destroyed");
     }
 
-    private void stopSound(String brickHit) {
+    private void stopSound(String soundName) {
+        Clip clip = assetManager.getSound(soundName);
+        if (clip != null && clip.isRunning()) {
+            clip.stop();
+            clip.setFramePosition(0);
+        }
     }
 
     public void onPaddleHit(BallHitPaddleEvent event) {
