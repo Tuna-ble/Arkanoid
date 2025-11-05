@@ -257,7 +257,6 @@ public final class CollisionManager {
                 }
             } else {
                 if (paddle.intersects(laser.getGameObject())) {
-                    // (Bạn cần tạo sự kiện mới, ví dụ 'PaddleHitEvent')
                     // EventManager.getInstance().publish(new PaddleHitEvent(paddle));
                     LifeManager.getInstance().loseLife();
                     laser.setActive(false);
