@@ -39,6 +39,7 @@ public class AssetManager {
         try {
             // loadImage("ball", "/images/ball.png");
             // loadImage("paddle", "/images/paddle.png");
+            loadImage("frame", "/GameIcon/Frame.png");
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());
             e.printStackTrace();

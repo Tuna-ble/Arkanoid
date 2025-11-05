@@ -12,8 +12,20 @@ public final class GameConstants {
     private GameConstants() {}
 
     // Screen
-    public static final double SCREEN_WIDTH = 800;
-    public static final double SCREEN_HEIGHT = 600;
+    public static final double SCREEN_WIDTH = 900;
+    public static final double SCREEN_HEIGHT = 750;
+
+    // UI
+    public static final double FRAME_TOP_BORDER = 0;
+    public static final double FRAME_LEFT_BORDER = 0;
+    public static final double FRAME_RIGHT_BORDER = 0;
+    public static final double FRAME_BOTTOM_BORDER = 0;
+//25
+    public static final double UI_BAR_HEIGHT = 150;
+    public static final double PLAY_AREA_X = FRAME_LEFT_BORDER;
+    public static final double PLAY_AREA_Y = FRAME_TOP_BORDER;
+    public static final double PLAY_AREA_WIDTH = SCREEN_WIDTH - FRAME_LEFT_BORDER - FRAME_RIGHT_BORDER;
+    public static final double PLAY_AREA_HEIGHT = (SCREEN_HEIGHT - UI_BAR_HEIGHT) - FRAME_TOP_BORDER - FRAME_BOTTOM_BORDER;
 
     // Color
     public static final Color NORMAL_BALL_COLOR = Color.RED;
@@ -28,6 +40,7 @@ public final class GameConstants {
     public static final double PADDLE_HEIGHT = 16;
     public static final double PADDLE_SPEED = 600.0; // pixels per second
     public static final double PADDLE_MOVE_INFLUENCE = 0.7; // influence on ball direction
+    public static final double PADDLE_LENGTH_CAP = 180;
 
     // Ball
     public static final double BALL_RADIUS = 8;

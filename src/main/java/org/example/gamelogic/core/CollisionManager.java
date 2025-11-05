@@ -50,31 +50,29 @@ public final class CollisionManager {
 
     private void checkBallBoundsCollisions(IBall ball) {
         boolean collisionOccurred = false;
-        // Tường trái/phải
-        if (ball.getX() <= 0) {
-            ball.setPosition(0, ball.getY()); // Đẩy bóng về đúng biên trái
-            ball.reverseDirX();
-            collisionOccurred = true;
-        }
-        // Tường phải
-        else if ((ball.getX() + ball.getWidth()) >= GameConstants.SCREEN_WIDTH) {
-            // Đẩy bóng về đúng biên phải
-            ball.setPosition(GameConstants.SCREEN_WIDTH - ball.getWidth(), ball.getY());
+
+        if (ball.getX() <= GameConstants.PLAY_AREA_X + 25) {
+            ball.setPosition(GameConstants.PLAY_AREA_X + 25, ball.getY());
             ball.reverseDirX();
             collisionOccurred = true;
         }
 
-        // Tường trên
-        if (ball.getY() <= 0) {
-            ball.setPosition(ball.getX(), 0);
+        else if ((ball.getX() + ball.getWidth()) >= (GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH) - 25) {
+            ball.setPosition(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - 25 - ball.getWidth(), ball.getY());
+            ball.reverseDirX();
+            collisionOccurred = true;
+        }
+
+        if (ball.getY() <= GameConstants.PLAY_AREA_Y + 25) {
+            ball.setPosition(ball.getX(), GameConstants.PLAY_AREA_Y + 25);
             ball.reverseDirY();
             collisionOccurred = true;
         }
-        // Đáy màn hình
-        if (ball.getY() > GameConstants.SCREEN_HEIGHT) {
-            ball.destroy();// Đánh dấu bóng để xóa bởi BallManager
+
+        if (ball.getY() > (GameConstants.PLAY_AREA_Y + GameConstants.PLAY_AREA_HEIGHT)) {
+            ball.destroy();
             EventManager.getInstance().publish(new BallLostEvent(ball));
-            collisionOccurred = true;
+            collisionOccurred = false;
         }
 
         if (collisionOccurred) {
@@ -448,21 +446,20 @@ public final class CollisionManager {
 
             return true;
         }
-
         return false;
     }
 
     private void checkEnemyBoundsCollisions(Enemy enemy) {
-        if (enemy.getX() <= 0) {
-            enemy.setPosition(0, enemy.getY());
+        if (enemy.getX() <= GameConstants.PLAY_AREA_X + 25) {
+            enemy.setPosition(GameConstants.PLAY_AREA_X + 25, enemy.getY());
             enemy.reverseDirX();
-        } else if ((enemy.getX() + enemy.getWidth()) >= GameConstants.SCREEN_WIDTH) {
-            enemy.setPosition(GameConstants.SCREEN_WIDTH - enemy.getWidth(), enemy.getY());
+        } else if ((enemy.getX() + enemy.getWidth()) >= (GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH) - 25) { // 0
+            enemy.setPosition(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - 25 - enemy.getWidth(), enemy.getY()); // 0
             enemy.reverseDirX();
         }
 
-        if (enemy.getHasEnteredScreen() && enemy.getY() <= 0) {
-            enemy.setPosition(enemy.getX(), 0);
+        if (enemy.getHasEnteredScreen() && enemy.getY() <= GameConstants.PLAY_AREA_Y + 25) {
+            enemy.setPosition(enemy.getX(), GameConstants.PLAY_AREA_Y + 25);
             enemy.reverseDirY();
         }
     }

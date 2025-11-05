@@ -7,6 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
+import org.example.data.AssetManager;
 import org.example.config.GameConstants;
 import org.example.data.FileLevelRepository;
 import org.example.gamelogic.I_InputProvider;
@@ -33,8 +34,10 @@ public final class PlayingState implements GameState {
     Paddle paddle;
     Font scoreFont;
     Image pauseIcon;
+
     private int currentLives;
     private boolean hasWon = false;
+    private Image frameImage;
 
     private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
     private int levelNumber;
@@ -55,8 +58,8 @@ public final class PlayingState implements GameState {
         this.laserManager = gameManager.getLaserManager();
 
         this.paddle = new Paddle(
-                GameConstants.PADDLE_X,
-                GameConstants.PADDLE_Y,
+                GameConstants.PLAY_AREA_X + (GameConstants.PLAY_AREA_WIDTH / 2.0) - (GameConstants.PADDLE_WIDTH / 2.0),
+                GameConstants.PLAY_AREA_Y + GameConstants.PLAY_AREA_HEIGHT - GameConstants.PADDLE_HEIGHT - 45,
                 GameConstants.PADDLE_WIDTH,
                 GameConstants.PADDLE_HEIGHT,
                 0,
@@ -87,6 +90,12 @@ public final class PlayingState implements GameState {
         subscribeToEvents();
         this.levelNumber = levelNumber;
         this.enemyManager.loadLevelScript(this.levelNumber);
+        try {
+            this.frameImage = AssetManager.getInstance().getImage("frame");
+        } catch (Exception e) {
+            System.err.println("Không thể tải ảnh Frame.png từ AssetManager!");
+            this.frameImage = null;
+        }
 
         powerUpManager.spawnPowerUp("H", 400, 300);
         powerUpManager.spawnPowerUp("E", 400, 400);
@@ -170,22 +179,57 @@ public final class PlayingState implements GameState {
     @Override
     public void render(javafx.scene.canvas.GraphicsContext gc) {
         gc.setTransform(new Affine());
-        gc.setTextAlign(TextAlignment.LEFT);
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        gc.setFill(Color.PINK);
-        gc.fillRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
-        //render
+        if (this.frameImage != null) {
+
+            gc.drawImage(this.frameImage,
+                    0, 0,
+                    GameConstants.SCREEN_WIDTH,
+                    GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT);
+
+            double sourceX = 0;
+            double sourceY = (GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT) - GameConstants.FRAME_BOTTOM_BORDER; // (600 - 25 = 575)
+            double sourceWidth = GameConstants.SCREEN_WIDTH; // 900
+            double sourceHeight = GameConstants.FRAME_BOTTOM_BORDER; // 25
+
+            double destX = 0;
+            double destY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT;
+            double destWidth = GameConstants.SCREEN_WIDTH;
+            double destHeight = GameConstants.UI_BAR_HEIGHT;
+
+            gc.drawImage(this.frameImage,
+                    sourceX, sourceY, sourceWidth, sourceHeight,
+                    destX, destY, destWidth, destHeight);
+
+        } else {
+
+            gc.setFill(Color.DARKSLATEGRAY);
+            gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT);
+            gc.setFill(Color.BLACK);
+            gc.fillRect(0, GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT,
+                    GameConstants.SCREEN_WIDTH, GameConstants.UI_BAR_HEIGHT);
+        }
+
+        renderScore(gc);
+        renderLives(gc);
+        gc.save();
+
+        gc.beginPath();
+        gc.rect(GameConstants.PLAY_AREA_X, GameConstants.PLAY_AREA_Y,
+                GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
+        gc.clip();
+
         brickManager.render(gc);
         ballManager.render(gc);
         powerUpManager.render(gc);
         laserManager.render(gc);
         enemyManager.render(gc);
         paddle.render(gc);
-        renderScore(gc);
+        ParticleManager.getInstance().render(gc);
 
+        gc.restore();
         renderPauseButton(gc);
-        renderLives(gc);
     }
 
     private void renderPauseButton(GraphicsContext gc) {
