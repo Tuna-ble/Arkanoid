@@ -5,6 +5,9 @@ import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.LaserManager;
 import org.example.gamelogic.entities.BulletFrom;
+import org.example.gamelogic.strategy.movement.DashMovementStrategy;
+import org.example.gamelogic.strategy.movement.DownMovementStrategy;
+import org.example.gamelogic.strategy.movement.LRMovementStrategy;
 
 public class BossMinion extends AbstractEnemy {
     private double shootTimer;
@@ -12,8 +15,9 @@ public class BossMinion extends AbstractEnemy {
 
     public BossMinion(double x, double y, double width, double height,
                       double dx, double dy) {
-        super(x, y, width, height, dx, dy);
+        super(x, y, width, height, dx, dy, new DashMovementStrategy());
         this.shootTimer = Math.random() * SHOOT_COOLDOWN;
+        this.hasEnteredScreen = true;
     }
 
     @Override
@@ -23,9 +27,8 @@ public class BossMinion extends AbstractEnemy {
 
     @Override
     public void update(double deltaTime) {
+        super.update(deltaTime);
         shootTimer += deltaTime;
-        this.x = this.x + this.dx * deltaTime;
-        this.y += this.dy * deltaTime;
 
         if (shootTimer >= SHOOT_COOLDOWN) {
             shootTimer = 0.0;
@@ -39,10 +42,6 @@ public class BossMinion extends AbstractEnemy {
                     -300,
                     BulletFrom.ENEMY
             );
-        }
-
-        if (this.y > GameConstants.SCREEN_HEIGHT) {
-            this.setActive(false);
         }
     }
 
@@ -61,5 +60,10 @@ public class BossMinion extends AbstractEnemy {
         this.isActive = false;
         /*EventManager.getInstance().publish(new BrickDestroyedEvent(this));
         EventManager.getInstance().publish(new ExplosiveBrickEvent(this));*/
+    }
+
+    @Override
+    public void handleEntry(double deltaTime) {
+
     }
 }

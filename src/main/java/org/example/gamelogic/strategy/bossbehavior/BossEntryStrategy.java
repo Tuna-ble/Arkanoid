@@ -1,6 +1,5 @@
 package org.example.gamelogic.strategy.bossbehavior;
 
-import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.entities.enemy.Boss;
 
 public class BossEntryStrategy implements BossBehaviorStrategy {
@@ -11,7 +10,7 @@ public class BossEntryStrategy implements BossBehaviorStrategy {
         if (boss.getY() >= 100) {
             boss.setDy(0);
             boss.setDx(150);
-            boss.setStrategy(new BossAttackStrategy());
+            boss.setStrategy(new BossPhase1Strategy());
         }
     }
 }
