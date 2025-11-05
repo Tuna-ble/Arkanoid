@@ -43,11 +43,6 @@ public final class SettingsState implements GameState {
     public void render(GraphicsContext gc) {
         gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         gc.drawImage(settings, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
-        gc.setTextAlign(TextAlignment.CENTER);
-        TextRenderer.drawOutlinedText(
-                gc, "SETTINGS", centerX, 110,
-                new Font("Arial", 70), Color.WHITE, Color.BLACK, 2.0, null
-        );
 
         boolean musicOn = SettingsManager.getInstance().isMusicEnabled();
         boolean sfxOn = SettingsManager.getInstance().isSfxEnabled();

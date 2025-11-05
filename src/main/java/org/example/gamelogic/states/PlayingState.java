@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class PlayingState implements GameState {
+    private Image PlayingImage;
     BrickManager brickManager;
     PowerUpManager powerUpManager;
     GameManager gameManager;
@@ -45,6 +46,7 @@ public final class PlayingState implements GameState {
     private final Consumer<LifeAddedEvent> handleLifeAdded;
 
     public PlayingState(GameManager gameManager, int levelNumber) {
+        PlayingImage = new Image(getClass().getResourceAsStream("/GameIcon/playing.png"));
         this.gameManager = gameManager;
         this.brickManager = gameManager.getBrickManager();
         this.brickManager.loadLevel(levelNumber);
@@ -173,8 +175,7 @@ public final class PlayingState implements GameState {
         gc.setTextAlign(TextAlignment.LEFT);
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        gc.setFill(Color.PINK);
-        gc.fillRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+        gc.drawImage(PlayingImage, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         //render
         brickManager.render(gc);
         ballManager.render(gc);
