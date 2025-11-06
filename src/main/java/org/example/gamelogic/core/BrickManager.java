@@ -81,31 +81,34 @@ public final class BrickManager {
 
         List<String> layout = levelData.getLayout();
 
-        int maxCols = 0;
-        for (String row : layout) {
-            int numCols = row.trim().split("\\s+").length;
-            if (numCols > maxCols) {
-                maxCols = numCols;
-            }
-        }
-
-        double gridWidth = maxCols * (GameConstants.BRICK_WIDTH + GameConstants.PADDING) - GameConstants.PADDING;
-
-        double startX = (GameConstants.SCREEN_WIDTH - gridWidth) / 2.0;
-
         for (int row = 0; row < layout.size(); row++) {
-            String[] types = layout.get(row).split(" ");
+
+            String[] types = layout.get(row).trim().split("\\s+");
+            int numCols = 0;
+            for (String type : types) {
+                if (!type.equals("_")) {
+                    numCols++;
+                }
+            }
+            if (numCols == 0) continue;
+            double rowWidth = numCols * (GameConstants.BRICK_WIDTH + GameConstants.PADDING) - GameConstants.PADDING;
+            double rowStartX = (GameConstants.PLAY_AREA_WIDTH - rowWidth) / 2.0;
+
+            int currentCol = 0;
             for (int col = 0; col < types.length; col++) {
                 String type = types[col];
                 if (type.equals("_")) {
                     continue;
                 }
-                double x = startX + col * (GameConstants.BRICK_WIDTH + GameConstants.PADDING);
-                double y = GameConstants.TOP_MARGIN + row * (GameConstants.BRICK_HEIGHT + GameConstants.PADDING);
+
+                double x = GameConstants.PLAY_AREA_X + rowStartX + currentCol * (GameConstants.BRICK_WIDTH + GameConstants.PADDING);
+                double y = GameConstants.PLAY_AREA_Y + GameConstants.TOP_MARGIN + row * (GameConstants.BRICK_HEIGHT + GameConstants.PADDING);
+
                 Brick brick = brickFactory.createBrick(type, x, y);
                 if (brick != null) {
                     this.bricks.add(brick);
                 }
+                currentCol++;
             }
         }
     }

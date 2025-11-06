@@ -39,6 +39,7 @@ public class AssetManager {
         try {
             // loadImage("ball", "/images/ball.png");
             // loadImage("paddle", "/images/paddle.png");
+            loadImage("frame", "/GameIcon/Frame.png");
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());
             e.printStackTrace();
@@ -159,5 +160,14 @@ public class AssetManager {
         cacheFont("rank", new Font("Arial", 32));
         
         resourcesPreloaded = true;
+    }
+
+    /**
+     * Public wrapper to load an image into the internal cache. Safe to call
+     * from initialization code. If loading fails it will throw an exception
+     * to the caller so they can decide how to handle it.
+     */
+    public synchronized void loadImageResource(String name, String path) throws Exception {
+        loadImage(name, path);
     }
 }

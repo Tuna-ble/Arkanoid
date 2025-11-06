@@ -121,7 +121,7 @@ public final class EnemyManager {
                 break;
             case 5:
                 if (this.brickManager != null && brickManager.isLevelComplete() && !this.bossSpawned) {
-                    spawnEnemy("BOSS");
+                    spawnEnemy("BOSS", GameConstants.SCREEN_WIDTH / 2, -GameConstants.BOSS_HEIGHT);
                     this.bossSpawned = true;
                 }
                 break;

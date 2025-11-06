@@ -19,7 +19,7 @@ public final class SettingsState implements GameState {
     private Button sfxButton;
     private Button backButton;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
-    private final Image settings;
+    private Image settings = null;
 
     public SettingsState(GameState previousState) {
         this.previousState = previousState;
@@ -31,7 +31,23 @@ public final class SettingsState implements GameState {
         this.sfxButton = new Button(btnX, 300, "SFX: " + (sfxOn ? "ON" : "OFF"));
         this.backButton = new Button(btnX, 400, "Back");
 
-        this.settings = new Image(getClass().getResourceAsStream("/GameIcon/settings.png"));
+        org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
+        Image pre = am.getImage("settings");
+        if (pre != null) {
+            this.settings = pre;
+        } else {
+            this.settings = null;
+            try {
+                java.net.URL res = getClass().getResource("/GameIcon/settings.png");
+                if (res != null) {
+                    this.settings = new Image(res.toExternalForm(), true);
+                }
+            } catch (Exception e) {
+                System.err.println("Không thể tải ảnh settings.png từ resources!");
+                e.printStackTrace();
+                this.settings = null;
+            }
+        }
     }
 
     @Override
@@ -42,7 +58,14 @@ public final class SettingsState implements GameState {
     @Override
     public void render(GraphicsContext gc) {
         gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
-        gc.drawImage(settings, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        if (settings != null) {
+            gc.drawImage(settings, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        }
+        gc.setTextAlign(TextAlignment.CENTER);
+        TextRenderer.drawOutlinedText(
+                gc, "SETTINGS", centerX, 110,
+                new Font("Arial", 70), Color.WHITE, Color.BLACK, 2.0, null
+        );
 
         boolean musicOn = SettingsManager.getInstance().isMusicEnabled();
         boolean sfxOn = SettingsManager.getInstance().isSfxEnabled();

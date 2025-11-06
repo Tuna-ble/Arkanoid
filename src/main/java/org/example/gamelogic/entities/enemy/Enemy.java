@@ -27,6 +27,8 @@ public interface Enemy {
 
     void setDx(double dx);
     void setDy(double dy);
+    void setX(double x);
+    void setY(double y);
     void reverseDirX();
     void reverseDirY();
 

@@ -8,19 +8,23 @@ import org.example.gamelogic.entities.LaserBullet;
 import org.example.gamelogic.entities.MovableObject;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.events.*;
+import org.example.gamelogic.strategy.movement.EnemyMovementStrategy;
 
 public abstract class AbstractEnemy extends MovableObject implements Enemy {
     private boolean isHit = false;
     protected boolean outOfBounds = false;
     protected double health;
     protected double scoreValue;
-    private boolean hasEnteredScreen;
+    protected boolean hasEnteredScreen;
 
-    public AbstractEnemy(double x, double y, double width,
-                         double height, double dx, double dy) {
+    protected EnemyMovementStrategy movementStrategy;
+
+    public AbstractEnemy(double x, double y, double width, double height,
+                         double dx, double dy, EnemyMovementStrategy initialMovementStrategy) {
         super(x, y, width, height, dx, dy);
         this.isActive = true;
         this.hasEnteredScreen = false;
+        this.movementStrategy = initialMovementStrategy;
 
         subscribeToEvents();
     }
@@ -56,16 +60,12 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
 
     @Override
     public void update(double deltaTime) {
-        this.x += this.dx * deltaTime;
-        this.y += this.dy * deltaTime;
-
-        if (this.x + this.width >= GameConstants.SCREEN_WIDTH) {
-            this.x = GameConstants.SCREEN_WIDTH - this.width;
-            this.dx = -this.dx;
-        }
-
-        if (!hasEnteredScreen && this.y > 0) {
-            this.hasEnteredScreen = true;
+        if (!hasEnteredScreen) {
+            handleEntry(deltaTime);
+        } else {
+            if (this.movementStrategy != null) {
+                this.movementStrategy.move(this, deltaTime);
+            }
         }
 
         if (this.y > GameConstants.SCREEN_HEIGHT) {
@@ -76,6 +76,8 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
     @Override
     public abstract void render(GraphicsContext gc);
 
+    public abstract void handleEntry(double deltaTime);
+
     @Override
     public void setPosition(double x, double y) {
         this.x = x;
@@ -85,6 +87,10 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
     @Override
     public void setHasEnteredScreen(boolean hasEnteredScreen) {
         this.hasEnteredScreen = hasEnteredScreen;
+    }
+
+    public void setMovementStrategy(EnemyMovementStrategy newStrategy) {
+        this.movementStrategy = newStrategy;
     }
 
     @Override
