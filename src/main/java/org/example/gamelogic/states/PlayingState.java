@@ -64,6 +64,7 @@ public final class PlayingState implements GameState {
                 GameConstants.PADDLE_HEIGHT,
                 0,
                 0);
+        ObjectAccess.getInstance().registerPaddle(this.paddle);
 
         this.ballManager.createInitialBall(this.paddle);
 
