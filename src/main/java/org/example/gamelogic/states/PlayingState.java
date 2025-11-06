@@ -39,6 +39,11 @@ public final class PlayingState implements GameState {
     private boolean hasWon = false;
     private Image gameFrameImage;
     private Image hudFrameImage;
+    private double elapsedTime = 0.0;
+    private String formattedTime = "00:00";
+    private int lastSecond = -1;
+    private Font labelFont;
+    private Font valueFont;
 
     private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
     private int levelNumber;
@@ -80,6 +85,8 @@ public final class PlayingState implements GameState {
         }
 
         this.scoreFont = new Font("Arial", 24);
+        this.labelFont = new Font("Arial", 18);
+        this.valueFont = new Font("Arial", 28);
 
         this.currentLives = LifeManager.getInstance().getLives();
 
@@ -134,8 +141,16 @@ public final class PlayingState implements GameState {
 
     @Override
     public void update(double deltaTime) {
-        updateStrategy(deltaTime);
+        elapsedTime += deltaTime;
+        int totalSeconds = (int) elapsedTime;
+        if (totalSeconds != lastSecond) {
+            int minutes = totalSeconds / 60;
+            int seconds = totalSeconds % 60;
+            this.formattedTime = String.format("%02d:%02d", minutes, seconds);
+            this.lastSecond = totalSeconds;
+        }
 
+        updateStrategy(deltaTime);
         paddle.update(deltaTime);
         updateAttachedBallPosition();
 
@@ -203,8 +218,7 @@ public final class PlayingState implements GameState {
             gc.drawImage(this.hudFrameImage, 0, GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT, 900, 170);
         }
 
-        renderScore(gc);
-        renderLives(gc);
+        renderHUD(gc);
 
         gc.save();
         gc.beginPath();
@@ -220,6 +234,45 @@ public final class PlayingState implements GameState {
         ParticleManager.getInstance().render(gc);
         gc.restore();
         renderPauseButton(gc);
+    }
+
+    private void renderHUD(GraphicsContext gc) {
+
+        double slotWidth = GameConstants.PLAY_AREA_WIDTH / 4.0;
+
+        double x_slot1 = GameConstants.PLAY_AREA_X + slotWidth / 2.0;
+        double x_slot2 = x_slot1 + slotWidth;
+        double x_slot3 = x_slot2 + slotWidth;
+        double x_slot4 = x_slot3 + slotWidth;
+
+        double y_center = GameConstants.SCREEN_HEIGHT - (GameConstants.UI_BAR_HEIGHT / 2.0);
+        double y_label = y_center - 15;
+        double y_value = y_center + 25;
+
+        int currentScore = ScoreManager.getInstance().getScore();
+
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setFill(Color.BLACK);
+
+        gc.setFont(labelFont);
+        gc.fillText("SCORE", x_slot1, y_label);
+        gc.setFont(valueFont);
+        gc.fillText(String.valueOf(currentScore), x_slot1, y_value);
+
+        gc.setFont(labelFont);
+        gc.fillText("TIME", x_slot2, y_label);
+        gc.setFont(valueFont);
+        gc.fillText(this.formattedTime, x_slot2, y_value);
+
+        gc.setFont(labelFont);
+        gc.fillText("ROUND", x_slot3, y_label);
+        gc.setFont(valueFont);
+        gc.fillText(String.valueOf(this.levelNumber), x_slot3, y_value);
+
+        gc.setFont(labelFont);
+        gc.fillText("LIVES", x_slot4, y_label);
+        gc.setFont(valueFont);
+        gc.fillText(String.valueOf(this.currentLives), x_slot4, y_value);
     }
 
     private void renderPauseButton(GraphicsContext gc) {

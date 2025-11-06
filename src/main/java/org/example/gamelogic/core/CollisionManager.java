@@ -57,21 +57,18 @@ public final class CollisionManager {
             collisionOccurred = true;
         }
 
-        // Tường phải: Bỏ "- 25"
         else if ((ball.getX() + ball.getWidth()) >= (GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH)) {
             ball.setPosition(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - ball.getWidth(), ball.getY());
             ball.reverseDirX();
             collisionOccurred = true;
         }
 
-        // Tường trên: Bỏ "+ 25"
         if (ball.getY() <= GameConstants.PLAY_AREA_Y) {
             ball.setPosition(ball.getX(), GameConstants.PLAY_AREA_Y);
             ball.reverseDirY();
             collisionOccurred = true;
         }
 
-        // Tường dưới (mất mạng) - Code cũ của bạn đã đúng
         if (ball.getY() > (GameConstants.PLAY_AREA_Y + GameConstants.PLAY_AREA_HEIGHT)) {
             ball.destroy();
             EventManager.getInstance().publish(new BallLostEvent(ball));
