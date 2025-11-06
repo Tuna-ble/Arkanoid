@@ -55,9 +55,7 @@ public final class CollisionManager {
             ball.setPosition(GameConstants.PLAY_AREA_X + 25, ball.getY());
             ball.reverseDirX();
             collisionOccurred = true;
-        }
-
-        else if ((ball.getX() + ball.getWidth()) >= (GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH) - 25) {
+        } else if ((ball.getX() + ball.getWidth()) >= (GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH) - 25) {
             ball.setPosition(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - 25 - ball.getWidth(), ball.getY());
             ball.reverseDirX();
             collisionOccurred = true;
@@ -115,12 +113,12 @@ public final class CollisionManager {
             if (brick.isDestroyed()) continue;
             if (!ball.getGameObject().intersects(brick.getGameObject())) continue;
 
-            boolean alreadyPierced=false;
+            boolean alreadyPierced = false;
 
             // skip repeated damage on the same brick
             for (GameObject piercingObject : ball.getPiercingObjects()) {
                 if (brick.getGameObject().equals(piercingObject)) {
-                    alreadyPierced=true;
+                    alreadyPierced = true;
                     break;
                 }
             }
@@ -229,6 +227,7 @@ public final class CollisionManager {
     }
 
     private void checkLaserCollisions(List<LaserBullet> lasers, List<Brick> bricks, List<Enemy> enemies, Paddle paddle) {
+        // ConcurrentModificationException is the worst
         Iterator<LaserBullet> iterator = lasers.iterator();
         while (iterator.hasNext()) {
             LaserBullet laser = iterator.next();
@@ -238,26 +237,23 @@ public final class CollisionManager {
                     if (!brick.isDestroyed() && laser.intersects(brick.getGameObject())) {
                         EventManager.getInstance().
                                 publish(new BrickDamagedEvent(brick, laser.getGameObject()));
-                        laser.setActive(false);
+                        iterator.remove();
                         break;
                     }
                 }
-
-                if (laser.isActive()) {
-                    for (Enemy enemy : enemies) {
-                        if (!enemy.isDestroyed() && laser.intersects(enemy.getGameObject())) {
-                            EventManager.getInstance().
-                                    publish(new EnemyDamagedEvent(enemy, laser.getGameObject()));
-                            laser.setActive(false);
-                            break;
-                        }
+                for (Enemy enemy : enemies) {
+                    if (!enemy.isDestroyed() && laser.intersects(enemy.getGameObject())) {
+                        EventManager.getInstance().
+                                publish(new EnemyDamagedEvent(enemy, laser.getGameObject()));
+                        iterator.remove();
+                        break;
                     }
                 }
             } else {
                 if (paddle.intersects(laser.getGameObject())) {
                     // EventManager.getInstance().publish(new PaddleHitEvent(paddle));
                     LifeManager.getInstance().loseLife();
-                    laser.setActive(false);
+                    iterator.remove();
                 }
             }
         }
@@ -277,12 +273,12 @@ public final class CollisionManager {
             if (enemy.isDestroyed()) continue;
             if (!ball.getGameObject().intersects(enemy.getGameObject())) continue;
 
-            boolean alreadyPierced=false;
+            boolean alreadyPierced = false;
 
             // skip repeated damage on the same enemy
             for (GameObject piercingObject : ball.getPiercingObjects()) {
                 if (enemy.getGameObject().equals(piercingObject)) {
-                    alreadyPierced=true;
+                    alreadyPierced = true;
                 }
             }
 

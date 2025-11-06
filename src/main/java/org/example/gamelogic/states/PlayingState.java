@@ -2,6 +2,9 @@ package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -38,6 +41,7 @@ public final class PlayingState implements GameState {
     private int currentLives;
     private boolean hasWon = false;
     private Image frameImage;
+    private Image backgroundImage;
 
     private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
     private int levelNumber;
@@ -96,9 +100,15 @@ public final class PlayingState implements GameState {
             System.err.println("Không thể tải ảnh Frame.png từ AssetManager!");
             this.frameImage = null;
         }
+        try {
+            this.backgroundImage = AssetManager.getInstance().getImage("playing");
+        } catch (Exception e) {
+            System.err.println("Không thể tải ảnh playing.png từ AssetManager!");
+            this.backgroundImage = null;
+        }
 
-        powerUpManager.spawnPowerUp("H", 400, 300);
-        powerUpManager.spawnPowerUp("E", 400, 400);
+        powerUpManager.spawnPowerUp("P", 400, 300);
+        powerUpManager.spawnPowerUp("M", 400, 400);
     }
 
     private void subscribeToEvents() {
@@ -181,9 +191,15 @@ public final class PlayingState implements GameState {
         gc.setTransform(new Affine());
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        if (this.frameImage != null) {
+        if (this.backgroundImage!=null) {
+            gc.drawImage(backgroundImage,
+                    0, 0,
+                    GameConstants.PLAY_AREA_WIDTH,
+                    GameConstants.PLAY_AREA_HEIGHT);
+        }
 
-            gc.drawImage(this.frameImage,
+        if (this.frameImage != null) {
+            gc.drawImage(frameImage,
                     0, 0,
                     GameConstants.SCREEN_WIDTH,
                     GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT);
@@ -203,7 +219,6 @@ public final class PlayingState implements GameState {
                     destX, destY, destWidth, destHeight);
 
         } else {
-
             gc.setFill(Color.DARKSLATEGRAY);
             gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT);
             gc.setFill(Color.BLACK);

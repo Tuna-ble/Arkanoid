@@ -16,7 +16,7 @@ public class AssetManager {
     private Map<String, Font> fonts = new HashMap<>();
     private Map<String, Effect> effects = new HashMap<>();
     private Map<String, Paint> gradients = new HashMap<>();
-    
+
     private boolean resourcesPreloaded = false;
 
     private AssetManager() {
@@ -37,9 +37,11 @@ public class AssetManager {
             e.printStackTrace();
         }
         try {
-            // loadImage("ball", "/images/ball.png");
-            // loadImage("paddle", "/images/paddle.png");
+            loadImage("main_menu", "/GameIcon/MainMenu.gif");
+            loadImage("title", "/GameIcon/title.png");
             loadImage("frame", "/GameIcon/Frame.png");
+            loadImage("playing", "/GameIcon/playing.png");
+            loadImage("enemies", "/GameIcon/EnemySprites.png");
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());
             e.printStackTrace();
@@ -151,14 +153,14 @@ public class AssetManager {
 
     public void preloadResources() {
         if (resourcesPreloaded) return;
-        
+
         loadAssets();
-        
+
         // Cache common fonts
         cacheFont("title", new Font("Arial", 70));
         cacheFont("score", new Font("Arial", 40));
         cacheFont("rank", new Font("Arial", 32));
-        
+
         resourcesPreloaded = true;
     }
 

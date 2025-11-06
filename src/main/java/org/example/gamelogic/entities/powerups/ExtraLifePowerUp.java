@@ -8,7 +8,7 @@ import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public class ExtraLifePowerUp extends AbstractPowerUp {
     private final Image extra = new Image(
-            getClass().getResourceAsStream("/GameIcon/extra.png")
+            getClass().getResourceAsStream("/GameIcon/red.png")
     );
 
     /// type: H

@@ -41,12 +41,8 @@ public final class EnemyManager {
     }
 
     private void registerEnemyPrototypes(EnemyRegistry enemyRegistry) {
-        final double POWERUP_WIDTH = 40;
-        final double POWERUP_HEIGHT = 40;
-
         enemyRegistry.register("E1", new Enemy1(0.0, 0.0, GameConstants.ENEMY_WIDTH,
                 GameConstants.ENEMY_HEIGHT, 25.0, 50.0));
-
         enemyRegistry.register("E2", new Enemy2(0.0, 0.0, GameConstants.ENEMY_WIDTH,
                 GameConstants.ENEMY_HEIGHT, 25.0, 50.0));
         enemyRegistry.register("MINION", new BossMinion(0.0, 0.0, GameConstants.ENEMY_WIDTH,

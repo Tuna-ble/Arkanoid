@@ -4,12 +4,12 @@ package org.example.config;
  */
 
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 
 public final class GameConstants {
 
     // Prevent instantiation
-    private GameConstants() {}
+    private GameConstants() {
+    }
 
     // Screen
     public static final double SCREEN_WIDTH = 900;
@@ -20,7 +20,7 @@ public final class GameConstants {
     public static final double FRAME_LEFT_BORDER = 0;
     public static final double FRAME_RIGHT_BORDER = 0;
     public static final double FRAME_BOTTOM_BORDER = 0;
-//25
+    //25
     public static final double UI_BAR_HEIGHT = 150;
     public static final double PLAY_AREA_X = FRAME_LEFT_BORDER;
     public static final double PLAY_AREA_Y = FRAME_TOP_BORDER;
@@ -32,6 +32,8 @@ public final class GameConstants {
     public static final Color PIERCING_BALL_COLOR = Color.CYAN;
     public static final Color PADDLE_COLOR = Color.CYAN;
     public static final Color PADDLE_BORDER_COLOR = Color.DARKBLUE;
+    public static final Color NORMAL_BOSS_COLOR = Color.LIGHTGREEN;
+    public static final Color ENRAGED_BOSS_COLOR = Color.ORANGERED;
 
     // Paddle
     public static final double PADDLE_X = SCREEN_WIDTH / 2;

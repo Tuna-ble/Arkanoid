@@ -1,48 +1,47 @@
 package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.transform.Affine;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.Stop;
-import javafx.scene.effect.DropShadow;
+import javafx.scene.transform.Affine;
 import org.example.config.GameConstants;
-import org.example.gamelogic.core.EventManager;
+import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
+import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class MainMenuState implements GameState {
     private Image mainMenuImage;
+    private Image gameTitle;
     private Button startButton;
     private Button rankingButton;
     private Button settingsButton;
     private double elapsedTime = 0;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
-    private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 30;
+    private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 + 75;
 
     public MainMenuState() {
-        org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
-        Image pre = am.getImage("mainMenu");
-        if (pre != null) {
-            mainMenuImage = pre;
-        } else {
-            try {
-                java.net.URL res = getClass().getResource("/GameIcon/MainMenu.png");
-                if (res != null) {
-                    mainMenuImage = new Image(res.toExternalForm(), true);
-                }
-            } catch (Exception e) {
-                System.err.println("Không thể tải ảnh MainMenu.png từ resources!");
-                e.printStackTrace();
-            }
+        try {
+            mainMenuImage = AssetManager.getInstance().getImage("main_menu");
+        } catch (Exception e) {
+            System.err.println("Không thể tải ảnh MainMenu.gif từ resources!");
+            e.printStackTrace();
+        }
+        try {
+            gameTitle = AssetManager.getInstance().getImage("title");
+        } catch (Exception e) {
+            System.err.println("Không thể tải ảnh title.png từ resources!");
+            e.printStackTrace();
         }
         double buttonGap = 70;
         startButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 0), "Start");
@@ -58,7 +57,7 @@ public final class MainMenuState implements GameState {
     @Override
     public void render(GraphicsContext gc) {
         gc.setTransform(new Affine());
-        gc.setTextAlign(TextAlignment.LEFT);
+        gc.setTextAlign(TextAlignment.CENTER);
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         // Background
         if (mainMenuImage != null) {
@@ -67,26 +66,9 @@ public final class MainMenuState implements GameState {
             gc.setFill(Color.BLACK);
             gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         }
-        // Title (outlined with subtle shadow and gradient)
-        gc.setTextAlign(TextAlignment.CENTER);
-        LinearGradient titleFill = new LinearGradient(
-                0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                new Stop(0, Color.web("#66ccff")),
-                new Stop(1, Color.web("#228BE6"))
-        );
-        DropShadow titleShadow = new DropShadow(12, Color.color(0, 0, 0, 0.6));
-        Font titleFont = Font.font("Verdana", FontWeight.BOLD, 72);
-        TextRenderer.drawOutlinedText(
-                gc,
-                "ARKANOID",
-                GameConstants.SCREEN_WIDTH / 2.0,
-                230,
-                titleFont,
-                titleFill,
-                Color.color(0, 0, 0, 0.8),
-                2.5,
-                titleShadow
-        );
+
+        // Title
+        gc.drawImage(gameTitle, (GameConstants.SCREEN_WIDTH-800)/2, 0, 800, 450);
 
         // Buttons
         if (startButton != null) startButton.render(gc);
@@ -113,7 +95,7 @@ public final class MainMenuState implements GameState {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.GAME_MODE)
             );
-        }  else if (rankingButton != null && rankingButton.isClicked()) {
+        } else if (rankingButton != null && rankingButton.isClicked()) {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.RANKING_STATE)
             );

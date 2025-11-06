@@ -1,8 +1,14 @@
 package org.example.gamelogic.entities.enemy;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.strategy.bossbehavior.BossBehaviorStrategy;
 import org.example.gamelogic.strategy.bossbehavior.BossEnrageStrategy;
 import org.example.gamelogic.strategy.bossbehavior.BossEntryStrategy;
@@ -13,6 +19,11 @@ public class Boss extends AbstractEnemy {
     private BossBehaviorStrategy currentStrategy;
     private double startX;
 
+    private Color bossColor;
+    private static final double BOSS_SPRITE_WIDTH = 220;
+    private static final double BOSS_SPRITE_HEIGHT = 160;
+    private static final double BOSS_SPRITE_PADDING = 20;
+
     public Boss(double x, double y, double dx, double dy) {
         super(x, y, GameConstants.BOSS_WIDTH, GameConstants.BOSS_HEIGHT,
                 dx, dy, new StaticMovementStrategy());
@@ -22,6 +33,8 @@ public class Boss extends AbstractEnemy {
         this.startX = GameConstants.SCREEN_WIDTH / 2 - GameConstants.BOSS_WIDTH / 2;
 
         this.currentStrategy = new BossEntryStrategy();
+
+        this.bossColor = GameConstants.NORMAL_BOSS_COLOR;
     }
 
     @Override
@@ -41,6 +54,7 @@ public class Boss extends AbstractEnemy {
         if (this.health <= GameConstants.BOSS_HEATLTH / 2.0
                 && !(currentStrategy instanceof BossEnrageStrategy || currentStrategy instanceof BossPhase2Strategy)) {
             setStrategy(new BossEnrageStrategy(startX));
+            bossColor = GameConstants.ENRAGED_BOSS_COLOR;
         }
     }
 
@@ -50,8 +64,28 @@ public class Boss extends AbstractEnemy {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.DARKRED);
-        gc.fillRect(x, y, width, height);
+        double bossSpriteX = 0;
+        if (currentStrategy instanceof BossEnrageStrategy ||
+                currentStrategy instanceof BossPhase2Strategy) {
+            bossSpriteX += BOSS_SPRITE_WIDTH + BOSS_SPRITE_PADDING;
+        }
+
+        double bossSpriteY = 0;
+
+        // Extract current phase frame from sprite sheet
+        Image currentFrame = new WritableImage(
+                enemySprites.getPixelReader(),
+                (int) bossSpriteX,
+                (int) bossSpriteY,
+                (int) BOSS_SPRITE_WIDTH,
+                (int) BOSS_SPRITE_HEIGHT
+        );
+
+        // Tint the current frame to desired color
+        Image tintedFrame = tintImage(currentFrame, bossColor);
+
+        // Draw the tinted sprite at the desired position and size
+        gc.drawImage(tintedFrame, this.x, this.y, this.width, this.height);
 
         gc.setFill(Color.BLACK);
         gc.fillRect(x, y - 10, width, 8);

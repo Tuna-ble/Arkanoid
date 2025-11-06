@@ -92,7 +92,7 @@ public final class GameManager {
         try {
             org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
             // load images into asset manager cache (public wrapper)
-            am.loadImageResource("mainMenu", "/GameIcon/MainMenu.png");
+            am.loadImageResource("main_menu", "/GameIcon/MainMenu.gif");
             am.loadImageResource("ranking", "/GameIcon/ranking.png");
             am.loadImageResource("settings", "/GameIcon/settings.png");
             am.loadImageResource("pause", "/GameIcon/pause.png");
