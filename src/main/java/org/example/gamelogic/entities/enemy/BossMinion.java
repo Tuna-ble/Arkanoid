@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.LaserManager;
 import org.example.gamelogic.entities.BulletFrom;
+import org.example.gamelogic.entities.BulletType;
 import org.example.gamelogic.strategy.movement.DashMovementStrategy;
 import org.example.gamelogic.strategy.movement.DownMovementStrategy;
 import org.example.gamelogic.strategy.movement.LRMovementStrategy;
@@ -39,7 +40,9 @@ public class BossMinion extends AbstractEnemy {
             LaserManager.getInstance().createBullet(
                     bulletX,
                     bulletY,
-                    -300,
+                    0,
+                    300,
+                    BulletType.ENEMY_LASER,
                     BulletFrom.ENEMY
             );
         }

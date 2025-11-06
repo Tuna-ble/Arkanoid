@@ -6,7 +6,6 @@ import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.entities.GameObject;
 import org.example.gamelogic.entities.LaserBullet;
 import org.example.gamelogic.entities.MovableObject;
-import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.events.*;
 import org.example.gamelogic.strategy.movement.EnemyMovementStrategy;
 
@@ -60,7 +59,7 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
 
     @Override
     public void update(double deltaTime) {
-        if (!hasEnteredScreen) {
+        if (!this.hasEnteredScreen) {
             handleEntry(deltaTime);
         } else {
             if (this.movementStrategy != null) {
