@@ -51,24 +51,27 @@ public final class CollisionManager {
     private void checkBallBoundsCollisions(IBall ball) {
         boolean collisionOccurred = false;
 
-        if (ball.getX() <= GameConstants.PLAY_AREA_X + 25) {
-            ball.setPosition(GameConstants.PLAY_AREA_X + 25, ball.getY());
+        if (ball.getX() <= GameConstants.PLAY_AREA_X) {
+            ball.setPosition(GameConstants.PLAY_AREA_X, ball.getY());
             ball.reverseDirX();
             collisionOccurred = true;
         }
 
-        else if ((ball.getX() + ball.getWidth()) >= (GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH) - 25) {
-            ball.setPosition(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - 25 - ball.getWidth(), ball.getY());
+        // Tường phải: Bỏ "- 25"
+        else if ((ball.getX() + ball.getWidth()) >= (GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH)) {
+            ball.setPosition(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - ball.getWidth(), ball.getY());
             ball.reverseDirX();
             collisionOccurred = true;
         }
 
-        if (ball.getY() <= GameConstants.PLAY_AREA_Y + 25) {
-            ball.setPosition(ball.getX(), GameConstants.PLAY_AREA_Y + 25);
+        // Tường trên: Bỏ "+ 25"
+        if (ball.getY() <= GameConstants.PLAY_AREA_Y) {
+            ball.setPosition(ball.getX(), GameConstants.PLAY_AREA_Y);
             ball.reverseDirY();
             collisionOccurred = true;
         }
 
+        // Tường dưới (mất mạng) - Code cũ của bạn đã đúng
         if (ball.getY() > (GameConstants.PLAY_AREA_Y + GameConstants.PLAY_AREA_HEIGHT)) {
             ball.destroy();
             EventManager.getInstance().publish(new BallLostEvent(ball));
@@ -326,9 +329,7 @@ public final class CollisionManager {
                 double overlapX = combinedHalfWidth - Math.abs(dx);
                 double overlapY = combinedHalfHeight - Math.abs(dy);
 
-                // Chỉ xử lý nếu thực sự có lún vào (overlap > 0)
                 if (overlapX > 0 && overlapY > 0) {
-                    // Xác định hướng va chạm chính (hướng lún ÍT hơn)
                     double currentOverlap;
                     boolean isHorizontal;
                     if (overlapX < overlapY) {
@@ -339,7 +340,6 @@ public final class CollisionManager {
                         isHorizontal = false;
                     }
 
-                    // Lưu lại va chạm có độ lún lớn nhất
                     if (currentOverlap > maxOverlap) {
                         maxOverlap = currentOverlap;
                         bestCollisionEnemy = enemy;
@@ -347,33 +347,27 @@ public final class CollisionManager {
                     }
                 }
             }
-        } // Kết thúc vòng lặp FOR
+        }
 
-        // --- Xử lý va chạm TỐT NHẤT sau khi duyệt hết ---
         if (bestCollisionEnemy != null) {
-            // Đẩy bóng ra khỏi viên gạch va chạm sâu nhất
-            if (collisionIsHorizontal) { // Va chạm ngang
+            if (collisionIsHorizontal) {
                 if (ball.getX() + ball.getWidth() / 2.0 > bestCollisionEnemy.getX() + bestCollisionEnemy.getWidth() / 2.0) { // Bóng bên phải
                     ball.setPosition(bestCollisionEnemy.getX() + bestCollisionEnemy.getWidth(), ball.getY());
-                } else { // Bóng bên trái
+                } else {
                     ball.setPosition(bestCollisionEnemy.getX() - ball.getWidth(), ball.getY());
                 }
                 ball.reverseDirX();
-            } else { // Va chạm dọc
+            } else {
                 if (ball.getY() + ball.getHeight() / 2.0 > bestCollisionEnemy.getY() + bestCollisionEnemy.getHeight() / 2.0) { // Bóng bên dưới
                     ball.setPosition(ball.getX(), bestCollisionEnemy.getY() + bestCollisionEnemy.getHeight());
-                } else { // Bóng bên trên
+                } else {
                     ball.setPosition(ball.getX(), bestCollisionEnemy.getY() - ball.getHeight());
                 }
                 ball.reverseDirY();
             }
-
-            // Phát sự kiện cho viên gạch bị va chạm
             EventManager.getInstance().publish(new BallHitEnemyEvent(bestCollisionEnemy, ball));
         }
     }
-
-    // BÊN TRONG CollisionManager.java
 
     private boolean checkEnemyBrickCollisions(Enemy enemy, List<Brick> bricks) {
         if ((enemy.getY() + enemy.getHeight()) < GameConstants.TOP_MARGIN) {
@@ -382,7 +376,7 @@ public final class CollisionManager {
 
         Brick bestCollisionBrick = null;
         double maxOverlap = -1.0;
-        boolean collisionIsHorizontal = false; // Sẽ được quyết định bởi logic SỬA LỖI
+        boolean collisionIsHorizontal = false;
 
         for (Brick brick : bricks) {
             if (!brick.isDestroyed() && enemy.getGameObject().intersects(brick.getGameObject())) {
@@ -450,16 +444,18 @@ public final class CollisionManager {
     }
 
     private void checkEnemyBoundsCollisions(Enemy enemy) {
-        if (enemy.getX() <= GameConstants.PLAY_AREA_X + 25) {
-            enemy.setPosition(GameConstants.PLAY_AREA_X + 25, enemy.getY());
-            enemy.reverseDirX();
-        } else if ((enemy.getX() + enemy.getWidth()) >= (GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH) - 25) { // 0
-            enemy.setPosition(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - 25 - enemy.getWidth(), enemy.getY()); // 0
+        if (enemy.getX() <= GameConstants.PLAY_AREA_X) {
+            enemy.setPosition(GameConstants.PLAY_AREA_X, enemy.getY());
             enemy.reverseDirX();
         }
 
-        if (enemy.getHasEnteredScreen() && enemy.getY() <= GameConstants.PLAY_AREA_Y + 25) {
-            enemy.setPosition(enemy.getX(), GameConstants.PLAY_AREA_Y + 25);
+        else if ((enemy.getX() + enemy.getWidth()) >= (GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH)) {
+            enemy.setPosition(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - enemy.getWidth(), enemy.getY());
+            enemy.reverseDirX();
+        }
+
+        if (enemy.getHasEnteredScreen() && enemy.getY() <= GameConstants.PLAY_AREA_Y) {
+            enemy.setPosition(enemy.getX(), GameConstants.PLAY_AREA_Y);
             enemy.reverseDirY();
         }
     }

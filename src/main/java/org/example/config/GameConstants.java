@@ -16,12 +16,12 @@ public final class GameConstants {
     public static final double SCREEN_HEIGHT = 750;
 
     // UI
-    public static final double FRAME_TOP_BORDER = 0;
-    public static final double FRAME_LEFT_BORDER = 0;
-    public static final double FRAME_RIGHT_BORDER = 0;
-    public static final double FRAME_BOTTOM_BORDER = 0;
+    public static final double FRAME_TOP_BORDER = 25;
+    public static final double FRAME_LEFT_BORDER = 25;
+    public static final double FRAME_RIGHT_BORDER = 25;
+    public static final double FRAME_BOTTOM_BORDER = 25;
 //25
-    public static final double UI_BAR_HEIGHT = 150;
+    public static final double UI_BAR_HEIGHT = 170;
     public static final double PLAY_AREA_X = FRAME_LEFT_BORDER;
     public static final double PLAY_AREA_Y = FRAME_TOP_BORDER;
     public static final double PLAY_AREA_WIDTH = SCREEN_WIDTH - FRAME_LEFT_BORDER - FRAME_RIGHT_BORDER;
