@@ -356,18 +356,12 @@ public final class CollisionManager {
                     boolean isHorizontal;
                     double currentOverlap;
 
-                    if (enemy.getDy() > 0) {
-                        // ƯU TIÊN va chạm DỌC
-                        isHorizontal = false;
-                        currentOverlap = overlapY;
+                    if (overlapX < overlapY) {
+                        currentOverlap = overlapX;
+                        isHorizontal = true;
                     } else {
-                        if (overlapX < overlapY) {
-                            currentOverlap = overlapX;
-                            isHorizontal = true;
-                        } else {
-                            currentOverlap = overlapY;
-                            isHorizontal = false;
-                        }
+                        currentOverlap = overlapY;
+                        isHorizontal = false;
                     }
 
                     if (currentOverlap > maxOverlap) {
