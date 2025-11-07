@@ -1,5 +1,6 @@
 package org.example.gamelogic.states;
 
+import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
@@ -15,7 +16,6 @@ import org.example.gamelogic.core.*;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.events.*;
-import org.example.gamelogic.entities.powerups.PowerUp;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 import java.util.ArrayList;
@@ -52,6 +52,15 @@ public final class PlayingState implements GameState {
     private final Consumer<PowerUpCollectedEvent> handlePowerUpCollected;
     private final Consumer<LifeLostEvent> handleLifeLost;
     private final Consumer<LifeAddedEvent> handleLifeAdded;
+
+    private enum SubState {
+        NORMAL_PLAY,
+        BOSS_WARNING
+    }
+
+    private SubState currentSubState = SubState.NORMAL_PLAY;
+    private double warningFlashTimer = 0.0;
+    private double warningFlashDuration = 6.0;
 
     public PlayingState(GameManager gameManager, int levelNumber) {
         this.gameManager = gameManager;
@@ -150,27 +159,49 @@ public final class PlayingState implements GameState {
             this.lastSecond = totalSeconds;
         }
 
-        updateStrategy(deltaTime);
-        paddle.update(deltaTime);
-        updateAttachedBallPosition();
+        switch (currentSubState) {
+            case NORMAL_PLAY:
+                updateStrategy(deltaTime);
+                paddle.update(deltaTime);
+                updateAttachedBallPosition();
+                laserManager.update(deltaTime);
+                brickManager.update(deltaTime);
+                ballManager.update(deltaTime);
+                powerUpManager.update(deltaTime);
+                enemyManager.update(deltaTime);
 
-        laserManager.update(deltaTime);
-        brickManager.update(deltaTime);
-        ballManager.update(deltaTime);
-        powerUpManager.update(deltaTime);
-        enemyManager.update(deltaTime);
+                if (collisionManager != null) {
+                    collisionManager.checkCollisions(
+                            ballManager.getActiveBalls(),
+                            paddle, brickManager.getBricks(),
+                            powerUpManager.getActivePowerUps(),
+                            laserManager.getLasers(),
+                            enemyManager.getActiveEnemies()
+                    );
+                }
+                if (this.levelNumber == 5 &&
+                        brickManager.isLevelComplete() &&
+                        !enemyManager.hasBossSpawned())
+                {
+                    enemyManager.spawnEnemy("BOSS", GameConstants.SCREEN_WIDTH / 2, -GameConstants.BOSS_HEIGHT);
 
-        if (collisionManager != null) {
-            collisionManager.checkCollisions(
-                    ballManager.getActiveBalls(),
-                    paddle,
-                    brickManager.getBricks(),
-                    powerUpManager.getActivePowerUps(),
-                    laserManager.getLasers(),
-                    enemyManager.getActiveEnemies()
-            );
+                    this.currentSubState = SubState.BOSS_WARNING;
+                    this.warningFlashTimer = 0.0;
+                } else {
+                    handleVictory();
+                }
+                break;
+
+            case BOSS_WARNING:
+                warningFlashTimer += deltaTime;
+
+                enemyManager.updateBossEntry(deltaTime);
+
+                if (enemyManager.isBossReady() && warningFlashTimer >= warningFlashDuration) {
+                    this.currentSubState = SubState.NORMAL_PLAY;
+                }
+                break;
         }
-        handleVictory();
     }
 
     private void handleVictory() {
@@ -234,6 +265,24 @@ public final class PlayingState implements GameState {
         ParticleManager.getInstance().render(gc);
         gc.restore();
         renderPauseButton(gc);
+
+        if (currentSubState == SubState.BOSS_WARNING) {
+            if ((warningFlashTimer % 0.8) < 0.5) {
+
+                gc.setFill(Color.RED);
+                gc.setFont(new Font("Arial", 80));
+
+                gc.setTextAlign(TextAlignment.CENTER);
+                gc.setTextBaseline(VPos.CENTER);
+
+                gc.fillText("WARNING",
+                        GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH / 2,
+                        GameConstants.PLAY_AREA_Y + GameConstants.PLAY_AREA_HEIGHT / 2);
+
+                gc.setTextAlign(TextAlignment.LEFT);
+                gc.setTextBaseline(VPos.BASELINE);
+            }
+        }
     }
 
     private void renderHUD(GraphicsContext gc) {
