@@ -139,4 +139,12 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
     public boolean getHasEnteredScreen() {
         return this.hasEnteredScreen;
     }
+
+    public double getCenterX() {
+        return this.x + (this.width / 2);
+    }
+
+    public double getCenterY() {
+        return this.y + (this.height / 2);
+    }
 }

@@ -12,6 +12,8 @@ public interface Enemy {
     double getDy();
     double getWidth();
     double getHeight();
+    double getCenterX();
+    double getCenterY();
     Enemy clone();
 
     void update(double deltaTime);
