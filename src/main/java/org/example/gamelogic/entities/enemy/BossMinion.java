@@ -10,6 +10,7 @@ import org.example.config.GameConstants;
 import org.example.data.AssetManager;
 import org.example.gamelogic.core.LaserManager;
 import org.example.gamelogic.entities.BulletFrom;
+import org.example.gamelogic.graphics.ImageModifier;
 import org.example.gamelogic.strategy.bossbehavior.BossEnrageStrategy;
 import org.example.gamelogic.strategy.bossbehavior.BossPhase2Strategy;
 import org.example.gamelogic.strategy.movement.DashMovementStrategy;
@@ -71,7 +72,7 @@ public class BossMinion extends AbstractEnemy {
         );
 
         // Tint the current frame to desired color
-        Image tintedFrame = tintImage(currentFrame, minionColor);
+        Image tintedFrame = ImageModifier.tintImage(currentFrame, minionColor);
 
         // Draw the tinted sprite at the desired position and size
         gc.drawImage(tintedFrame, this.x, this.y, this.width, this.height);

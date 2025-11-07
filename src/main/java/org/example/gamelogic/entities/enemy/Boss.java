@@ -9,6 +9,7 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
 import org.example.data.AssetManager;
+import org.example.gamelogic.graphics.ImageModifier;
 import org.example.gamelogic.strategy.bossbehavior.BossBehaviorStrategy;
 import org.example.gamelogic.strategy.bossbehavior.BossEnrageStrategy;
 import org.example.gamelogic.strategy.bossbehavior.BossEntryStrategy;
@@ -82,7 +83,7 @@ public class Boss extends AbstractEnemy {
         );
 
         // Tint the current frame to desired color
-        Image tintedFrame = tintImage(currentFrame, bossColor);
+        Image tintedFrame = ImageModifier.tintImage(currentFrame, bossColor);
 
         // Draw the tinted sprite at the desired position and size
         gc.drawImage(tintedFrame, this.x, this.y, this.width, this.height);

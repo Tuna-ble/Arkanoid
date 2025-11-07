@@ -4,6 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import org.example.gamelogic.graphics.ImageModifier;
 import org.example.gamelogic.strategy.movement.DownMovementStrategy;
 
 public class Enemy2 extends AbstractEnemy {
@@ -50,7 +51,7 @@ public class Enemy2 extends AbstractEnemy {
         );
 
         // Tint the current frame to desired color
-        Image tintedFrame = tintImage(currentFrame, enemy2Color);
+        Image tintedFrame = ImageModifier.tintImage(currentFrame, enemy2Color);
 
         // Draw the tinted sprite at the desired position and size
         gc.drawImage(tintedFrame, this.x, this.y, this.width, this.height);
