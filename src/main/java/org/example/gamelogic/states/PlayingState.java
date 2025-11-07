@@ -55,12 +55,16 @@ public final class PlayingState implements GameState {
 
     private enum SubState {
         NORMAL_PLAY,
-        BOSS_WARNING
+        BOSS_WARNING,
+        BOSS_DYING
     }
 
     private SubState currentSubState = SubState.NORMAL_PLAY;
     private double warningFlashTimer = 0.0;
     private double warningFlashDuration = 6.0;
+
+    private double bossDyingTimer = 0.0;
+    private final double BOSS_DEATH_DURATION = 5.0;
 
     public PlayingState(GameManager gameManager, int levelNumber) {
         this.gameManager = gameManager;
@@ -187,18 +191,36 @@ public final class PlayingState implements GameState {
 
                     this.currentSubState = SubState.BOSS_WARNING;
                     this.warningFlashTimer = 0.0;
-                } else {
-                    handleVictory();
                 }
+                if (enemyManager.isBossDying()) {
+                    this.currentSubState = SubState.BOSS_DYING;
+                    this.bossDyingTimer = 0.0;
+                }
+
+                handleVictory();
                 break;
 
             case BOSS_WARNING:
                 warningFlashTimer += deltaTime;
 
-                enemyManager.updateBossEntry(deltaTime);
+                enemyManager.updateBossOnly(deltaTime);
 
                 if (enemyManager.isBossReady() && warningFlashTimer >= warningFlashDuration) {
                     this.currentSubState = SubState.NORMAL_PLAY;
+                }
+                break;
+
+            case BOSS_DYING:
+                bossDyingTimer += deltaTime;
+
+                enemyManager.updateBossOnly(deltaTime);
+
+                if (bossDyingTimer >= BOSS_DEATH_DURATION) {
+                    if (enemyManager.isBossDefeated()) {
+                        EventManager.getInstance().publish(
+                                new ChangeStateEvent(GameStateEnum.VICTORY)
+                        );
+                    }
                 }
                 break;
         }
@@ -208,13 +230,7 @@ public final class PlayingState implements GameState {
         if (this.hasWon || LifeManager.getInstance().getLives() <= 0) {
             return;
         }
-        if (this.levelNumber == 5) {
-            if (enemyManager.hasBossSpawned() && enemyManager.isBossDefeated()) {
-                EventManager.getInstance().publish(
-                        new ChangeStateEvent(GameStateEnum.VICTORY)
-                );
-            }
-        } else {
+        if (this.levelNumber != 5) {
             if (brickManager.isLevelComplete()) {
                 this.hasWon = true;
                 EventManager.getInstance().publish(
@@ -282,6 +298,13 @@ public final class PlayingState implements GameState {
                 gc.setTextAlign(TextAlignment.LEFT);
                 gc.setTextBaseline(VPos.BASELINE);
             }
+        }
+
+        if (currentSubState == SubState.BOSS_DYING) {
+            double fadeAlpha = Math.min(1.0, bossDyingTimer / BOSS_DEATH_DURATION);
+
+            gc.setFill(Color.color(1.0, 1.0, 1.0, fadeAlpha));
+            gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         }
     }
 
