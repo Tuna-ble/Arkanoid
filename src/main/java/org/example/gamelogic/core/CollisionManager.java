@@ -237,7 +237,7 @@ public final class CollisionManager {
                     if (!brick.isDestroyed() && laser.intersects(brick.getGameObject())) {
                         EventManager.getInstance().
                                 publish(new BrickDamagedEvent(brick, laser.getGameObject()));
-                        iterator.remove();
+                        laser.setActive(false);
                         break;
                     }
                 }
@@ -245,7 +245,7 @@ public final class CollisionManager {
                     if (!enemy.isDestroyed() && laser.intersects(enemy.getGameObject())) {
                         EventManager.getInstance().
                                 publish(new EnemyDamagedEvent(enemy, laser.getGameObject()));
-                        iterator.remove();
+                        laser.setActive(false);
                         break;
                     }
                 }
@@ -253,7 +253,8 @@ public final class CollisionManager {
                 if (paddle.intersects(laser.getGameObject())) {
                     // EventManager.getInstance().publish(new PaddleHitEvent(paddle));
                     LifeManager.getInstance().loseLife();
-                    iterator.remove();
+                    laser.setActive(false);
+                    break;
                 }
             }
         }

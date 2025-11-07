@@ -42,6 +42,7 @@ public class AssetManager {
             loadImage("frame", "/GameIcon/Frame.png");
             loadImage("playing", "/GameIcon/playing.png");
             loadImage("enemies", "/GameIcon/EnemySprites.png");
+            loadImage("powerups", "/GameIcon/PowerupSprites.png");
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());
             e.printStackTrace();

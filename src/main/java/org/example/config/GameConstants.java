@@ -29,7 +29,7 @@ public final class GameConstants {
 
     // Color
     public static final Color NORMAL_BALL_COLOR = Color.RED;
-    public static final Color PIERCING_BALL_COLOR = Color.CYAN;
+    public static final Color PIERCING_BALL_COLOR = Color.LIGHTYELLOW;
     public static final Color PADDLE_COLOR = Color.CYAN;
     public static final Color PADDLE_BORDER_COLOR = Color.DARKBLUE;
     public static final Color NORMAL_BOSS_COLOR = Color.LIGHTGREEN;
@@ -68,7 +68,7 @@ public final class GameConstants {
     public static final double BRICK_PADDING = 2;
     public static final double BRICK_DURABILITY = 1;
     public static final double BRICK_WIDTH = 60;
-    public static final double BRICK_HEIGHT = 60;
+    public static final double BRICK_HEIGHT = 20;
     public static final double PADDING = 5;
     public static final double TOP_MARGIN = 50;
     public static final double HARD_BRICK_DURABILITY = 3;
@@ -81,6 +81,16 @@ public final class GameConstants {
     public static final double BOSS_WIDTH = 200;
     public static final double BOSS_HEIGHT = 100;
     public static final double BOSS_HEATLTH = 10.0;
+
+    // Powerups
+    public static final double POWERUP_WIDTH = 40;
+    public static final double POWERUP_HEIGHT = 40;
+    public static final double POWERUP_SPRITE_WIDTH = 15;
+    public static final double POWERUP_SPRITE_HEIGHT = 15;
+    public static final double POWERUP_SPRITE_OFFSET = 0.5;
+    public static final double POWERUP_SPRITE_PADDING = 2;
+    public static final int POWERUP_TOTAL_FRAMES = 14;
+    public static final double POWERUP_FRAME_DURATION = 0.1;
 
     // Gameplay tuning
     public static final double BALL_INITIAL_ANGLE_RANDOM_RANGE = 15.0; // ±15 degrees

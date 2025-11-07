@@ -6,7 +6,7 @@ import org.example.gamelogic.strategy.powerup.FastBallStrategy;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public class FastBallPowerUp extends AbstractPowerUp {
-    /// type: F
+    /// type: S
     public FastBallPowerUp(double x, double y, double width, double height,
                            double dx, double dy, PowerUpStrategy strategy) {
         super(x, y, width, height, dx, dy, strategy);
@@ -18,10 +18,7 @@ public class FastBallPowerUp extends AbstractPowerUp {
     }
 
     @Override
-    public void render(GraphicsContext gc) {
-        gc.setFill(Color.CYAN);
-        gc.fillRect(x, y, width, height);
-        gc.setStroke(Color.BLACK);
-        gc.strokeRect(x, y, width, height);
+    public double getSpriteRow() {
+        return 8;
     }
 }

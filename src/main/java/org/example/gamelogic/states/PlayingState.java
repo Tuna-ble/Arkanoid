@@ -2,9 +2,6 @@ package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.image.PixelReader;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -107,8 +104,12 @@ public final class PlayingState implements GameState {
             this.backgroundImage = null;
         }
 
-        powerUpManager.spawnPowerUp("P", 400, 300);
-        powerUpManager.spawnPowerUp("M", 400, 400);
+        powerUpManager.spawnPowerUp("E", 100, 100);
+        powerUpManager.spawnPowerUp("L", 200, 100);
+        powerUpManager.spawnPowerUp("M", 300, 100);
+        powerUpManager.spawnPowerUp("S", 400, 100);
+        powerUpManager.spawnPowerUp("P", 500, 100);
+        powerUpManager.spawnPowerUp("B", 600, 100);
     }
 
     private void subscribeToEvents() {
@@ -127,10 +128,6 @@ public final class PlayingState implements GameState {
         EventManager.getInstance().subscribe(
                 LifeAddedEvent.class,
                 handleLifeAdded
-        );
-        EventManager.getInstance().subscribe(
-                LifeAddedEvent.class,
-                this::handleLifeAdded
         );
     }
 
@@ -236,10 +233,10 @@ public final class PlayingState implements GameState {
         gc.clip();
 
         brickManager.render(gc);
-        ballManager.render(gc);
-        powerUpManager.render(gc);
-        laserManager.render(gc);
         enemyManager.render(gc);
+        powerUpManager.render(gc);
+        ballManager.render(gc);
+        laserManager.render(gc);
         paddle.render(gc);
         ParticleManager.getInstance().render(gc);
 

@@ -1,16 +1,10 @@
 package org.example.gamelogic.entities.powerups;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
-import org.example.gamelogic.strategy.powerup.ExpandPaddleStrategy;
+import org.example.config.GameConstants;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 public class ExpandPaddlePowerUp extends AbstractPowerUp {
-    private final Image expand = new Image(
-            getClass().getResourceAsStream("/GameIcon/expandpaddle.png")
-    );
-
     /// type: E
     public ExpandPaddlePowerUp(double x, double y, double width, double height,
                                double dx, double dy, PowerUpStrategy strategy) {
@@ -23,7 +17,7 @@ public class ExpandPaddlePowerUp extends AbstractPowerUp {
     }
 
     @Override
-    public void render(GraphicsContext gc) {
-        gc.drawImage(expand, x, y, 30, 30);
+    public double getSpriteRow() {
+        return 3;
     }
 }
