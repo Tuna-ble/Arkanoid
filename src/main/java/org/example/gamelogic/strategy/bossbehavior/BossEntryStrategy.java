@@ -10,6 +10,7 @@ public class BossEntryStrategy implements BossBehaviorStrategy {
         if (boss.getY() >= 100) {
             boss.setDy(0);
             boss.setDx(150);
+            boss.setHasEnteredScreen(true);
             boss.setStrategy(new BossPhase1Strategy());
         }
     }
