@@ -37,8 +37,13 @@ public final class PlayingState implements GameState {
 
     private int currentLives;
     private boolean hasWon = false;
-    private Image frameImage;
-    private Image backgroundImage;
+    private Image gameFrameImage;
+    private Image hudFrameImage;
+    private double elapsedTime = 0.0;
+    private String formattedTime = "00:00";
+    private int lastSecond = -1;
+    private Font labelFont;
+    private Font valueFont;
 
     private List<PowerUpStrategy> activeStrategies = new ArrayList<>();
     private int levelNumber;
@@ -65,6 +70,7 @@ public final class PlayingState implements GameState {
                 GameConstants.PADDLE_HEIGHT,
                 0,
                 0);
+        ObjectAccess.getInstance().registerPaddle(this.paddle);
 
         this.ballManager.createInitialBall(this.paddle);
 
@@ -79,6 +85,8 @@ public final class PlayingState implements GameState {
         }
 
         this.scoreFont = new Font("Arial", 24);
+        this.labelFont = new Font("Arial", 18);
+        this.valueFont = new Font("Arial", 28);
 
         this.currentLives = LifeManager.getInstance().getLives();
 
@@ -92,16 +100,17 @@ public final class PlayingState implements GameState {
         this.levelNumber = levelNumber;
         this.enemyManager.loadLevelScript(this.levelNumber);
         try {
-            this.frameImage = AssetManager.getInstance().getImage("frame");
+            this.gameFrameImage = new Image(getClass().getResourceAsStream("/GameIcon/GameFrame.png"));
+            this.hudFrameImage = new Image(getClass().getResourceAsStream("/GameIcon/HudFrame.png"));
+
+            if (this.gameFrameImage.isError()) throw new Exception("Lỗi nạp GameFrame.png");
+            if (this.hudFrameImage.isError()) throw new Exception("Lỗi nạp HudFrame.png");
+
         } catch (Exception e) {
-            System.err.println("Không thể tải ảnh Frame.png từ AssetManager!");
-            this.frameImage = null;
-        }
-        try {
-            this.backgroundImage = AssetManager.getInstance().getImage("playing");
-        } catch (Exception e) {
-            System.err.println("Không thể tải ảnh playing.png từ AssetManager!");
-            this.backgroundImage = null;
+            System.err.println("Không thể tải ảnh Frame từ /GameIcon/!");
+            e.printStackTrace();
+            this.gameFrameImage = null;
+            this.hudFrameImage = null;
         }
 
         powerUpManager.spawnPowerUp("E", 100, 100);
@@ -139,8 +148,16 @@ public final class PlayingState implements GameState {
 
     @Override
     public void update(double deltaTime) {
-        updateStrategy(deltaTime);
+        elapsedTime += deltaTime;
+        int totalSeconds = (int) elapsedTime;
+        if (totalSeconds != lastSecond) {
+            int minutes = totalSeconds / 60;
+            int seconds = totalSeconds % 60;
+            this.formattedTime = String.format("%02d:%02d", minutes, seconds);
+            this.lastSecond = totalSeconds;
+        }
 
+        updateStrategy(deltaTime);
         paddle.update(deltaTime);
         updateAttachedBallPosition();
 
@@ -188,45 +205,29 @@ public final class PlayingState implements GameState {
         gc.setTransform(new Affine());
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        if (this.backgroundImage!=null) {
-            gc.drawImage(backgroundImage,
-                    0, 0,
-                    GameConstants.PLAY_AREA_WIDTH,
-                    GameConstants.PLAY_AREA_HEIGHT);
+        gc.setFill(Color.WHITE);
+        gc.fillRect(GameConstants.PLAY_AREA_X,
+                GameConstants.PLAY_AREA_Y,
+                GameConstants.PLAY_AREA_WIDTH,
+                GameConstants.PLAY_AREA_HEIGHT);
+
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0,
+                GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT,
+                GameConstants.SCREEN_WIDTH,
+                GameConstants.UI_BAR_HEIGHT);
+
+        if (this.gameFrameImage != null) {
+            gc.drawImage(this.gameFrameImage, 0, 0, 900, 580);
         }
 
-        if (this.frameImage != null) {
-            gc.drawImage(frameImage,
-                    0, 0,
-                    GameConstants.SCREEN_WIDTH,
-                    GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT);
-
-            double sourceX = 0;
-            double sourceY = (GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT) - GameConstants.FRAME_BOTTOM_BORDER; // (600 - 25 = 575)
-            double sourceWidth = GameConstants.SCREEN_WIDTH; // 900
-            double sourceHeight = GameConstants.FRAME_BOTTOM_BORDER; // 25
-
-            double destX = 0;
-            double destY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT;
-            double destWidth = GameConstants.SCREEN_WIDTH;
-            double destHeight = GameConstants.UI_BAR_HEIGHT;
-
-            gc.drawImage(this.frameImage,
-                    sourceX, sourceY, sourceWidth, sourceHeight,
-                    destX, destY, destWidth, destHeight);
-
-        } else {
-            gc.setFill(Color.DARKSLATEGRAY);
-            gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT);
-            gc.setFill(Color.BLACK);
-            gc.fillRect(0, GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT,
-                    GameConstants.SCREEN_WIDTH, GameConstants.UI_BAR_HEIGHT);
+        if (this.hudFrameImage != null) {
+            gc.drawImage(this.hudFrameImage, 0, GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT, 900, 170);
         }
 
-        renderScore(gc);
-        renderLives(gc);
+        renderHUD(gc);
+
         gc.save();
-
         gc.beginPath();
         gc.rect(GameConstants.PLAY_AREA_X, GameConstants.PLAY_AREA_Y,
                 GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
@@ -244,6 +245,45 @@ public final class PlayingState implements GameState {
         renderPauseButton(gc);
     }
 
+    private void renderHUD(GraphicsContext gc) {
+
+        double slotWidth = GameConstants.PLAY_AREA_WIDTH / 4.0;
+
+        double x_slot1 = GameConstants.PLAY_AREA_X + slotWidth / 2.0;
+        double x_slot2 = x_slot1 + slotWidth;
+        double x_slot3 = x_slot2 + slotWidth;
+        double x_slot4 = x_slot3 + slotWidth;
+
+        double y_center = GameConstants.SCREEN_HEIGHT - (GameConstants.UI_BAR_HEIGHT / 2.0);
+        double y_label = y_center - 15;
+        double y_value = y_center + 25;
+
+        int currentScore = ScoreManager.getInstance().getScore();
+
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setFill(Color.BLACK);
+
+        gc.setFont(labelFont);
+        gc.fillText("SCORE", x_slot1, y_label);
+        gc.setFont(valueFont);
+        gc.fillText(String.valueOf(currentScore), x_slot1, y_value);
+
+        gc.setFont(labelFont);
+        gc.fillText("TIME", x_slot2, y_label);
+        gc.setFont(valueFont);
+        gc.fillText(this.formattedTime, x_slot2, y_value);
+
+        gc.setFont(labelFont);
+        gc.fillText("ROUND", x_slot3, y_label);
+        gc.setFont(valueFont);
+        gc.fillText(String.valueOf(this.levelNumber), x_slot3, y_value);
+
+        gc.setFont(labelFont);
+        gc.fillText("LIVES", x_slot4, y_label);
+        gc.setFont(valueFont);
+        gc.fillText(String.valueOf(this.currentLives), x_slot4, y_value);
+    }
+
     private void renderPauseButton(GraphicsContext gc) {
         if (pauseIcon == null) return;
         double iconWidth = 40;
@@ -257,17 +297,24 @@ public final class PlayingState implements GameState {
         int currentScore = ScoreManager.getInstance().getScore();
 
         gc.setFont(scoreFont);
-        gc.setFill(Color.WHITE);
+        gc.setFill(Color.BLACK);
         gc.setTextAlign(TextAlignment.LEFT);
-        gc.fillText("Score: " + currentScore, 10, 25);
+
+        double x_pos = GameConstants.FRAME_LEFT_BORDER + 50;
+
+        double y_pos = GameConstants.SCREEN_HEIGHT - (GameConstants.UI_BAR_HEIGHT / 2.0) + 8;
+
+        gc.fillText("Score: " + currentScore, x_pos, y_pos);
     }
 
     private void renderLives(GraphicsContext gc) {
         gc.setFont(scoreFont);
-        gc.setFill(Color.WHITE);
+        gc.setFill(Color.BLACK);
         gc.setTextAlign(TextAlignment.RIGHT);
-        gc.setTextAlign(TextAlignment.LEFT);
-        gc.fillText("Lives: " + this.currentLives, 10, GameConstants.SCREEN_HEIGHT - 10);
+
+        double x_pos = GameConstants.SCREEN_WIDTH - GameConstants.FRAME_RIGHT_BORDER - 50;
+        double y_pos = GameConstants.SCREEN_HEIGHT - (GameConstants.UI_BAR_HEIGHT / 2.0) + 8;
+        gc.fillText("Lives: " + this.currentLives, x_pos, y_pos);
     }
 
     @Override
@@ -344,7 +391,7 @@ public final class PlayingState implements GameState {
         while (iterator.hasNext()) {
             PowerUpStrategy strategy = iterator.next();
 
-            strategy.update(this, deltaTime); // Giả sử PowerUpStrategy có phương thức này
+            strategy.update(this, deltaTime);
 
             if (strategy.isExpired()) {
                 strategy.remove(this);

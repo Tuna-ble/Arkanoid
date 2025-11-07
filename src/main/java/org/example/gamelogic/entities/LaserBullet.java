@@ -6,15 +6,20 @@ import org.example.config.GameConstants;
 
 public class LaserBullet extends MovableObject {
     private final BulletFrom faction;
-    public LaserBullet(double x, double y, double dy, BulletFrom faction) {
-        super(x, y, 4, 20, 0, dy);
+    public LaserBullet(double x, double y, double dx, double dy, BulletType type, BulletFrom faction) {
+        super(x, y, type.width, type.height, dx, dy);
         this.faction = faction;
     }
 
     @Override
     public void update(double deltaTime) {
-        y -= dy * deltaTime;
-        if (y + height < 0 || y > GameConstants.SCREEN_HEIGHT) isActive = false;
+        x += dx * deltaTime;
+        y += dy * deltaTime;
+
+        if (y + height < 0 || y > GameConstants.SCREEN_HEIGHT ||
+                x + width < 0 || x > GameConstants.SCREEN_WIDTH) {
+            isActive = false;
+        }
     }
 
     @Override

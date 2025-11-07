@@ -10,6 +10,7 @@ import org.example.config.GameConstants;
 import org.example.data.AssetManager;
 import org.example.gamelogic.core.LaserManager;
 import org.example.gamelogic.entities.BulletFrom;
+import org.example.gamelogic.entities.BulletType;
 import org.example.gamelogic.graphics.ImageModifier;
 import org.example.gamelogic.strategy.bossbehavior.BossEnrageStrategy;
 import org.example.gamelogic.strategy.bossbehavior.BossPhase2Strategy;
@@ -53,7 +54,9 @@ public class BossMinion extends AbstractEnemy {
             LaserManager.getInstance().createBullet(
                     bulletX,
                     bulletY,
-                    -300,
+                    0,
+                    300,
+                    BulletType.ENEMY_LASER,
                     BulletFrom.ENEMY
             );
         }
