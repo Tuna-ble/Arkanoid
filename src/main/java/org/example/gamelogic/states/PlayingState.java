@@ -54,12 +54,17 @@ public final class PlayingState implements GameState {
     private final Consumer<LifeAddedEvent> handleLifeAdded;
 
     private enum SubState {
+        LEVEL_START,
         NORMAL_PLAY,
         BOSS_WARNING,
         BOSS_DYING
     }
 
-    private SubState currentSubState = SubState.NORMAL_PLAY;
+    private SubState currentSubState;
+
+    private double levelStartTimer = 0.0;
+    private final double LEVEL_START_DURATION = 1.5;
+
     private double warningFlashTimer = 0.0;
     private double warningFlashDuration = 6.0;
 
@@ -110,6 +115,10 @@ public final class PlayingState implements GameState {
             e.printStackTrace();
         }
         subscribeToEvents();
+
+        this.currentSubState = SubState.LEVEL_START;
+        this.levelStartTimer = 0.0;
+
         this.levelNumber = levelNumber;
         this.enemyManager.loadLevelScript(this.levelNumber);
         try {
@@ -164,6 +173,16 @@ public final class PlayingState implements GameState {
         }
 
         switch (currentSubState) {
+            case LEVEL_START:
+                levelStartTimer += deltaTime;
+
+                paddle.update(deltaTime);
+                updateAttachedBallPosition();
+
+                if (levelStartTimer >= LEVEL_START_DURATION) {
+                    this.currentSubState = SubState.NORMAL_PLAY;
+                }
+                break;
             case NORMAL_PLAY:
                 updateStrategy(deltaTime);
                 paddle.update(deltaTime);
@@ -272,13 +291,23 @@ public final class PlayingState implements GameState {
         gc.rect(GameConstants.PLAY_AREA_X, GameConstants.PLAY_AREA_Y,
                 GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
         gc.clip();
-        brickManager.render(gc);
-        ballManager.render(gc);
-        powerUpManager.render(gc);
-        laserManager.render(gc);
-        enemyManager.render(gc);
-        paddle.render(gc);
-        ParticleManager.getInstance().render(gc);
+
+        if (currentSubState == SubState.LEVEL_START) {
+            brickManager.render(gc, levelStartTimer, LEVEL_START_DURATION);
+            paddle.render(gc);
+            ballManager.render(gc);
+
+        }
+        else {
+            brickManager.render(gc);
+            ballManager.render(gc);
+            powerUpManager.render(gc);
+            laserManager.render(gc);
+            enemyManager.render(gc);
+            paddle.render(gc);
+            ParticleManager.getInstance().render(gc);
+        }
+
         gc.restore();
         renderPauseButton(gc);
 

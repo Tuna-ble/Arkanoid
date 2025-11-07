@@ -75,6 +75,31 @@ public final class BrickManager {
         }
     }
 
+    public void render(GraphicsContext gc, double timer, double duration) {
+        if (bricks.isEmpty()) {
+            return;
+        }
+
+        double timePerBrick = duration / bricks.size();
+
+        for (int i = 0; i < bricks.size(); i++) {
+            Brick brick = bricks.get(i);
+            double brickStartTime = i * timePerBrick;
+
+            if (timer < brickStartTime) {
+                break;
+            }
+
+            double timeSinceSpawn = timer - brickStartTime;
+            double alpha = Math.min(1.0, timeSinceSpawn / timePerBrick);
+
+            gc.save();
+            gc.setGlobalAlpha(alpha);
+            brick.render(gc);
+            gc.restore();
+        }
+    }
+
     public void loadLevel(int levelNumber) {
         this.bricks.clear();
         LevelData levelData = levelRepository.loadLevel(levelNumber);
