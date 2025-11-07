@@ -1,17 +1,14 @@
 package org.example.gamelogic.entities.enemy;
 
 import javafx.scene.canvas.GraphicsContext;
+import org.example.gamelogic.entities.Collidable;
 import org.example.gamelogic.entities.GameObject;
 
-public interface Enemy {
+public interface Enemy extends Collidable {
     void takeDamage(double damage);
     void setPosition(double x, double y);
-    double getX();
-    double getY();
     double getDx();
     double getDy();
-    double getWidth();
-    double getHeight();
     double getCenterX();
     double getCenterY();
     Enemy clone();
@@ -22,10 +19,7 @@ public interface Enemy {
     void setActive(boolean active);
     boolean isActive();
     boolean isOutOfBounds();
-    boolean isDestroyed();
     void destroy();
-
-    public GameObject getGameObject();
 
     void setDx(double dx);
     void setDy(double dy);

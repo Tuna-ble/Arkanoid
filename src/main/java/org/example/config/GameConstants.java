@@ -61,6 +61,7 @@ public final class GameConstants {
     // Collision / CCD
     public static final boolean USE_CCD = true;
     public static final double MAX_ITER_PER_FRAME = 5;
+    public static final double COLLISION_EPSILON = 0.1;
 
     // Bricks
     public static final double BRICK_PADDING = 2;
