@@ -10,11 +10,85 @@ import org.example.gamelogic.events.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public final class CollisionManager {
 
     public CollisionManager() {
 
+    }
+
+    private <T extends Collidable> boolean resolveBallCollision(IBall ball, List<T> objects, BiConsumer<IBall, T> onHit) {
+        T bestCollisionObject = null;
+        double maxOverlap = -1.0;
+        boolean collisionIsHorizontal = false;
+
+        // Tìm va chạm tốt nhất
+        for (T obj : objects) {
+            if (!obj.isDestroyed() && ball.getGameObject().intersects(obj.getGameObject())) {
+                // Tính toán độ lún
+                double ballCenterX = ball.getX() + ball.getWidth() / 2.0;
+                double ballCenterY = ball.getY() + ball.getHeight() / 2.0;
+                double objCenterX = obj.getX() + obj.getWidth() / 2.0;
+                double objCenterY = obj.getY() + obj.getHeight() / 2.0;
+
+                double dx = ballCenterX - objCenterX;
+                double dy = ballCenterY - objCenterY;
+                double combinedHalfWidth = ball.getWidth() / 2.0 + obj.getWidth() / 2.0;
+                double combinedHalfHeight = ball.getHeight() / 2.0 + obj.getHeight() / 2.0;
+
+                double overlapX = combinedHalfWidth - Math.abs(dx);
+                double overlapY = combinedHalfHeight - Math.abs(dy);
+
+                if (overlapX > 0 && overlapY > 0) {
+                    double currentOverlap;
+                    boolean isHorizontal;
+                    if (overlapX < overlapY) {
+                        currentOverlap = overlapX;
+                        isHorizontal = true;
+                    } else {
+                        currentOverlap = overlapY;
+                        isHorizontal = false;
+                    }
+
+                    if (currentOverlap > maxOverlap) {
+                        maxOverlap = currentOverlap;
+                        bestCollisionObject = obj;
+                        collisionIsHorizontal = isHorizontal;
+                    }
+                }
+            }
+        }
+
+        // Xử lí va chạm tốt nhất
+        if (bestCollisionObject != null) {
+            // Đẩy bóng ra
+            if (collisionIsHorizontal) {
+                if (ball.getX() + ball.getWidth() / 2.0 > bestCollisionObject.getX() + bestCollisionObject.getWidth() / 2.0) {
+                    ball.setPosition(bestCollisionObject.getX() + bestCollisionObject.getWidth()
+                            + GameConstants.COLLISION_EPSILON, ball.getY());
+                } else {
+                    ball.setPosition(bestCollisionObject.getX() - ball.getWidth()
+                            - GameConstants.COLLISION_EPSILON, ball.getY());
+                }
+                ball.reverseDirX();
+            } else {
+                if (ball.getY() + ball.getHeight() / 2.0
+                        > bestCollisionObject.getY() + bestCollisionObject.getHeight() / 2.0) {
+                    ball.setPosition(ball.getX(), bestCollisionObject.getY()
+                            + bestCollisionObject.getHeight() + GameConstants.COLLISION_EPSILON);
+                } else {
+                    ball.setPosition(ball.getX(), bestCollisionObject.getY()
+                            - ball.getHeight() - GameConstants.COLLISION_EPSILON);
+                }
+                ball.reverseDirY();
+            }
+
+            // Gọi logic lambda
+            onHit.accept(ball, bestCollisionObject);
+            return true;
+        }
+        return false;
     }
 
     public void checkCollisions(List<IBall> balls, Paddle paddle, List<Brick> bricks,
@@ -147,69 +221,9 @@ public final class CollisionManager {
     }
 
     private void handleNormalBrickCollision(IBall ball, List<Brick> bricks) {
-        Brick bestCollisionBrick = null; // Viên gạch va chạm "tốt nhất"
-        double maxOverlap = -1.0;          // Độ lún lớn nhất tìm thấy
-        boolean collisionIsHorizontal = false; // Hướng va chạm chính
-
-        for (Brick brick : bricks) {
-            if (!brick.isDestroyed() && ball.getGameObject().intersects(brick.getGameObject())) {
-                // --- Tính toán độ lún (overlap) ---
-                double ballCenterX = ball.getX() + ball.getWidth() / 2.0;
-                double ballCenterY = ball.getY() + ball.getHeight() / 2.0;
-                double brickCenterX = brick.getX() + brick.getWidth() / 2.0;
-                double brickCenterY = brick.getY() + brick.getHeight() / 2.0;
-                double dx = ballCenterX - brickCenterX;
-                double dy = ballCenterY - brickCenterY;
-                double combinedHalfWidth = ball.getWidth() / 2.0 + brick.getWidth() / 2.0;
-                double combinedHalfHeight = ball.getHeight() / 2.0 + brick.getHeight() / 2.0;
-                double overlapX = combinedHalfWidth - Math.abs(dx);
-                double overlapY = combinedHalfHeight - Math.abs(dy);
-
-                // Chỉ xử lý nếu thực sự có lún vào (overlap > 0)
-                if (overlapX > 0 && overlapY > 0) {
-                    // Xác định hướng va chạm chính (hướng lún ÍT hơn)
-                    double currentOverlap;
-                    boolean isHorizontal;
-                    if (overlapX < overlapY) {
-                        currentOverlap = overlapX;
-                        isHorizontal = true;
-                    } else {
-                        currentOverlap = overlapY;
-                        isHorizontal = false;
-                    }
-
-                    // Lưu lại va chạm có độ lún lớn nhất
-                    if (currentOverlap > maxOverlap) {
-                        maxOverlap = currentOverlap;
-                        bestCollisionBrick = brick;
-                        collisionIsHorizontal = isHorizontal;
-                    }
-                }
-            }
-        } // Kết thúc vòng lặp FOR
-
-        // --- Xử lý va chạm TỐT NHẤT sau khi duyệt hết ---
-        if (bestCollisionBrick != null) {
-            // Đẩy bóng ra khỏi viên gạch va chạm sâu nhất
-            if (collisionIsHorizontal) { // Va chạm ngang
-                if (ball.getX() + ball.getWidth() / 2.0 > bestCollisionBrick.getX() + bestCollisionBrick.getWidth() / 2.0) { // Bóng bên phải
-                    ball.setPosition(bestCollisionBrick.getX() + bestCollisionBrick.getWidth(), ball.getY());
-                } else { // Bóng bên trái
-                    ball.setPosition(bestCollisionBrick.getX() - ball.getWidth(), ball.getY());
-                }
-                ball.reverseDirX();
-            } else { // Va chạm dọc
-                if (ball.getY() + ball.getHeight() / 2.0 > bestCollisionBrick.getY() + bestCollisionBrick.getHeight() / 2.0) { // Bóng bên dưới
-                    ball.setPosition(ball.getX(), bestCollisionBrick.getY() + bestCollisionBrick.getHeight());
-                } else { // Bóng bên trên
-                    ball.setPosition(ball.getX(), bestCollisionBrick.getY() - ball.getHeight());
-                }
-                ball.reverseDirY();
-            }
-
-            // Phát sự kiện cho viên gạch bị va chạm
-            EventManager.getInstance().publish(new BallHitBrickEvent(bestCollisionBrick, ball));
-        }
+        resolveBallCollision(ball, bricks, (theBall, theBrick) -> {
+            EventManager.getInstance().publish(new BallHitBrickEvent(theBrick, theBall));
+        });
     }
 
     private void checkPaddlePowerUpCollisions(Paddle paddle, List<PowerUp> fallingPowerUps) {
@@ -309,62 +323,9 @@ public final class CollisionManager {
     }
 
     private void handleNormalEnemyCollision(IBall ball, List<Enemy> enemies) {
-        Enemy bestCollisionEnemy = null;
-        double maxOverlap = -1.0;
-        boolean collisionIsHorizontal = false;
-
-        for (Enemy enemy : enemies) {
-            if (!enemy.isDestroyed() && ball.getGameObject().intersects(enemy.getGameObject())) {
-                // --- Tính toán độ lún (overlap) ---
-                double ballCenterX = ball.getX() + ball.getWidth() / 2.0;
-                double ballCenterY = ball.getY() + ball.getHeight() / 2.0;
-                double enemyCenterX = enemy.getX() + enemy.getWidth() / 2.0;
-                double enemyCenterY = enemy.getY() + enemy.getHeight() / 2.0;
-                double dx = ballCenterX - enemyCenterX;
-                double dy = ballCenterY - enemyCenterY;
-                double combinedHalfWidth = ball.getWidth() / 2.0 + enemy.getWidth() / 2.0;
-                double combinedHalfHeight = ball.getHeight() / 2.0 + enemy.getHeight() / 2.0;
-                double overlapX = combinedHalfWidth - Math.abs(dx);
-                double overlapY = combinedHalfHeight - Math.abs(dy);
-
-                if (overlapX > 0 && overlapY > 0) {
-                    double currentOverlap;
-                    boolean isHorizontal;
-                    if (overlapX < overlapY) {
-                        currentOverlap = overlapX;
-                        isHorizontal = true;
-                    } else {
-                        currentOverlap = overlapY;
-                        isHorizontal = false;
-                    }
-
-                    if (currentOverlap > maxOverlap) {
-                        maxOverlap = currentOverlap;
-                        bestCollisionEnemy = enemy;
-                        collisionIsHorizontal = isHorizontal;
-                    }
-                }
-            }
-        }
-
-        if (bestCollisionEnemy != null) {
-            if (collisionIsHorizontal) {
-                if (ball.getX() + ball.getWidth() / 2.0 > bestCollisionEnemy.getX() + bestCollisionEnemy.getWidth() / 2.0) { // Bóng bên phải
-                    ball.setPosition(bestCollisionEnemy.getX() + bestCollisionEnemy.getWidth(), ball.getY());
-                } else {
-                    ball.setPosition(bestCollisionEnemy.getX() - ball.getWidth(), ball.getY());
-                }
-                ball.reverseDirX();
-            } else {
-                if (ball.getY() + ball.getHeight() / 2.0 > bestCollisionEnemy.getY() + bestCollisionEnemy.getHeight() / 2.0) { // Bóng bên dưới
-                    ball.setPosition(ball.getX(), bestCollisionEnemy.getY() + bestCollisionEnemy.getHeight());
-                } else {
-                    ball.setPosition(ball.getX(), bestCollisionEnemy.getY() - ball.getHeight());
-                }
-                ball.reverseDirY();
-            }
-            EventManager.getInstance().publish(new BallHitEnemyEvent(bestCollisionEnemy, ball));
-        }
+        resolveBallCollision(ball, enemies, (theBall, theEnemy) -> {
+            EventManager.getInstance().publish(new BallHitEnemyEvent(theEnemy, theBall));
+        });
     }
 
     private boolean checkEnemyBrickCollisions(Enemy enemy, List<Brick> bricks) {
@@ -396,18 +357,12 @@ public final class CollisionManager {
                     boolean isHorizontal;
                     double currentOverlap;
 
-                    if (enemy.getDy() > 0) {
-                        // ƯU TIÊN va chạm DỌC
-                        isHorizontal = false;
-                        currentOverlap = overlapY;
+                    if (overlapX < overlapY) {
+                        currentOverlap = overlapX;
+                        isHorizontal = true;
                     } else {
-                        if (overlapX < overlapY) {
-                            currentOverlap = overlapX;
-                            isHorizontal = true;
-                        } else {
-                            currentOverlap = overlapY;
-                            isHorizontal = false;
-                        }
+                        currentOverlap = overlapY;
+                        isHorizontal = false;
                     }
 
                     if (currentOverlap > maxOverlap) {

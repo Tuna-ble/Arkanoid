@@ -1,6 +1,6 @@
 _ _ _ _ _ _ _ _ _ _ _
-_ N N N N N N N N N _
-_ E E E E E E E E E _
+H H N N N N N N N H H
+E E E E E E E E E E E
 _ _ _ _ _ _ _ _ _ _ _
 _ _ _ _ _ _ _ _ _ _ _
 _ _ _ _ _ _ _ _ _ _ _

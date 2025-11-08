@@ -5,6 +5,7 @@ import org.example.config.GameConstants;
 import org.example.gamelogic.entities.enemy.*;
 import org.example.gamelogic.factory.EnemyFactory;
 import org.example.gamelogic.registry.EnemyRegistry;
+import org.example.gamelogic.strategy.bossbehavior.BossDyingStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +67,10 @@ public final class EnemyManager {
         }
 
         this.enemiesToSpawn.add(newEnemy);
+
+        if (type.equals("BOSS")) {
+            this.bossSpawned = true;
+        }
     }
 
     public void spawnEnemy(String type) {
@@ -81,6 +86,10 @@ public final class EnemyManager {
             newEnemy.setDx(-horizontalSpeed);
         }
         this.enemiesToSpawn.add(newEnemy);
+
+        if (type.equals("BOSS")) {
+            this.bossSpawned = true;
+        }
     }
 
     public void loadLevelScript(int levelNumber) {
@@ -115,18 +124,22 @@ public final class EnemyManager {
                     spawnEnemy("E2");
                 }
                 break;
-            case 5:
+            /*case 5:
                 if (this.brickManager != null && brickManager.isLevelComplete() && !this.bossSpawned) {
                     spawnEnemy("BOSS", GameConstants.SCREEN_WIDTH / 2, -GameConstants.BOSS_HEIGHT);
                     this.bossSpawned = true;
                 }
-                break;
+                break;*/
         }
         activeEnemies.removeIf(Enemy::isDestroyed);
         for (Enemy enemy : activeEnemies) {
             enemy.update(deltaTime);
         }
 
+        processSpawnQueue();
+    }
+
+    private void processSpawnQueue() {
         if (!enemiesToSpawn.isEmpty()) {
             activeEnemies.addAll(enemiesToSpawn);
             enemiesToSpawn.clear();
@@ -158,5 +171,37 @@ public final class EnemyManager {
 
     public boolean hasBossSpawned() {
         return this.bossSpawned;
+    }
+
+    public void updateBossOnly(double deltaTime) {
+        processSpawnQueue();
+        activeEnemies.removeIf(Enemy::isDestroyed);
+        for (Enemy enemy : activeEnemies) {
+            if (enemy instanceof Boss) {
+                enemy.update(deltaTime);
+                break;
+            }
+        }
+    }
+
+    public boolean isBossReady() {
+        for (Enemy enemy : activeEnemies) {
+            if (enemy instanceof Boss) {
+                return enemy.getHasEnteredScreen();
+            }
+        }
+        return false;
+    }
+
+    public boolean isBossDying() {
+        for (Enemy enemy : activeEnemies) {
+            if (enemy instanceof Boss) {
+                Boss boss = (Boss) enemy;
+                if (boss.getCurrentStrategy() instanceof BossDyingStrategy) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

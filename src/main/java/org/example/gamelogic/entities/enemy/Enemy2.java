@@ -4,6 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import org.example.config.GameConstants;
 import org.example.gamelogic.graphics.ImageModifier;
 import org.example.gamelogic.strategy.movement.DownMovementStrategy;
 
@@ -33,7 +34,7 @@ public class Enemy2 extends AbstractEnemy {
     public void handleEntry(double deltaTime) {
         this.y += this.dy * deltaTime;
 
-        if (this.y > 0) {
+        if (this.y > GameConstants.PLAY_AREA_Y) {
             this.hasEnteredScreen = true;
         }
     }

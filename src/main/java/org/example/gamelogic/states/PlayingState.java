@@ -1,5 +1,6 @@
 package org.example.gamelogic.states;
 
+import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
@@ -15,7 +16,6 @@ import org.example.gamelogic.core.*;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.events.*;
-import org.example.gamelogic.entities.powerups.PowerUp;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 
 import java.util.ArrayList;
@@ -52,6 +52,24 @@ public final class PlayingState implements GameState {
     private final Consumer<PowerUpCollectedEvent> handlePowerUpCollected;
     private final Consumer<LifeLostEvent> handleLifeLost;
     private final Consumer<LifeAddedEvent> handleLifeAdded;
+
+    private enum SubState {
+        LEVEL_START,
+        NORMAL_PLAY,
+        BOSS_WARNING,
+        BOSS_DYING
+    }
+
+    private SubState currentSubState;
+
+    private double levelStartTimer = 0.0;
+    private final double LEVEL_START_DURATION = 1.5;
+
+    private double warningFlashTimer = 0.0;
+    private double warningFlashDuration = 6.0;
+
+    private double bossDyingTimer = 0.0;
+    private final double BOSS_DEATH_DURATION = 5.0;
 
     public PlayingState(GameManager gameManager, int levelNumber) {
         this.gameManager = gameManager;
@@ -97,6 +115,10 @@ public final class PlayingState implements GameState {
             e.printStackTrace();
         }
         subscribeToEvents();
+
+        this.currentSubState = SubState.LEVEL_START;
+        this.levelStartTimer = 0.0;
+
         this.levelNumber = levelNumber;
         this.enemyManager.loadLevelScript(this.levelNumber);
         try {
@@ -112,7 +134,6 @@ public final class PlayingState implements GameState {
             this.gameFrameImage = null;
             this.hudFrameImage = null;
         }
-
     }
 
     private void subscribeToEvents() {
@@ -151,40 +172,84 @@ public final class PlayingState implements GameState {
             this.lastSecond = totalSeconds;
         }
 
-        updateStrategy(deltaTime);
-        paddle.update(deltaTime);
-        updateAttachedBallPosition();
+        switch (currentSubState) {
+            case LEVEL_START:
+                levelStartTimer += deltaTime;
 
-        laserManager.update(deltaTime);
-        brickManager.update(deltaTime);
-        ballManager.update(deltaTime);
-        powerUpManager.update(deltaTime);
-        enemyManager.update(deltaTime);
+                paddle.update(deltaTime);
+                updateAttachedBallPosition();
 
-        if (collisionManager != null) {
-            collisionManager.checkCollisions(
-                    ballManager.getActiveBalls(),
-                    paddle,
-                    brickManager.getBricks(),
-                    powerUpManager.getActivePowerUps(),
-                    laserManager.getLasers(),
-                    enemyManager.getActiveEnemies()
-            );
+                if (levelStartTimer >= LEVEL_START_DURATION) {
+                    this.currentSubState = SubState.NORMAL_PLAY;
+                }
+                break;
+            case NORMAL_PLAY:
+                updateStrategy(deltaTime);
+                paddle.update(deltaTime);
+                updateAttachedBallPosition();
+                laserManager.update(deltaTime);
+                brickManager.update(deltaTime);
+                ballManager.update(deltaTime);
+                powerUpManager.update(deltaTime);
+                enemyManager.update(deltaTime);
+
+                if (collisionManager != null) {
+                    collisionManager.checkCollisions(
+                            ballManager.getActiveBalls(),
+                            paddle, brickManager.getBricks(),
+                            powerUpManager.getActivePowerUps(),
+                            laserManager.getLasers(),
+                            enemyManager.getActiveEnemies()
+                    );
+                }
+                if (this.levelNumber == 5 &&
+                        brickManager.isLevelComplete() &&
+                        !enemyManager.hasBossSpawned())
+                {
+                    enemyManager.spawnEnemy("BOSS", GameConstants.SCREEN_WIDTH / 2, -GameConstants.BOSS_HEIGHT);
+
+                    this.currentSubState = SubState.BOSS_WARNING;
+                    this.warningFlashTimer = 0.0;
+                }
+                if (enemyManager.isBossDying()) {
+                    this.currentSubState = SubState.BOSS_DYING;
+                    this.bossDyingTimer = 0.0;
+                }
+
+                handleVictory();
+                break;
+
+            case BOSS_WARNING:
+                warningFlashTimer += deltaTime;
+
+                enemyManager.updateBossOnly(deltaTime);
+
+                if (enemyManager.isBossReady() && warningFlashTimer >= warningFlashDuration) {
+                    this.currentSubState = SubState.NORMAL_PLAY;
+                }
+                break;
+
+            case BOSS_DYING:
+                bossDyingTimer += deltaTime;
+
+                enemyManager.updateBossOnly(deltaTime);
+
+                if (bossDyingTimer >= BOSS_DEATH_DURATION) {
+                    if (enemyManager.isBossDefeated()) {
+                        EventManager.getInstance().publish(
+                                new ChangeStateEvent(GameStateEnum.VICTORY)
+                        );
+                    }
+                }
+                break;
         }
-        handleVictory();
     }
 
     private void handleVictory() {
         if (this.hasWon || LifeManager.getInstance().getLives() <= 0) {
             return;
         }
-        if (this.levelNumber == 5) {
-            if (enemyManager.hasBossSpawned() && enemyManager.isBossDefeated()) {
-                EventManager.getInstance().publish(
-                        new ChangeStateEvent(GameStateEnum.VICTORY)
-                );
-            }
-        } else {
+        if (this.levelNumber != 5) {
             if (brickManager.isLevelComplete()) {
                 this.hasWon = true;
                 EventManager.getInstance().publish(
@@ -227,16 +292,49 @@ public final class PlayingState implements GameState {
                 GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
         gc.clip();
 
-        brickManager.render(gc);
-        enemyManager.render(gc);
-        powerUpManager.render(gc);
-        ballManager.render(gc);
-        laserManager.render(gc);
-        paddle.render(gc);
-        ParticleManager.getInstance().render(gc);
+        if (currentSubState == SubState.LEVEL_START) {
+            brickManager.render(gc, levelStartTimer, LEVEL_START_DURATION);
+            paddle.render(gc);
+            ballManager.render(gc);
+
+        }
+        else {
+            brickManager.render(gc);
+            enemyManager.render(gc);
+            powerUpManager.render(gc);
+            ballManager.render(gc);
+            laserManager.render(gc);
+            paddle.render(gc);
+            ParticleManager.getInstance().render(gc);
+        }
 
         gc.restore();
         renderPauseButton(gc);
+
+        if (currentSubState == SubState.BOSS_WARNING) {
+            if ((warningFlashTimer % 0.8) < 0.5) {
+
+                gc.setFill(Color.RED);
+                gc.setFont(new Font("Arial", 80));
+
+                gc.setTextAlign(TextAlignment.CENTER);
+                gc.setTextBaseline(VPos.CENTER);
+
+                gc.fillText("WARNING",
+                        GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH / 2,
+                        GameConstants.PLAY_AREA_Y + GameConstants.PLAY_AREA_HEIGHT / 2);
+
+                gc.setTextAlign(TextAlignment.LEFT);
+                gc.setTextBaseline(VPos.BASELINE);
+            }
+        }
+
+        if (currentSubState == SubState.BOSS_DYING) {
+            double fadeAlpha = Math.min(1.0, bossDyingTimer / BOSS_DEATH_DURATION);
+
+            gc.setFill(Color.color(1.0, 1.0, 1.0, fadeAlpha));
+            gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        }
     }
 
     private void renderHUD(GraphicsContext gc) {

@@ -8,12 +8,10 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
+import org.example.gamelogic.strategy.bossbehavior.*;
 import org.example.data.AssetManager;
 import org.example.gamelogic.graphics.ImageModifier;
-import org.example.gamelogic.strategy.bossbehavior.BossBehaviorStrategy;
-import org.example.gamelogic.strategy.bossbehavior.BossEnrageStrategy;
-import org.example.gamelogic.strategy.bossbehavior.BossEntryStrategy;
-import org.example.gamelogic.strategy.bossbehavior.BossPhase2Strategy;
+import org.example.gamelogic.strategy.bossbehavior.*;
 import org.example.gamelogic.strategy.movement.StaticMovementStrategy;
 
 public class Boss extends AbstractEnemy {
@@ -45,7 +43,9 @@ public class Boss extends AbstractEnemy {
             currentStrategy.update(this, deltaTime);
         }
 
-        checkPhaseChange();
+        if (!(currentStrategy instanceof BossDyingStrategy)) {
+            checkPhaseChange();
+        }
     }
 
     private void checkPhaseChange() {
@@ -104,14 +104,21 @@ public class Boss extends AbstractEnemy {
         if (isDestroyed()) {
             return;
         }
-        this.health -= damage;
-        if (health <= 0) {
-            this.isActive = false;
+        if (!(currentStrategy instanceof BossDyingStrategy)) {
+            this.health -= damage;
+
+            if (health <= 0) {
+                setStrategy(new BossDyingStrategy());
+            }
         }
     }
 
     @Override
     public void handleEntry(double deltaTime) {
 
+    }
+
+    public BossBehaviorStrategy getCurrentStrategy() {
+        return currentStrategy;
     }
 }
