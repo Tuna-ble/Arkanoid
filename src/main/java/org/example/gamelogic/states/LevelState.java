@@ -30,6 +30,8 @@ public final class LevelState implements GameState {
     private final int maxLevelUnlocked;
     private final Map<Integer, Integer> starsMap;
 
+    private final Button backButton;
+
     public LevelState() {
         this.level = new Image("/GameIcon/level.gif");
         this.levelButtons = new Button[NUM_LEVELS];
@@ -55,6 +57,10 @@ public final class LevelState implements GameState {
 
             levelButtons[i] = new Button(btnX, btnY, btnText);
         }
+
+        double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
+        double btnY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 40;
+        this.backButton = new Button(btnX, btnY, "Back");
     }
 
     private String getStarString(int stars) {
@@ -80,6 +86,7 @@ public final class LevelState implements GameState {
                 btn.update(inputProvider);
             }
         }
+        backButton.update(inputProvider);
     }
 
     @Override
@@ -113,12 +120,19 @@ public final class LevelState implements GameState {
                 btn.render(gc);
             }
         }
+        backButton.render(gc);
     }
 
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
         updateButtons(inputProvider);
+
+        if (backButton.isClicked()) {
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.GAME_MODE)
+            );
+        }
 
         for (int i = 0; i < levelButtons.length; i++) {
             Button btn = levelButtons[i];
