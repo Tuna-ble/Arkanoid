@@ -103,7 +103,7 @@ public final class GameManager {
         }
 
         currentState = new MainMenuState();
-        currentGameMode=GameModeEnum.LEVEL;
+        currentGameMode = GameModeEnum.LEVEL;
         this.stateManager.setState(currentState);
 
         this.enemyManager = EnemyManager.getInstance();
@@ -183,7 +183,10 @@ public final class GameManager {
                 if (currentState instanceof PauseState) {
                     ((PauseState) currentState).cleanUp();
                 }
-                newState = new PlayingState(this, currentGameMode, levelToLoad);
+                if (currentGameMode == GameModeEnum.INFINITE) {
+                    levelToLoad = 1;
+                }
+                newState = new PlayingState(this, currentGameMode, levelToLoad, true);
                 break;
 
             case GAME_MODE:
@@ -192,13 +195,13 @@ public final class GameManager {
 
             case LEVEL_STATE:
                 this.setLevelRepository(new FileLevelRepository());
-                this.currentGameMode=GameModeEnum.LEVEL;
+                this.currentGameMode = GameModeEnum.LEVEL;
                 newState = new LevelState();
                 break;
 
             case INFINITE_MODE:
                 this.setLevelRepository(new InfiniteLevelRepository());
-                this.currentGameMode=GameModeEnum.INFINITE;
+                this.currentGameMode = GameModeEnum.INFINITE;
                 newState = new InfiniteModeState();
                 break;
 
@@ -271,7 +274,7 @@ public final class GameManager {
     }
 
     public void startNewGame() {
-        GameState newPlayingState = new PlayingState(this, currentGameMode, 1);
+        GameState newPlayingState = new PlayingState(this, currentGameMode, 1, true);
         stateManager.setState(newPlayingState);
     }
 

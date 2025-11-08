@@ -55,7 +55,8 @@ public final class PlayingState implements GameState {
         LEVEL_START,
         NORMAL_PLAY,
         BOSS_WARNING,
-        BOSS_DYING
+        BOSS_DYING,
+        WAVE_CLEARED
     }
 
     private GameModeEnum currentGameMode;
@@ -70,7 +71,11 @@ public final class PlayingState implements GameState {
     private double bossDyingTimer = 0.0;
     private final double BOSS_DEATH_DURATION = 5.0;
 
-    public PlayingState(GameManager gameManager, GameModeEnum currentGameMode, int levelNumber) {
+    private double waveClearedTimer = 0.0;
+    private final double WAVE_CLEARED_DURATION = 3.0;
+
+    public PlayingState(GameManager gameManager, GameModeEnum currentGameMode,
+                        int levelNumber, boolean resetStats) {
         this.gameManager = gameManager;
         this.brickManager = gameManager.getBrickManager();
         this.brickManager.loadLevel(levelNumber);
@@ -96,8 +101,7 @@ public final class PlayingState implements GameState {
         handleLifeLost = this::handleLifeLost;
         handleLifeAdded = this::handleLifeAdded;
 
-        this.currentGameMode = currentGameMode;
-        if (currentGameMode == GameModeEnum.LEVEL) {
+        if (resetStats) {
             ScoreManager.getInstance().resetScore();
             LifeManager.getInstance().reset();
         }
@@ -106,6 +110,7 @@ public final class PlayingState implements GameState {
         this.labelFont = new Font("Arial", 18);
         this.valueFont = new Font("Arial", 28);
 
+        this.currentGameMode = currentGameMode;
         this.currentLives = LifeManager.getInstance().getLives();
 
         try {
@@ -169,7 +174,9 @@ public final class PlayingState implements GameState {
 
     @Override
     public void update(double deltaTime) {
-        elapsedTime += deltaTime;
+        if (currentSubState == SubState.NORMAL_PLAY) {
+            elapsedTime += deltaTime;
+        }
         int totalSeconds = (int) elapsedTime;
         if (totalSeconds != lastSecond) {
             int minutes = totalSeconds / 60;
@@ -187,6 +194,7 @@ public final class PlayingState implements GameState {
 
                 if (levelStartTimer >= LEVEL_START_DURATION) {
                     this.currentSubState = SubState.NORMAL_PLAY;
+                    levelStartTimer = 0;
                 }
                 break;
             case NORMAL_PLAY:
@@ -248,6 +256,21 @@ public final class PlayingState implements GameState {
                     }
                 }
                 break;
+
+            case WAVE_CLEARED:
+                waveClearedTimer += deltaTime;
+                if (waveClearedTimer >= WAVE_CLEARED_DURATION) {
+                    levelNumber++;
+
+                    brickManager.loadLevel(levelNumber);
+                    ballManager.createInitialBall(this.paddle);
+
+                    waveClearedTimer = 0;
+                    hasWon = false;
+
+                    currentSubState = SubState.LEVEL_START;
+                }
+                break;
         }
     }
 
@@ -255,13 +278,19 @@ public final class PlayingState implements GameState {
         if (this.hasWon || LifeManager.getInstance().getLives() <= 0) {
             return;
         }
-        if ((currentGameMode == GameModeEnum.LEVEL && this.levelNumber != 5) ||
-                (currentGameMode == GameModeEnum.INFINITE && this.levelNumber % 5 != 0)) {
+        if (currentGameMode == GameModeEnum.LEVEL && this.levelNumber != 5) {
             if (brickManager.isLevelComplete()) {
                 this.hasWon = true;
                 EventManager.getInstance().publish(
                         new ChangeStateEvent(GameStateEnum.VICTORY)
                 );
+            }
+        } else if (currentGameMode == GameModeEnum.INFINITE && this.levelNumber % 5 != 0) {
+            if (brickManager.isLevelComplete()) {
+                clearManagers();
+                this.hasWon = true;
+                this.currentSubState = SubState.WAVE_CLEARED;
+                this.waveClearedTimer = 0;
             }
         }
     }
@@ -341,6 +370,21 @@ public final class PlayingState implements GameState {
             gc.setFill(Color.color(1.0, 1.0, 1.0, fadeAlpha));
             gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         }
+
+        if (currentSubState == SubState.WAVE_CLEARED) {
+            gc.setFill(Color.GREEN);
+            gc.setFont(new Font("Arial", 80));
+
+            gc.setTextAlign(TextAlignment.CENTER);
+            gc.setTextBaseline(VPos.CENTER);
+
+            gc.fillText("WAVE CLEARED",
+                    GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH / 2,
+                    GameConstants.PLAY_AREA_Y + GameConstants.PLAY_AREA_HEIGHT / 2);
+
+            gc.setTextAlign(TextAlignment.LEFT);
+            gc.setTextBaseline(VPos.BASELINE);
+        }
     }
 
     private void renderHUD(GraphicsContext gc) {
@@ -372,7 +416,7 @@ public final class PlayingState implements GameState {
         gc.fillText(this.formattedTime, x_slot2, y_value);
 
         gc.setFont(labelFont);
-        gc.fillText("ROUND", x_slot3, y_label);
+        gc.fillText((currentGameMode == GameModeEnum.LEVEL ? "Round" : "Wave"), x_slot3, y_label);
         gc.setFont(valueFont);
         gc.fillText(String.valueOf(this.levelNumber), x_slot3, y_value);
 
@@ -524,6 +568,10 @@ public final class PlayingState implements GameState {
                 handleLifeAdded
         );
 
+        clearManagers();
+    }
+
+    private void clearManagers() {
         for (PowerUpStrategy strategy : activeStrategies) {
             strategy.remove(this);
         }
@@ -532,6 +580,8 @@ public final class PlayingState implements GameState {
         ballManager.clear();
         powerUpManager.clear();
         laserManager.clear();
+        enemyManager.clear();
+        ParticleManager.getInstance().clear();
     }
 
     private void handleBallLost(BallLostEvent event) {
