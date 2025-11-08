@@ -113,12 +113,6 @@ public final class PlayingState implements GameState {
             this.hudFrameImage = null;
         }
 
-        powerUpManager.spawnPowerUp("E", 100, 100);
-        powerUpManager.spawnPowerUp("L", 200, 100);
-        powerUpManager.spawnPowerUp("M", 300, 100);
-        powerUpManager.spawnPowerUp("S", 400, 100);
-        powerUpManager.spawnPowerUp("P", 500, 100);
-        powerUpManager.spawnPowerUp("B", 600, 100);
     }
 
     private void subscribeToEvents() {

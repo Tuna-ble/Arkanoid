@@ -31,15 +31,15 @@ public class MultiBallStrategy implements PowerUpStrategy {
                     break;
                 }
 
-                IBall clone = originalBall.clone(); // clone() đã set attachedToPaddle=false
+                IBall clone = originalBall.duplicate();
                 clone.setPosition(originalBall.getX(), originalBall.getY());
 
                 double currentAngle = Math.atan2(originalBall.getDy(), originalBall.getDx());
                 double newAngle;
                 if (i == 0) {
-                    newAngle = currentAngle + Math.toRadians(ANGLE_OFFSET); // Lệch 1 hướng
+                    newAngle = currentAngle + Math.toRadians(ANGLE_OFFSET);
                 } else {
-                    newAngle = currentAngle - Math.toRadians(ANGLE_OFFSET); // Lệch hướng còn lại
+                    newAngle = currentAngle - Math.toRadians(ANGLE_OFFSET);
                 }
 
                 double speed = originalBall.getSpeed();

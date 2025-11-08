@@ -39,7 +39,8 @@ public class AssetManager {
         try {
             loadImage("main_menu", "/GameIcon/MainMenu.gif");
             loadImage("title", "/GameIcon/title.png");
-            loadImage("frame", "/GameIcon/Frame.png");
+            loadImage("game_frame", "/GameIcon/GameFrame.png");
+            loadImage("hud_frame", "/GameIcon/HudFrame.png");
             loadImage("playing", "/GameIcon/playing.png");
             loadImage("enemies", "/GameIcon/EnemySprites.png");
             loadImage("powerups", "/GameIcon/PowerupSprites.png");

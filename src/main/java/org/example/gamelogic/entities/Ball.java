@@ -279,6 +279,18 @@ public class Ball extends MovableObject implements IBall {
         return newBall;
     }
 
+    public IBall duplicate() {
+        Ball newBall = new Ball(0, 0, this.width / 2.0);
+        newBall.pierceLeft=pierceLeft;
+        for (GameObject pierced : piercingObjects) {
+            newBall.getPiercingObjects().add(pierced);
+        }
+        newBall.speed=speed;
+        newBall.attachedToPaddle = false;
+        newBall.isActive = true;
+        return newBall;
+    }
+
     public boolean isDestroyed() {
         return !isActive;
     }

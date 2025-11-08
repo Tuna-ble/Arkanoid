@@ -79,7 +79,7 @@ public final class GameConstants {
     public static final double ENEMY_HEIGHT = 40;
     public static final double BOSS_WIDTH = 200;
     public static final double BOSS_HEIGHT = 100;
-    public static final double BOSS_HEATLTH = 10.0;
+    public static final double BOSS_HEALTH = 10.0;
 
     // Powerups
     public static final double POWERUP_WIDTH = 40;

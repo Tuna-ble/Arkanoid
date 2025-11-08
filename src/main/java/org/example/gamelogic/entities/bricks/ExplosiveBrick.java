@@ -2,11 +2,10 @@ package org.example.gamelogic.entities.bricks;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import org.example.config.GameConstants;
 import org.example.gamelogic.core.EventManager;
+import org.example.gamelogic.core.ParticleManager;
 import org.example.gamelogic.events.BrickDestroyedEvent;
 import org.example.gamelogic.events.ExplosiveBrickEvent;
-import org.example.gamelogic.core.ParticleManager;
 
 public class ExplosiveBrick extends AbstractBrick {
     /// type: E

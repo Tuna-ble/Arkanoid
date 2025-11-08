@@ -62,7 +62,6 @@ public final class BrickManager {
     }
 
     public void update(double deltaTime) {
-        System.out.println("there are "+bricks.size()+" exits");
         for (Brick brick : bricks) {
             brick.update(deltaTime);
         }
