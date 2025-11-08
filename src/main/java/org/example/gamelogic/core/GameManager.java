@@ -266,6 +266,10 @@ public final class GameManager {
             case SETTINGS:
                 newState = new SettingsState(currentState);
                 break;
+
+            case CONFIRM_RESET:
+                newState = new ConfirmResetState();
+                break;
         }
 
         if (newState != null && stateManager != null) {

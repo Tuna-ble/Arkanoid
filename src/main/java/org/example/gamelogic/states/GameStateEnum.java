@@ -12,5 +12,6 @@ public enum GameStateEnum {
     RANKING_STATE,
     VICTORY,
     GAME_MODE,
-    INFINITE_MODE
+    INFINITE_MODE,
+    CONFIRM_RESET
 }

@@ -37,7 +37,7 @@ public final class HighscoreManager {
                 try {
                     scores.add(Integer.parseInt(line.trim()));
                 } catch (NumberFormatException e) {
-
+//
                 }
             }
         } catch (IOException e) {
@@ -61,6 +61,21 @@ public final class HighscoreManager {
             }
         } catch (IOException e) {
             System.err.println("Lỗi khi lưu file highscore: " + e.getMessage());
+        }
+    }
+
+    public static void resetHighscores() {
+        try {
+            File scoreFile = new File(HIGHSCORE_FILE_PATH);
+            if (scoreFile.exists()) {
+                if (!scoreFile.delete()) {
+                    System.err.println("Không thể xóa file highscore.");
+                } else {
+                    System.out.println("Đã reset highscore.");
+                }
+            }
+        } catch (SecurityException e) {
+            System.err.println("Lỗi bảo mật khi xóa file highscore: " + e.getMessage());
         }
     }
 }

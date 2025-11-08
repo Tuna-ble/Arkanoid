@@ -12,9 +12,11 @@ import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
+import org.example.gamelogic.core.ProgressManager;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.Button;
 import org.example.gamelogic.graphics.TextRenderer;
+import java.util.Map;
 
 public final class LevelState implements GameState {
 
@@ -25,19 +27,46 @@ public final class LevelState implements GameState {
     private final Button[] levelButtons;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
-    public LevelState() {
+    private final int maxLevelUnlocked;
+    private final Map<Integer, Integer> starsMap;
 
+    public LevelState() {
         this.level = new Image("/GameIcon/level.gif");
         this.levelButtons = new Button[NUM_LEVELS];
+
+        this.maxLevelUnlocked = ProgressManager.getMaxLevelUnlocked();
+        this.starsMap = ProgressManager.loadStars();
+
         double baseY = 180;
 
         for (int i = 0; i < NUM_LEVELS; i++) {
             double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
             double btnY = baseY + i * (GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_SPACING);
-            String btnText = "Level " + (i + 1);
+
+            int currentLevel = i + 1;
+            String btnText;
+
+            if (currentLevel > maxLevelUnlocked) {
+                btnText = "Level " + currentLevel + " (Locked)";
+            } else {
+                int stars = starsMap.getOrDefault(currentLevel, 0);
+                btnText = "Level " + currentLevel + "  " + getStarString(stars);
+            }
 
             levelButtons[i] = new Button(btnX, btnY, btnText);
         }
+    }
+
+    private String getStarString(int stars) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            if (i < stars) {
+                sb.append("★");
+            } else {
+                sb.append("☆");
+            }
+        }
+        return sb.toString();
     }
 
     @Override
@@ -65,58 +94,47 @@ public final class LevelState implements GameState {
         );
         DropShadow titleShadow = new DropShadow(14, Color.color(0, 0, 0, 0.7));
         Font titleFont = new Font("Arial", 70);
-
         TextRenderer.drawOutlinedText(
-                gc,
-                "CHOOSE LEVEL",
-                centerX,
-                110,
-                titleFont,
-                titleFill,
-                Color.color(0,0,0,0.9),
-                3.0,
-                titleShadow
+                gc, "CHOOSE LEVEL", centerX, 110, titleFont,
+                titleFill, Color.color(0,0,0,0.9), 3.0, titleShadow
         );
 
-        for (Button btn : levelButtons) {
-            if (btn != null) {
+        for (int i = 0; i < levelButtons.length; i++) {
+            Button btn = levelButtons[i];
+            if (btn == null) continue;
+
+            int currentLevel = i + 1;
+            if (currentLevel > maxLevelUnlocked) {
+                gc.save();
+                gc.setGlobalAlpha(0.5);
+                btn.render(gc);
+                gc.restore();
+            } else {
                 btn.render(gc);
             }
         }
-
-        /*
-        if ((int)(elapsedTime * 2) % 2 == 0) {
-            gc.setTextAlign(TextAlignment.CENTER);
-            TextRenderer.drawOutlinedText(
-                    gc,
-                    "Click a level to start",
-                    centerX,
-                    GameConstants.SCREEN_HEIGHT - 40,
-                    new Font("Arial", 14),
-                    Color.WHITE,
-                    Color.color(0,0,0,0.85),
-                    1.0,
-                    new DropShadow(5, Color.color(0,0,0,0.5))
-            );
-        }
-         */
     }
 
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
         updateButtons(inputProvider);
+
         for (int i = 0; i < levelButtons.length; i++) {
             Button btn = levelButtons[i];
-
-            if (btn != null && btn.isClicked()) {
-                int selectedLevel = i + 1;
-
-                EventManager.getInstance().publish(
-                        new ChangeStateEvent(GameStateEnum.PLAYING, selectedLevel)
-                );
-                break;
+            if (btn == null || !btn.isClicked()) {
+                continue;
             }
+
+            int selectedLevel = i + 1;
+
+            if (selectedLevel > maxLevelUnlocked) {
+                continue;
+            }
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.PLAYING, selectedLevel)
+            );
+            break;
         }
     }
 }
