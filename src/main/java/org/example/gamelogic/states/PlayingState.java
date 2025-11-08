@@ -8,9 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
-import org.example.data.AssetManager;
 import org.example.config.GameConstants;
-import org.example.data.FileLevelRepository;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.*;
 import org.example.gamelogic.entities.IBall;
@@ -60,6 +58,7 @@ public final class PlayingState implements GameState {
         BOSS_DYING
     }
 
+    private GameModeEnum currentGameMode;
     private SubState currentSubState;
 
     private double levelStartTimer = 0.0;
@@ -71,7 +70,7 @@ public final class PlayingState implements GameState {
     private double bossDyingTimer = 0.0;
     private final double BOSS_DEATH_DURATION = 5.0;
 
-    public PlayingState(GameManager gameManager, int levelNumber) {
+    public PlayingState(GameManager gameManager, GameModeEnum currentGameMode, int levelNumber) {
         this.gameManager = gameManager;
         this.brickManager = gameManager.getBrickManager();
         this.brickManager.loadLevel(levelNumber);
@@ -97,7 +96,8 @@ public final class PlayingState implements GameState {
         handleLifeLost = this::handleLifeLost;
         handleLifeAdded = this::handleLifeAdded;
 
-        if (gameManager.getLevelRepository() instanceof FileLevelRepository) {
+        this.currentGameMode = currentGameMode;
+        if (currentGameMode == GameModeEnum.LEVEL) {
             ScoreManager.getInstance().resetScore();
             LifeManager.getInstance().reset();
         }
@@ -120,7 +120,7 @@ public final class PlayingState implements GameState {
         this.levelStartTimer = 0.0;
 
         this.levelNumber = levelNumber;
-        this.enemyManager.loadLevelScript(this.levelNumber);
+        this.enemyManager.loadLevelScript(this.currentGameMode, this.levelNumber);
         try {
             this.gameFrameImage = new Image(getClass().getResourceAsStream("/GameIcon/GameFrame.png"));
             this.hudFrameImage = new Image(getClass().getResourceAsStream("/GameIcon/HudFrame.png"));
@@ -134,6 +134,12 @@ public final class PlayingState implements GameState {
             this.gameFrameImage = null;
             this.hudFrameImage = null;
         }
+
+        powerUpManager.spawnPowerUp("M", 400, 300);
+        powerUpManager.spawnPowerUp("M", 400, 320);
+        powerUpManager.spawnPowerUp("M", 400, 340);
+        powerUpManager.spawnPowerUp("M", 400, 360);
+        powerUpManager.spawnPowerUp("P", 400, 400);
     }
 
     private void subscribeToEvents() {
@@ -202,10 +208,10 @@ public final class PlayingState implements GameState {
                             enemyManager.getActiveEnemies()
                     );
                 }
-                if (this.levelNumber == 5 &&
+                if (((this.currentGameMode == GameModeEnum.LEVEL && this.levelNumber == 5) ||
+                        (this.currentGameMode == GameModeEnum.INFINITE && this.levelNumber % 5 == 0)) &&
                         brickManager.isLevelComplete() &&
-                        !enemyManager.hasBossSpawned())
-                {
+                        !enemyManager.hasBossSpawned()) {
                     enemyManager.spawnEnemy("BOSS", GameConstants.SCREEN_WIDTH / 2, -GameConstants.BOSS_HEIGHT);
 
                     this.currentSubState = SubState.BOSS_WARNING;
@@ -249,7 +255,8 @@ public final class PlayingState implements GameState {
         if (this.hasWon || LifeManager.getInstance().getLives() <= 0) {
             return;
         }
-        if (this.levelNumber != 5) {
+        if ((currentGameMode == GameModeEnum.LEVEL && this.levelNumber != 5) ||
+                (currentGameMode == GameModeEnum.INFINITE && this.levelNumber % 5 != 0)) {
             if (brickManager.isLevelComplete()) {
                 this.hasWon = true;
                 EventManager.getInstance().publish(
@@ -297,8 +304,7 @@ public final class PlayingState implements GameState {
             paddle.render(gc);
             ballManager.render(gc);
 
-        }
-        else {
+        } else {
             brickManager.render(gc);
             enemyManager.render(gc);
             powerUpManager.render(gc);

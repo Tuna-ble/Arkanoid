@@ -5,6 +5,7 @@ import org.example.config.GameConstants;
 import org.example.gamelogic.entities.enemy.*;
 import org.example.gamelogic.factory.EnemyFactory;
 import org.example.gamelogic.registry.EnemyRegistry;
+import org.example.gamelogic.states.GameModeEnum;
 import org.example.gamelogic.strategy.bossbehavior.BossDyingStrategy;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public final class EnemyManager {
 
     private static final String[] ENEMY_TYPES = {"E1", "E2"};
 
+    private GameModeEnum currentGameMode;
     private double levelTimer = 0.0;
     private int enemiesSpawned = 0;
     private final int MAX_ENEMIES_PER_LEVEL = 5;
@@ -92,7 +94,8 @@ public final class EnemyManager {
         }
     }
 
-    public void loadLevelScript(int levelNumber) {
+    public void loadLevelScript(GameModeEnum currentGameMode, int levelNumber) {
+        this.currentGameMode = currentGameMode;
         this.currentLevelNumber = levelNumber;
         this.levelTimer = 0.0;
         this.enemiesSpawned = 0;
@@ -108,7 +111,22 @@ public final class EnemyManager {
     public void update(double deltaTime) {
         levelTimer += deltaTime;
 
-        switch (this.currentLevelNumber) {
+        if (currentGameMode == GameModeEnum.LEVEL) {
+            updateLevelMode();
+        } else if (currentGameMode == GameModeEnum.INFINITE) {
+            updateInfiniteMode();
+        }
+
+        activeEnemies.removeIf(Enemy::isDestroyed);
+        for (Enemy enemy : activeEnemies) {
+            enemy.update(deltaTime);
+        }
+
+        processSpawnQueue();
+    }
+
+    private void updateLevelMode() {
+        switch (currentLevelNumber) {
             case 2:
                 if (levelTimer > 5.0 && enemiesSpawned < 10) {
                     levelTimer = 0.0;
@@ -131,12 +149,20 @@ public final class EnemyManager {
                 }
                 break;*/
         }
-        activeEnemies.removeIf(Enemy::isDestroyed);
-        for (Enemy enemy : activeEnemies) {
-            enemy.update(deltaTime);
-        }
+    }
 
-        processSpawnQueue();
+    private void updateInfiniteMode() {
+        if (currentLevelNumber % 2 == 0 && currentLevelNumber % 10 != 0) {
+            if (levelTimer > 5.0 && enemiesSpawned < 10) {
+                levelTimer = 0.0;
+                enemiesSpawned++;
+                if (Math.random() < 0.5) {
+                    spawnEnemy("E1");
+                } else {
+                    spawnEnemy("E2");
+                }
+            }
+        }
     }
 
     private void processSpawnQueue() {
