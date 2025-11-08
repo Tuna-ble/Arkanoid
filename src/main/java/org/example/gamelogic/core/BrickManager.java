@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public final class BrickManager {
-    private final ILevelRepository levelRepository;
+    private ILevelRepository levelRepository;
     private final BrickFactory brickFactory;
     private List<Brick> bricks;
 
@@ -56,10 +56,16 @@ public final class BrickManager {
         brickRegistry.register("N", new NormalBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
         brickRegistry.register("U", new UnbreakableBrick(0, 0, TILE_WIDTH, TILE_HEIGHT));
         brickRegistry.register("E", new ExplosiveBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
+        brickRegistry.register("R", new HealingBrick(0, 0, TILE_WIDTH, TILE_HEIGHT));
         /// HNUE :)))
+        /// bựa
     }
 
     public void update(double deltaTime) {
+        System.out.println("there are "+bricks.size()+" exits");
+        for (Brick brick : bricks) {
+            brick.update(deltaTime);
+        }
         bricks.removeIf(Brick::isDestroyed);
     }
 
@@ -69,43 +75,80 @@ public final class BrickManager {
         }
     }
 
+    public void render(GraphicsContext gc, double timer, double duration) {
+        if (bricks.isEmpty()) {
+            return;
+        }
+
+        double timePerBrick = duration / bricks.size();
+
+        for (int i = 0; i < bricks.size(); i++) {
+            Brick brick = bricks.get(i);
+            double brickStartTime = i * timePerBrick;
+
+            if (timer < brickStartTime) {
+                break;
+            }
+
+            double timeSinceSpawn = timer - brickStartTime;
+            double alpha = Math.min(1.0, timeSinceSpawn / timePerBrick);
+
+            gc.save();
+            gc.setGlobalAlpha(alpha);
+            brick.render(gc);
+            gc.restore();
+        }
+    }
+
     public void loadLevel(int levelNumber) {
         this.bricks.clear();
         LevelData levelData = levelRepository.loadLevel(levelNumber);
 
         List<String> layout = levelData.getLayout();
 
-        int maxCols = 0;
-        for (String row : layout) {
-            int numCols = row.trim().split("\\s+").length;
-            if (numCols > maxCols) {
-                maxCols = numCols;
-            }
-        }
-
-        double gridWidth = maxCols * (GameConstants.BRICK_WIDTH + GameConstants.PADDING) - GameConstants.PADDING;
-
-        double startX = (GameConstants.SCREEN_WIDTH - gridWidth) / 2.0;
-
         for (int row = 0; row < layout.size(); row++) {
-            String[] types = layout.get(row).split(" ");
+
+            String[] types = layout.get(row).trim().split("\\s+");
+            int numCols = 0;
+            for (String type : types) {
+                if (!type.equals("_")) {
+                    numCols++;
+                }
+            }
+            if (numCols == 0) continue;
+            double rowWidth = numCols * (GameConstants.BRICK_WIDTH + GameConstants.PADDING) - GameConstants.PADDING;
+            double rowStartX = (GameConstants.PLAY_AREA_WIDTH - rowWidth) / 2.0;
+
+            int currentCol = 0;
             for (int col = 0; col < types.length; col++) {
                 String type = types[col];
                 if (type.equals("_")) {
                     continue;
                 }
-                double x = startX + col * (GameConstants.BRICK_WIDTH + GameConstants.PADDING);
-                double y = GameConstants.TOP_MARGIN + row * (GameConstants.BRICK_HEIGHT + GameConstants.PADDING);
+
+                double x = GameConstants.PLAY_AREA_X + rowStartX + currentCol * (GameConstants.BRICK_WIDTH + GameConstants.PADDING);
+                double y = GameConstants.PLAY_AREA_Y + GameConstants.TOP_MARGIN + row * (GameConstants.BRICK_HEIGHT + GameConstants.PADDING);
+
                 Brick brick = brickFactory.createBrick(type, x, y);
                 if (brick != null) {
                     this.bricks.add(brick);
                 }
+                currentCol++;
             }
         }
     }
 
     public boolean isLevelComplete() {
-        return bricks.isEmpty();
+        for (Brick brick : bricks) {
+            if (brick.isBreakable()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void setLevelRepository(ILevelRepository repo) {
+        this.levelRepository = repo;
     }
 
     public List<Brick> getBricks() {

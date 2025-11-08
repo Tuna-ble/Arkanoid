@@ -1,0 +1,72 @@
+package org.example.gamelogic.entities.enemy;
+
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import org.example.config.GameConstants;
+import org.example.gamelogic.core.LaserManager;
+import org.example.gamelogic.entities.BulletFrom;
+import org.example.gamelogic.entities.BulletType;
+import org.example.gamelogic.strategy.movement.DashMovementStrategy;
+import org.example.gamelogic.strategy.movement.DownMovementStrategy;
+import org.example.gamelogic.strategy.movement.LRMovementStrategy;
+
+public class BossMinion extends AbstractEnemy {
+    private double shootTimer;
+    private final double SHOOT_COOLDOWN = 2.5;
+
+    public BossMinion(double x, double y, double width, double height,
+                      double dx, double dy) {
+        super(x, y, width, height, dx, dy, new DashMovementStrategy());
+        this.shootTimer = Math.random() * SHOOT_COOLDOWN;
+        this.hasEnteredScreen = true;
+    }
+
+    @Override
+    public Enemy clone() {
+        return new BossMinion(0.0, 0.0, this.width, this.height, this.dx, this.dy);
+    }
+
+    @Override
+    public void update(double deltaTime) {
+        super.update(deltaTime);
+        shootTimer += deltaTime;
+
+        if (shootTimer >= SHOOT_COOLDOWN) {
+            shootTimer = 0.0;
+
+            double bulletX = this.x + (this.width / 2.0) - 2;
+            double bulletY = this.y + this.height;
+
+            LaserManager.getInstance().createBullet(
+                    bulletX,
+                    bulletY,
+                    0,
+                    300,
+                    BulletType.ENEMY_LASER,
+                    BulletFrom.ENEMY
+            );
+        }
+    }
+
+    @Override
+    public void render(GraphicsContext gc) {
+        gc.setFill(Color.BLACK);
+        gc.fillRect(x, y, width, height);
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(x, y, width, height);
+    }
+
+    public void takeDamage(double damage) {
+        if (isDestroyed()) {
+            return;
+        }
+        this.isActive = false;
+        /*EventManager.getInstance().publish(new BrickDestroyedEvent(this));
+        EventManager.getInstance().publish(new ExplosiveBrickEvent(this));*/
+    }
+
+    @Override
+    public void handleEntry(double deltaTime) {
+
+    }
+}

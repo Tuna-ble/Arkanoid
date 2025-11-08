@@ -1,8 +1,8 @@
-_ H H H H H H H H H _
-_ H N N N N N N N H _
-_ H N H H H H H N H _
-_ H N H _ E _ H N H _
-_ H N H H H H H N H _
-_ H N N N E N N N H _
-_ H H H H H H H H H _
+_ _ _ _ _ _ _ _ _ _ _
+H H N N N N N N N H H
+E E E E E E E E E E E
+_ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _ _ _ _
 _ _ _ _ _ _ _ _ _ _ _

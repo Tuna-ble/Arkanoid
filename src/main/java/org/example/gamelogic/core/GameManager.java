@@ -1,15 +1,14 @@
 package org.example.gamelogic.core;
+
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import org.example.config.GameConstants;
+import org.example.data.FileLevelRepository;
 import org.example.data.ILevelRepository;
+import org.example.data.InfiniteLevelRepository;
 import org.example.gamelogic.I_InputProvider;
-import org.example.gamelogic.events.*;
+import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.states.*;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
 
 //singleton (co dung Bill Pugh Idiom de xu li multithreading)
 public final class GameManager {
@@ -23,6 +22,7 @@ public final class GameManager {
     private ScoreManager scoreManager;
     private LifeManager lifeManager;
     private LaserManager laserManager;
+    private EnemyManager enemyManager;
 
     private GraphicsContext gc;
     private ILevelRepository levelRepository;
@@ -31,6 +31,7 @@ public final class GameManager {
 
     private double accumulator = 0.0;
     private final double FIXED_TIMESTEP = GameConstants.FIXED_TIMESTEP;
+    private ParticleManager particleManager;
 
     private GameManager() {
         this.gameLoop = new AnimationTimer() {
@@ -70,12 +71,14 @@ public final class GameManager {
     public void setInputProvider(I_InputProvider provider) {
         this.inputProvider = provider;
     }
+
     public void setGraphicsContext(GraphicsContext gc) {
         this.gc = gc;
     }
 
     public void setLevelRepository(ILevelRepository repo) {
         this.levelRepository = repo;
+        this.brickManager.setLevelRepository(repo);
     }
 
     public void init() {
@@ -84,13 +87,31 @@ public final class GameManager {
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
+        // Preload some common UI images synchronously so returning to states
+        // (like Main Menu or Ranking) draws immediately without a visible delay.
+        try {
+            org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
+            // load images into asset manager cache (public wrapper)
+            am.loadImageResource("mainMenu", "/GameIcon/MainMenu.png");
+            am.loadImageResource("ranking", "/GameIcon/ranking.png");
+            am.loadImageResource("settings", "/GameIcon/settings.png");
+            am.loadImageResource("pause", "/GameIcon/pause.png");
+        } catch (Exception e) {
+            // non-fatal: if preload fails, states will fall back to background load
+            System.err.println("Warning: failed to preload UI images: " + e.getMessage());
+        }
+
         currentState = new MainMenuState();
         this.stateManager.setState(currentState);
 
+        this.enemyManager = EnemyManager.getInstance();
         this.soundManager = SoundManager.getInstance();
         this.scoreManager = ScoreManager.getInstance();
         this.lifeManager = LifeManager.getInstance();
         this.laserManager = LaserManager.getInstance();
+        this.particleManager = ParticleManager.getInstance();
+
+        this.enemyManager.setBrickManager(this.brickManager);
 
         subscribeToEvents();
     }
@@ -100,6 +121,10 @@ public final class GameManager {
             stateManager.handleInput(inputProvider);
             stateManager.update(deltaTime);
         }
+        if (particleManager != null) {
+            particleManager.update(deltaTime);
+        }
+
         if (inputProvider != null) {
             inputProvider.resetMouseClick();
         }
@@ -109,6 +134,9 @@ public final class GameManager {
         GameState currentState = stateManager.getState();
         if (currentState != null && gc != null) {
             currentState.render(gc);
+        }
+        if (particleManager != null && gc != null) {
+            particleManager.render(gc);
         }
     }
 
@@ -146,21 +174,28 @@ public final class GameManager {
 
         if (currentState instanceof PlayingState && event.targetState != GameStateEnum.PAUSED && event.targetState != GameStateEnum.RESUME_GAME) {
             ((PlayingState) currentState).cleanUp();
-            powerUpManager.clear();
-            ballManager.clear();
         }
 
         switch (event.targetState) {
             case PLAYING:
-                if (currentState instanceof PlayingState) {
-                    ((PlayingState) currentState).cleanUp();
-                    powerUpManager.clear();
-                    ballManager.clear();
+                if (currentState instanceof PauseState) {
+                    ((PauseState) currentState).cleanUp();
                 }
                 newState = new PlayingState(this, levelToLoad);
                 break;
+
+            case GAME_MODE:
+                newState = new GameModeState();
+                break;
+
             case LEVEL_STATE:
+                this.setLevelRepository(new FileLevelRepository());
                 newState = new LevelState();
+                break;
+
+            case INFINITE_MODE:
+                this.setLevelRepository(new InfiniteLevelRepository());
+                newState = new InfiniteModeState();
                 break;
 
             case RANKING_STATE:
@@ -170,35 +205,63 @@ public final class GameManager {
             case MAIN_MENU:
                 if (currentState instanceof PlayingState) {
                     ((PlayingState) currentState).cleanUp();
-                    powerUpManager.clear();
-                    ballManager.clear();
+                } else if (currentState instanceof PauseState) {
+                    ((PauseState) currentState).cleanUp();
                 }
                 newState = new MainMenuState();
                 break;
+
+            case VICTORY:
+                if (currentState instanceof PlayingState) {
+                    PlayingState playingState = (PlayingState) currentState;
+
+                    int livesLeft = playingState.getCurrentLives();
+                    int levelCompleted = playingState.getLevelNumber();
+                    int finalScore = ScoreManager.getInstance().getScore();
+
+                    HighscoreManager.saveNewScore(finalScore);
+
+                    playingState.cleanUp();
+
+                    newState = new VictoryState(livesLeft, levelCompleted);
+                }
+                break;
+
             case GAME_OVER:
-                int currentLevel = 1;
+                int currentLevel = levelToLoad;
 
                 if (currentState instanceof PlayingState) {
                     PlayingState playingState = (PlayingState) currentState;
                     currentLevel = playingState.getLevelNumber();
+
                     int finalScore = ScoreManager.getInstance().getScore();
                     HighscoreManager.saveNewScore(finalScore);
 
                     playingState.cleanUp();
-                    powerUpManager.clear();
-                    ballManager.clear();
                 }
                 newState = new GameOverState(currentLevel);
                 break;
+
             case PAUSED:
                 if (currentState instanceof PlayingState) {
-                    newState = new PauseState(this, currentState);
+                    newState = new PauseState(currentState);
                 }
                 break;
+
             case RESUME_GAME:
                 if (currentState instanceof PauseState) {
                     newState = ((PauseState) currentState).getPreviousState();
+                } else if (currentState instanceof SettingsState) {
+                    newState = ((SettingsState) currentState).getPreviousState();
                 }
+                break;
+
+            case SETTINGS:
+                newState = new SettingsState(currentState);
+                break;
+
+            case CONFIRM_RESET:
+                newState = new ConfirmResetState();
                 break;
         }
 
@@ -215,6 +278,10 @@ public final class GameManager {
     public void goToMainMenu() {
         GameState mainMenuState = new MainMenuState();
         stateManager.setState(mainMenuState);
+    }
+
+    public ILevelRepository getLevelRepository() {
+        return levelRepository;
     }
 
     public BrickManager getBrickManager() {
@@ -239,5 +306,13 @@ public final class GameManager {
 
     public LaserManager getLaserManager() {
         return this.laserManager;
+    }
+
+    public ParticleManager getParticleManager() {
+        return this.particleManager;
+    }
+
+    public EnemyManager getEnemyManager() {
+        return this.enemyManager;
     }
 }

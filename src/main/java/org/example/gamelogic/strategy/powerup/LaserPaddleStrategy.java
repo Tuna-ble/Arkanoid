@@ -1,6 +1,8 @@
 package org.example.gamelogic.strategy.powerup;
 
 import org.example.gamelogic.core.LaserManager;
+import org.example.gamelogic.entities.BulletFrom;
+import org.example.gamelogic.entities.BulletType;
 import org.example.gamelogic.entities.LaserBullet;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.states.PlayingState;
@@ -22,7 +24,14 @@ public class LaserPaddleStrategy implements PowerUpStrategy {
 
         if (timeSinceLastShot>=interval) {
             timeSinceLastShot=0;
-            LaserManager.getInstance().shoot(playingState.getPaddle());
+            Paddle paddle = playingState.getPaddle();
+
+            double leftX = paddle.getX() + 10;
+            double rightX = paddle.getX() + paddle.getWidth() - 14;
+            double y = paddle.getY() - 16;
+
+            LaserManager.getInstance().createBullet(leftX, y, 0, -600, BulletType.PLAYER_LASER, BulletFrom.PLAYER);
+            LaserManager.getInstance().createBullet(rightX, y, 0, -600, BulletType.PLAYER_LASER, BulletFrom.PLAYER);
         }
 
         if (remainingTime <= 0) {
@@ -32,7 +41,7 @@ public class LaserPaddleStrategy implements PowerUpStrategy {
 
     @Override
     public void remove(PlayingState playingState) {
-
+        remainingTime = 0;
     }
 
     @Override
@@ -43,5 +52,10 @@ public class LaserPaddleStrategy implements PowerUpStrategy {
     @Override
     public void reset() {
         remainingTime = 5.0;
+    }
+
+    @Override
+    public PowerUpStrategy clone() {
+        return new LaserPaddleStrategy();
     }
 }

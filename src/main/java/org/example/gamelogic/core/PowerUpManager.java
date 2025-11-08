@@ -25,9 +25,9 @@ public final class PowerUpManager {
     private List<PowerUp> activePowerUps = new ArrayList<>();
 
     private final Random random = new Random();
-    private static final double POWERUP_DROP_CHANCE = 0.3;
+    private static final double POWERUP_DROP_CHANCE = 0.2;
 
-    private static final String[] POWERUP_TYPES = {"E", "F", "M", "L", "B"};
+    private static final String[] POWERUP_TYPES = {"E", "F", "M", "H", "L", "P"};
 
     public PowerUpManager() {
         PowerUpRegistry registry = PowerUpRegistry.getInstance();
@@ -68,11 +68,14 @@ public final class PowerUpManager {
         powerUpRegistry.register("M", new MultiBallPowerUp(0.0, 0.0, POWERUP_WIDTH,
                 POWERUP_HEIGHT, 0.0, 2.0, new MultiBallStrategy()));
 
-        powerUpRegistry.register("L", new ExtraLifePowerUp(0.0, 0.0, POWERUP_WIDTH,
+        powerUpRegistry.register("H", new ExtraLifePowerUp(0.0, 0.0, POWERUP_WIDTH,
                 POWERUP_HEIGHT, 0.0, 2.0, new ExtraLifeStrategy()));
 
-        powerUpRegistry.register("B", new LaserPaddlePowerUp(0.0, 0.0, POWERUP_WIDTH,
+        powerUpRegistry.register("L", new LaserPaddlePowerUp(0.0, 0.0, POWERUP_WIDTH,
                 POWERUP_HEIGHT, 0.0, 2.0, new LaserPaddleStrategy()));
+
+        powerUpRegistry.register("P", new PiercingBallPowerUp(0.0, 0.0, POWERUP_WIDTH,
+                POWERUP_HEIGHT, 0.0, 2.0, new PiercingBallStrategy()));
     }
 
     public void spawnPowerUp(String type, double x, double y) {

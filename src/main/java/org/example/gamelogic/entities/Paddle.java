@@ -13,8 +13,8 @@ public class Paddle extends MovableObject {
     public Paddle(double x, double y, double width, double height, double dx, double dy) {
         super(x, y, width, height, dx, dy);
         this.speed = GameConstants.PADDLE_SPEED;
-        this.minX = 0;
-        this.maxX = GameConstants.SCREEN_WIDTH - this.width;
+        this.minX = GameConstants.PLAY_AREA_X;
+        this.maxX = GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - this.width;
     }
 
     public double getCenterX() {
@@ -51,8 +51,8 @@ public class Paddle extends MovableObject {
     }
 
     public void setBounds(double minX, double maxX) {
-        this.minX = minX;
-        this.maxX = GameConstants.SCREEN_WIDTH - this.width;
+        this.minX = GameConstants.PLAY_AREA_X;
+        this.maxX = GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - this.width;
     }
 
     // setter and getter
@@ -80,6 +80,6 @@ public class Paddle extends MovableObject {
     @Override
     public void setWidth(double width) {
         super.setWidth(width);
-        this.maxX = GameConstants.SCREEN_WIDTH - this.width;
+        this.maxX = GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - this.width;
     }
 }

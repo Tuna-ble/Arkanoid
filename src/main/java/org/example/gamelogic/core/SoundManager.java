@@ -3,8 +3,18 @@ package org.example.gamelogic.core;
 import org.example.data.AssetManager;
 import org.example.gamelogic.events.*;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 
-public class SoundManager {
+import org.example.gamelogic.entities.bricks.Brick;
+import org.example.gamelogic.entities.bricks.ExplosiveBrick;
+import org.example.gamelogic.entities.bricks.NormalBrick;
+import org.example.gamelogic.entities.bricks.HardBrick;
+import org.example.gamelogic.entities.bricks.HealingBrick;
+import org.example.gamelogic.entities.bricks.UnbreakableBrick;
+import org.example.gamelogic.events.PowerUpCollectedEvent;
+
+
+public final class SoundManager {
     private AssetManager assetManager;
 
     private static class SingletonHolder {
@@ -38,11 +48,39 @@ public class SoundManager {
                 GameOverEvent.class,
                 this::onGameOver
         );
+        EventManager.getInstance().subscribe(
+                BallHitBrickEvent.class,
+                this::onBallHitBrick
+        );
+        EventManager.getInstance().subscribe(
+                PowerUpCollectedEvent.class,
+                this::onPowerUpCollected
+        );
+    }
+
+    private void setClipVolume(Clip clip, double volume) {
+        if (clip == null) return;
+
+        // Gain (dB) là thang logarit. -80.0f là tắt, 6.0206f là tối đa
+        try {
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            float dB = (float) (Math.log10(Math.max(volume, 0.0001)) * 20.0);
+
+            dB = Math.max(gainControl.getMinimum(), Math.min(dB, gainControl.getMaximum()));
+
+            gainControl.setValue(dB);
+        } catch (Exception e) {
+            System.err.println("Không thể set volume: " + e.getMessage());
+        }
     }
 
     private void playSound(String name) {
+        if (!SettingsManager.getInstance().isSfxEnabled()) return;
+
         Clip clip = assetManager.getSound(name);
         if (clip != null) {
+            double sfxVolume = SettingsManager.getInstance().getSfxVolume();
+            setClipVolume(clip, sfxVolume);
             if (clip.isRunning()) {
                 clip.stop();
             }
@@ -52,8 +90,12 @@ public class SoundManager {
     }
 
     private void loopMusic(String name) {
+        if (!SettingsManager.getInstance().isMusicEnabled()) return;
+
         Clip clip = assetManager.getSound(name);
         if (clip != null) {
+            double musicVolume = SettingsManager.getInstance().getMusicVolume();
+            setClipVolume(clip, musicVolume);
             if (!clip.isRunning()) {
                 clip.setFramePosition(0);
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
@@ -61,8 +103,31 @@ public class SoundManager {
         }
     }
 
+    public void updateAllVolumes() {
+        double musicVolume = SettingsManager.getInstance().getMusicVolume();
+
+        String musicName = SettingsManager.getInstance().getSelectedMusic();
+        Clip musicClip = assetManager.getSound(musicName);
+        if (musicClip != null) {
+            if (SettingsManager.getInstance().isMusicEnabled()) {
+                setClipVolume(musicClip, musicVolume);
+            } else {
+                musicClip.stop();
+            }
+        }
+    }
+
     public void onBrickDestroyed(BrickDestroyedEvent event) {
-        playSound("brick_hit");
+        stopSound("brick_hit");
+        playSound("brick_destroyed");
+    }
+
+    private void stopSound(String soundName) {
+        Clip clip = assetManager.getSound(soundName);
+        if (clip != null && clip.isRunning()) {
+            clip.stop();
+            clip.setFramePosition(0);
+        }
     }
 
     public void onPaddleHit(BallHitPaddleEvent event) {
@@ -73,9 +138,33 @@ public class SoundManager {
         playSound("ball_lost");
     }
 
+
     public void onGameOver(GameOverEvent event) {
         // playSound("game_over");
         // Dừng nhạc nền (neu co)
         // stopSound
+    }
+
+    private void onBallHitBrick(BallHitBrickEvent event) {
+
+        if (event == null || event.getBrick() == null) {
+            return;
+        }
+
+        Brick brick = event.getBrick();
+
+        if (brick instanceof UnbreakableBrick) {
+            playSound("glass");
+        }
+        else if (brick instanceof ExplosiveBrick) {
+            playSound("bomb");
+        }
+        else if (brick instanceof HardBrick || brick instanceof HealingBrick) {
+            playSound("brick_hit");
+        }
+
+    }
+    private void onPowerUpCollected(PowerUpCollectedEvent event) {
+        playSound("powerup");
     }
 }

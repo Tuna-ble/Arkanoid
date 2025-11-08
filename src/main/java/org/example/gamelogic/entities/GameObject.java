@@ -6,7 +6,7 @@ import java.awt.geom.Rectangle2D;
 
 public abstract class GameObject {
     protected double x, y, width, height;
-    public boolean isActive;
+    protected boolean isActive;
     public GameObject(double x, double y, double width, double height) {
         this.x = x;
         this.y = y;
@@ -35,7 +35,6 @@ public abstract class GameObject {
     public double getHeight() { return height; }
     public void setHeight(double height) { this.height = height; }
 
-    public boolean isAlive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
 
     public boolean intersects(GameObject other) {

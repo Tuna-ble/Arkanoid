@@ -78,4 +78,9 @@ public class MultiBallStrategy implements PowerUpStrategy {
     public void reset() {
 
     }
+
+    @Override
+    public PowerUpStrategy clone() {
+        return new MultiBallStrategy();
+    }
 }

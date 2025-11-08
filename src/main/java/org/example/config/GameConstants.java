@@ -8,17 +8,30 @@ import javafx.scene.paint.Paint;
 
 public final class GameConstants {
 
-    public static final Color BALL_COLOR = Color.RED;
-    public static final Color PADDLE_COLOR = Color.CYAN;
-    public static final Color PADDLE_BORDER_COLOR = Color.DARKBLUE;
-    public static final int POINTS_PER_EXPLOSIVE_BRICK = 30;
-
     // Prevent instantiation
     private GameConstants() {}
 
     // Screen
-    public static final double SCREEN_WIDTH = 800;
-    public static final double SCREEN_HEIGHT = 600;
+    public static final double SCREEN_WIDTH = 900;
+    public static final double SCREEN_HEIGHT = 750;
+
+    // UI
+    public static final double FRAME_TOP_BORDER = 25;
+    public static final double FRAME_LEFT_BORDER = 25;
+    public static final double FRAME_RIGHT_BORDER = 25;
+    public static final double FRAME_BOTTOM_BORDER = 25;
+//25
+    public static final double UI_BAR_HEIGHT = 170;
+    public static final double PLAY_AREA_X = FRAME_LEFT_BORDER;
+    public static final double PLAY_AREA_Y = FRAME_TOP_BORDER;
+    public static final double PLAY_AREA_WIDTH = SCREEN_WIDTH - FRAME_LEFT_BORDER - FRAME_RIGHT_BORDER;
+    public static final double PLAY_AREA_HEIGHT = (SCREEN_HEIGHT - UI_BAR_HEIGHT) - FRAME_TOP_BORDER - FRAME_BOTTOM_BORDER;
+
+    // Color
+    public static final Color NORMAL_BALL_COLOR = Color.RED;
+    public static final Color PIERCING_BALL_COLOR = Color.CYAN;
+    public static final Color PADDLE_COLOR = Color.CYAN;
+    public static final Color PADDLE_BORDER_COLOR = Color.DARKBLUE;
 
     // Paddle
     public static final double PADDLE_X = SCREEN_WIDTH / 2;
@@ -27,6 +40,7 @@ public final class GameConstants {
     public static final double PADDLE_HEIGHT = 16;
     public static final double PADDLE_SPEED = 600.0; // pixels per second
     public static final double PADDLE_MOVE_INFLUENCE = 0.7; // influence on ball direction
+    public static final double PADDLE_LENGTH_CAP = 180;
 
     // Ball
     public static final double BALL_RADIUS = 8;
@@ -47,6 +61,7 @@ public final class GameConstants {
     // Collision / CCD
     public static final boolean USE_CCD = true;
     public static final double MAX_ITER_PER_FRAME = 5;
+    public static final double COLLISION_EPSILON = 0.1;
 
     // Bricks
     public static final double BRICK_PADDING = 2;
@@ -57,6 +72,14 @@ public final class GameConstants {
     public static final double TOP_MARGIN = 50;
     public static final double HARD_BRICK_DURABILITY = 3;
     public static final int POINTS_PER_HARD_BRICK = 50;
+    public static final int POINTS_PER_EXPLOSIVE_BRICK = 30;
+
+    // Enemies
+    public static final double ENEMY_WIDTH = 40;
+    public static final double ENEMY_HEIGHT = 40;
+    public static final double BOSS_WIDTH = 200;
+    public static final double BOSS_HEIGHT = 100;
+    public static final double BOSS_HEATLTH = 10.0;
 
     // Gameplay tuning
     public static final double BALL_INITIAL_ANGLE_RANDOM_RANGE = 15.0; // ±15 degrees

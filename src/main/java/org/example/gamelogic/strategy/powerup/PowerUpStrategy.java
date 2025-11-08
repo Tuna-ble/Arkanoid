@@ -1,6 +1,5 @@
 package org.example.gamelogic.strategy.powerup;
 
-import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.states.PlayingState;
 
 public interface PowerUpStrategy {
@@ -9,4 +8,5 @@ public interface PowerUpStrategy {
     void remove(PlayingState playingState);
     boolean isExpired();
     void reset();
+    PowerUpStrategy clone();
 }

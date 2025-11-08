@@ -1,22 +1,67 @@
 package org.example.gamelogic.entities;
 
+import com.sun.glass.ui.SystemClipboard;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import org.example.config.GameConstants;
+import org.example.gamelogic.entities.bricks.Brick;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Ball extends MovableObject implements IBall {
     private double radius;
     private double speed;
     private boolean attachedToPaddle;
+    private Color currentColor;
+
+    private int pierceLeft;
+    private List<GameObject> piercingObjects;
+
+    private static class GhostSnapshot {
+        double x, y, width, height;
+
+        GhostSnapshot(double x, double y, double width, double height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+    }
+
+    private final LinkedList<GhostSnapshot> trail = new LinkedList<>();
+    private final int MAX_GHOSTS = 8;
+    private double lastGhostX, lastGhostY;
 
     public Ball(double x, double y, double radius) {
         super(x, y, radius * 2, radius * 2, 0, 0);
         this.radius = radius;
         this.speed = GameConstants.BALL_INITIAL_SPEED;
         this.attachedToPaddle = true;
+        this.currentColor = GameConstants.NORMAL_BALL_COLOR;
+
+        this.pierceLeft = 0;
+        this.piercingObjects = new ArrayList<GameObject>();
+
+        this.lastGhostX = x;
+        this.lastGhostY = y;
+    }
+
+    public void setPierceLeft(int pierceLeft) {
+        this.pierceLeft = pierceLeft;
+    }
+
+    public int getPierceLeft() {
+        return pierceLeft;
+    }
+
+    public List<GameObject> getPiercingObjects() {
+        return piercingObjects;
     }
 
     public double getCenterX() {
@@ -28,12 +73,34 @@ public class Ball extends MovableObject implements IBall {
     public void update(double deltaTime) {
         if (isActive) { // bóng rời paddle
 
+            currentColor = (pierceLeft > 0 ?
+                    GameConstants.PIERCING_BALL_COLOR :
+                    GameConstants.NORMAL_BALL_COLOR);
+
             if (!attachedToPaddle) {
                 // Logic di chuyển tự do
                 ensureMinimumVelocity();
                 limitMaximumSpeed();
                 this.x += dx * deltaTime;
                 this.y += dy * deltaTime;
+
+                double distanceMoved = Math.hypot(x - lastGhostX, y - lastGhostY);
+
+                if (distanceMoved > 2.0) {
+
+                    trail.addFirst(new GhostSnapshot(x, y, width, height));
+                    this.lastGhostX = x;
+                    this.lastGhostY = y;
+
+                    if (trail.size() > MAX_GHOSTS) {
+                        trail.removeLast();
+                    }
+                }
+
+            } else {
+                trail.clear();
+                this.lastGhostX = x;
+                this.lastGhostY = y;
             }
         }
     }
@@ -41,6 +108,30 @@ public class Ball extends MovableObject implements IBall {
     @Override
     public void render(GraphicsContext gc) {
         if (isActive) {
+
+            gc.save();
+            for (int i = 0; i < trail.size(); i++) {
+                GhostSnapshot ghost = trail.get(i);
+
+                double progress = 1.0 - (double) i / MAX_GHOSTS;
+
+                double opacity = 0.5 * progress;
+
+                double scale = 0.5 + (0.5 * progress);
+
+                double ghostWidth = ghost.width * scale;
+                double ghostHeight = ghost.height * scale;
+
+                double ghostX = ghost.x + (ghost.width - ghostWidth) / 2.0;
+                double ghostY = ghost.y + (ghost.height - ghostHeight) / 2.0;
+
+                gc.setGlobalAlpha(opacity);
+                gc.setFill(currentColor);
+                gc.fillOval(ghostX, ghostY, ghostWidth, ghostHeight);
+            }
+
+            gc.restore();
+
             // Tạo gradient nhẹ để bóng có cảm giác 3D
             RadialGradient gradient = new RadialGradient(
                     0, 0,                // focus angle, focus distance
@@ -49,7 +140,7 @@ public class Ball extends MovableObject implements IBall {
                     false,                // proportional = false -> dùng pixel
                     CycleMethod.NO_CYCLE,
                     new Stop(0, Color.WHITE),          // vùng sáng
-                    new Stop(1, GameConstants.BALL_COLOR) // vùng tối
+                    new Stop(1, currentColor) // vùng tối
             );
 
             // tô hình tròn bằng gradient
@@ -88,6 +179,10 @@ public class Ball extends MovableObject implements IBall {
         this.dx = 0;
         this.dy = 0;
         this.speed = GameConstants.BALL_INITIAL_SPEED;
+
+        this.trail.clear();
+        this.lastGhostX = this.x;
+        this.lastGhostY = this.y;
     }
 
     @Override
@@ -137,7 +232,9 @@ public class Ball extends MovableObject implements IBall {
         dx += paddledx * GameConstants.PADDLE_MOVE_INFLUENCE;
         dx += speed * hitPosition * 0.5;
 
-        if (dy > 0) { dy = -Math.abs(dy); }
+        if (dy > 0) {
+            dy = -Math.abs(dy);
+        }
 
         double currentSpeed = Math.sqrt(dx * dx + dy * dy);
         double targetSpeed = speed * GameConstants.BALL_RESTITUTION;
@@ -152,9 +249,14 @@ public class Ball extends MovableObject implements IBall {
     }
 
     // getter
-    public double getRadius() { return radius; }
-    public double getSpeed() { return speed; }
-    
+    public double getRadius() {
+        return radius;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
     public void incrementSpeed() {
         speed = Math.min(speed + GameConstants.BALL_SPEED_INCREMENT_PER_BRICK, GameConstants.BALL_MAX_SPEED);
         // Cập nhật lại dx, dy để phản ánh tốc độ mới
@@ -169,7 +271,7 @@ public class Ball extends MovableObject implements IBall {
         // Cập nhật lại dx, dy
         updateVelocityWithSpeed();
     }
-    
+
     public IBall clone() {
         Ball newBall = new Ball(0, 0, this.width / 2.0);
         newBall.attachedToPaddle = false;
@@ -224,7 +326,7 @@ public class Ball extends MovableObject implements IBall {
                 double factor = GameConstants.BALL_MIN_SPEED / currentSpeed;
                 dx *= factor;
                 dy *= factor;
-            } else if (speed > 0){ // Nếu đang đứng yên nhưng speed > 0 (ví dụ sau reset)
+            } else if (speed > 0) { // Nếu đang đứng yên nhưng speed > 0 (ví dụ sau reset)
                 // Có thể đặt lại một vận tốc ngẫu nhiên nhỏ hoặc theo hướng mặc định
                 // Ví dụ: Đặt lại theo góc -75 độ
                 double baseAngle = Math.toRadians(-75);
@@ -233,6 +335,7 @@ public class Ball extends MovableObject implements IBall {
             }
         }
     }
+
     private void limitMaximumSpeed() {
         double currentSpeedSq = dx * dx + dy * dy;
         double maxSpeedSq = GameConstants.BALL_MAX_SPEED * GameConstants.BALL_MAX_SPEED;
@@ -247,6 +350,7 @@ public class Ball extends MovableObject implements IBall {
             speed = GameConstants.BALL_MAX_SPEED;
         }
     }
+
     private void updateVelocityWithSpeed() {
         if (!attachedToPaddle) {
             double currentSpeed = Math.sqrt(dx * dx + dy * dy);

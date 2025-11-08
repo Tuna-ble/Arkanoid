@@ -5,12 +5,14 @@ import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.events.BrickDestroyedEvent;
+import org.example.gamelogic.core.ParticleManager;
 
 
 public class HardBrick extends AbstractBrick {
-    private double durability; //do ben
+    /// type: H
+    private double durability;
 
-    public HardBrick(double x, double y,double width, double height) {
+    public HardBrick(double x, double y, double width, double height) {
         super(x, y, width, height);
         this.durability = GameConstants.HARD_BRICK_DURABILITY;
     }
@@ -22,6 +24,7 @@ public class HardBrick extends AbstractBrick {
 
         this.durability -= damage;
         if (this.durability <= 0) {
+            ParticleManager.getInstance().spawnBrickDebris(this.x, this.y, Color.LIGHTGRAY);
             this.isActive = false;
             EventManager.getInstance().publish(new BrickDestroyedEvent(this));
         }
@@ -36,10 +39,10 @@ public class HardBrick extends AbstractBrick {
         if (isDestroyed()) {
             return;
         }
-        if (this.durability == 3) {
-            gc.setFill(Color.DARKGRAY);
-        } else if (this.durability == 2) {
+        if (this.durability > 2) {
             gc.setFill(Color.GRAY);
+        } else if (this.durability <= 2 && this.durability > 1) {
+            gc.setFill(Color.DARKGRAY);
         } else {
             gc.setFill(Color.LIGHTGRAY);
         }
@@ -48,24 +51,8 @@ public class HardBrick extends AbstractBrick {
         gc.strokeRect(x, y, width, height);
     }
 
-    public void takeDamage() {
-        if (isDestroyed()) {
-            return;
-        }
-
-        this.durability--;
-        if (this.durability <= 0) {
-            this.isActive = false;
-            EventManager.getInstance().publish(new BrickDestroyedEvent(this));
-        }
-    }
-
-    public int getScore() {
-        return 0;
-    }
-
     @Override
     public Brick clone() {
-        return new HardBrick(0,0,this.width,this.height);
+        return new HardBrick(0, 0, this.width, this.height);
     }
 }

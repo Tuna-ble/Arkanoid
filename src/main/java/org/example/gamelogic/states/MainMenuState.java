@@ -22,17 +22,34 @@ import org.example.gamelogic.graphics.TextRenderer;
 public final class MainMenuState implements GameState {
     private Image mainMenuImage;
     private Button startButton;
-    private Button levelButton;
     private Button rankingButton;
+    private Button settingsButton;
+    private Button newGameButton;
     private double elapsedTime = 0;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
-    private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 15;
+    private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 100;
 
     public MainMenuState() {
-        mainMenuImage = new Image(getClass().getResourceAsStream("/GameIcon/MainMenu.png"));
-        startButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 0, "Start");
-        levelButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 80, "Level");
-        rankingButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 160, "Ranking");
+        org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
+        Image pre = am.getImage("mainMenu");
+        if (pre != null) {
+            mainMenuImage = pre;
+        } else {
+            try {
+                java.net.URL res = getClass().getResource("/GameIcon/MainMenu.png");
+                if (res != null) {
+                    mainMenuImage = new Image(res.toExternalForm(), true);
+                }
+            } catch (Exception e) {
+                System.err.println("Không thể tải ảnh MainMenu.png từ resources!");
+                e.printStackTrace();
+            }
+        }
+        double buttonGap = 70;
+        startButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 0), "Start");
+        rankingButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 1), "Ranking");
+        settingsButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 2), "Settings");
+        newGameButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 3), "Reset Game");
     }
 
     @Override
@@ -46,7 +63,12 @@ public final class MainMenuState implements GameState {
         gc.setTextAlign(TextAlignment.LEFT);
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         // Background
-        gc.drawImage(mainMenuImage, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        if (mainMenuImage != null) {
+            gc.drawImage(mainMenuImage, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        } else {
+            gc.setFill(Color.BLACK);
+            gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        }
         // Title (outlined with subtle shadow and gradient)
         gc.setTextAlign(TextAlignment.CENTER);
         LinearGradient titleFill = new LinearGradient(
@@ -60,7 +82,7 @@ public final class MainMenuState implements GameState {
                 gc,
                 "ARKANOID",
                 GameConstants.SCREEN_WIDTH / 2.0,
-                250,
+                230,
                 titleFont,
                 titleFill,
                 Color.color(0, 0, 0, 0.8),
@@ -70,8 +92,9 @@ public final class MainMenuState implements GameState {
 
         // Buttons
         if (startButton != null) startButton.render(gc);
-        if (levelButton != null) levelButton.render(gc);
         if (rankingButton != null) rankingButton.render(gc);
+        if (settingsButton != null) settingsButton.render(gc);
+        if (newGameButton != null) newGameButton.render(gc);
 
         // Nháy nhẹ phần gợi ý thoát
         if ((int) (elapsedTime * 2) % 2 == 0) {
@@ -85,21 +108,25 @@ public final class MainMenuState implements GameState {
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
-
+        
         updateButtons(inputProvider);
 
         if ((startButton != null && startButton.isClicked())
                 || inputProvider.isKeyPressed(KeyCode.SPACE)) {
             EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.PLAYING, 1)
+                    new ChangeStateEvent(GameStateEnum.GAME_MODE)
             );
-        } else if (levelButton != null && levelButton.isClicked()) {
-            EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.LEVEL_STATE)
-            );
-        } else if (rankingButton != null && rankingButton.isClicked()) {
+        }  else if (rankingButton != null && rankingButton.isClicked()) {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.RANKING_STATE)
+            );
+        } else if (settingsButton != null && settingsButton.isClicked()) {
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.SETTINGS)
+            );
+        } else if (newGameButton != null && newGameButton.isClicked()) {
+            EventManager.getInstance().publish(
+                    new ChangeStateEvent(GameStateEnum.CONFIRM_RESET)
             );
         } else if (inputProvider.isKeyPressed(KeyCode.ESCAPE)) {
             System.exit(0);
@@ -108,10 +135,10 @@ public final class MainMenuState implements GameState {
 
     private void updateButtons(I_InputProvider inputProvider) {
         if (startButton != null) startButton.update(inputProvider);
-        if (levelButton != null) levelButton.update(inputProvider);
         if (rankingButton != null) rankingButton.update(inputProvider);
+        if (settingsButton != null) settingsButton.update(inputProvider);
+        if (newGameButton != null) newGameButton.update(inputProvider);
     }
-
 }
 
 
