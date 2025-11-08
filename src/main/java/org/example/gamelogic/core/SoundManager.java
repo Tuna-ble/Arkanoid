@@ -3,6 +3,8 @@ package org.example.gamelogic.core;
 import org.example.data.AssetManager;
 import org.example.gamelogic.events.*;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+
 import org.example.gamelogic.entities.bricks.Brick;
 import org.example.gamelogic.entities.bricks.ExplosiveBrick;
 import org.example.gamelogic.entities.bricks.NormalBrick;
@@ -56,11 +58,29 @@ public final class SoundManager {
         );
     }
 
+    private void setClipVolume(Clip clip, double volume) {
+        if (clip == null) return;
+
+        // Gain (dB) là thang logarit. -80.0f là tắt, 6.0206f là tối đa
+        try {
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            float dB = (float) (Math.log10(Math.max(volume, 0.0001)) * 20.0);
+
+            dB = Math.max(gainControl.getMinimum(), Math.min(dB, gainControl.getMaximum()));
+
+            gainControl.setValue(dB);
+        } catch (Exception e) {
+            System.err.println("Không thể set volume: " + e.getMessage());
+        }
+    }
+
     private void playSound(String name) {
         if (!SettingsManager.getInstance().isSfxEnabled()) return;
 
         Clip clip = assetManager.getSound(name);
         if (clip != null) {
+            double sfxVolume = SettingsManager.getInstance().getSfxVolume();
+            setClipVolume(clip, sfxVolume);
             if (clip.isRunning()) {
                 clip.stop();
             }
@@ -74,6 +94,8 @@ public final class SoundManager {
 
         Clip clip = assetManager.getSound(name);
         if (clip != null) {
+            double musicVolume = SettingsManager.getInstance().getMusicVolume();
+            setClipVolume(clip, musicVolume);
             if (!clip.isRunning()) {
                 clip.setFramePosition(0);
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
@@ -81,8 +103,21 @@ public final class SoundManager {
         }
     }
 
-    public void onBrickDestroyed(BrickDestroyedEvent event) {
+    public void updateAllVolumes() {
+        double musicVolume = SettingsManager.getInstance().getMusicVolume();
 
+        String musicName = SettingsManager.getInstance().getSelectedMusic();
+        Clip musicClip = assetManager.getSound(musicName);
+        if (musicClip != null) {
+            if (SettingsManager.getInstance().isMusicEnabled()) {
+                setClipVolume(musicClip, musicVolume);
+            } else {
+                musicClip.stop();
+            }
+        }
+    }
+
+    public void onBrickDestroyed(BrickDestroyedEvent event) {
         stopSound("brick_hit");
         playSound("brick_destroyed");
     }

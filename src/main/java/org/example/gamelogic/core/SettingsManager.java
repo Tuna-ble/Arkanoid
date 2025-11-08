@@ -22,6 +22,8 @@ public final class SettingsManager {
 
     private boolean sfxEnabled;
     private boolean musicEnabled;
+    private double musicVolume;
+    private double sfxVolume;
     private String selectedMusic;;
 
     private SettingsManager() {
@@ -35,6 +37,9 @@ public final class SettingsManager {
         if (!settingsFile.exists()) {
             this.sfxEnabled = true;
             this.musicEnabled = true;
+            this.musicVolume = 1.0;
+            this.sfxVolume = 1.0;
+            this.selectedMusic = "default_music";
             saveSettings();
             return;
         }
@@ -46,10 +51,18 @@ public final class SettingsManager {
             this.sfxEnabled = Boolean.parseBoolean(properties.getProperty("sfxEnabled", "true"));
             this.musicEnabled = Boolean.parseBoolean(properties.getProperty("musicEnabled", "true"));
 
-        } catch (IOException e) {
+            this.musicVolume = Double.parseDouble(properties.getProperty("musicVolume", "0.8"));
+            this.sfxVolume = Double.parseDouble(properties.getProperty("sfxVolume", "1.0"));
+
+            this.selectedMusic = properties.getProperty("selectedMusic", "default_music");
+
+        } catch (IOException | NumberFormatException e) {
             System.err.println("Lỗi khi đọc file settings: " + e.getMessage());
             this.sfxEnabled = true;
             this.musicEnabled = true;
+            this.musicVolume = 1.0;
+            this.sfxVolume = 1.0;
+            this.selectedMusic = "default_music";
         }
     }
 
@@ -57,6 +70,11 @@ public final class SettingsManager {
         try (FileWriter writer = new FileWriter(SETTINGS_FILE_PATH)) {
             properties.setProperty("sfxEnabled", String.valueOf(this.sfxEnabled));
             properties.setProperty("musicEnabled", String.valueOf(this.musicEnabled));
+
+            properties.setProperty("musicVolume", String.valueOf(this.musicVolume));
+            properties.setProperty("sfxVolume", String.valueOf(this.sfxVolume));
+
+            properties.setProperty("selectedMusic", this.selectedMusic);
 
             // Ghi ra file
             properties.store(writer, "Arkanoid Game Settings");
@@ -97,5 +115,21 @@ public final class SettingsManager {
 
     public void toggleMusic() {
         setMusicEnabled(!this.musicEnabled);
+    }
+
+    public double getMusicVolume() {
+        return musicVolume;
+    }
+
+    public void setMusicVolume(double musicVolume) {
+        this.musicVolume = Math.max(0.0, Math.min(1.0, musicVolume));
+    }
+
+    public double getSfxVolume() {
+        return sfxVolume;
+    }
+
+    public void setSfxVolume(double sfxVolume) {
+        this.sfxVolume = Math.max(0.0, Math.min(1.0, sfxVolume));
     }
 }
