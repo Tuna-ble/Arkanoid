@@ -9,6 +9,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
 import org.example.config.GameConstants;
+import org.example.data.Score;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.*;
 import org.example.gamelogic.entities.IBall;
@@ -19,6 +20,7 @@ import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public final class PlayingState implements GameState {
@@ -75,7 +77,7 @@ public final class PlayingState implements GameState {
     private final double WAVE_CLEARED_DURATION = 3.0;
 
     public PlayingState(GameManager gameManager, GameModeEnum currentGameMode,
-                        int levelNumber, boolean resetStats) {
+                        int levelNumber, boolean startingNewGame) {
         this.gameManager = gameManager;
         this.brickManager = gameManager.getBrickManager();
         this.brickManager.loadLevel(levelNumber);
@@ -100,18 +102,28 @@ public final class PlayingState implements GameState {
         handlePowerUpCollected = this::handlePowerUpCollected;
         handleLifeLost = this::handleLifeLost;
         handleLifeAdded = this::handleLifeAdded;
+        subscribeToEvents();
 
-        if (resetStats) {
+        this.currentGameMode = currentGameMode;
+        Map<String, String> data = ProgressManager.loadSession(currentGameMode.toString());
+        if (!data.isEmpty() && !startingNewGame) {
+            ScoreManager.getInstance().resetScore();
+            ScoreManager.getInstance().addScore(Integer.parseInt(data.get("score")));
+            elapsedTime = Double.parseDouble(data.get("time"));
+            this.levelNumber=Integer.parseInt(data.get("level"));
+            this.currentLives=Integer.parseInt(data.get("lives"));
+            LifeManager.getInstance().setLives(this.currentLives);
+        }
+        else if (startingNewGame) {
             ScoreManager.getInstance().resetScore();
             LifeManager.getInstance().reset();
+            this.currentLives = LifeManager.getInstance().getLives();
+            this.levelNumber = levelNumber;
         }
 
         this.scoreFont = new Font("Arial", 24);
         this.labelFont = new Font("Arial", 18);
         this.valueFont = new Font("Arial", 28);
-
-        this.currentGameMode = currentGameMode;
-        this.currentLives = LifeManager.getInstance().getLives();
 
         try {
             pauseIcon = new Image(getClass().getResourceAsStream("/GameIcon/pause.png"));
@@ -119,13 +131,11 @@ public final class PlayingState implements GameState {
             System.err.println("Không thể tải ảnh pause.png từ resources!");
             e.printStackTrace();
         }
-        subscribeToEvents();
+
 
         this.currentSubState = SubState.LEVEL_START;
         this.levelStartTimer = 0.0;
 
-        this.levelNumber = levelNumber;
-        this.enemyManager.loadLevelScript(this.currentGameMode, this.levelNumber);
         try {
             this.gameFrameImage = new Image(getClass().getResourceAsStream("/GameIcon/GameFrame.png"));
             this.hudFrameImage = new Image(getClass().getResourceAsStream("/GameIcon/HudFrame.png"));
@@ -144,6 +154,10 @@ public final class PlayingState implements GameState {
         powerUpManager.spawnPowerUp("M", 400, 320);
         powerUpManager.spawnPowerUp("M", 400, 340);
         powerUpManager.spawnPowerUp("M", 400, 360);
+        powerUpManager.spawnPowerUp("L", 400, 370);
+        powerUpManager.spawnPowerUp("L", 400, 375);
+        powerUpManager.spawnPowerUp("L", 400, 380);
+        powerUpManager.spawnPowerUp("L", 400, 385);
         powerUpManager.spawnPowerUp("P", 400, 400);
     }
 
@@ -193,10 +207,17 @@ public final class PlayingState implements GameState {
                 updateAttachedBallPosition();
 
                 if (levelStartTimer >= LEVEL_START_DURATION) {
+                    ProgressManager.saveSession(currentGameMode.toString(),
+                            ScoreManager.getInstance().getScore(),
+                            elapsedTime,
+                            levelNumber,
+                            LifeManager.getInstance().getLives());
+                    this.enemyManager.loadLevelScript(this.currentGameMode, this.levelNumber);
                     this.currentSubState = SubState.NORMAL_PLAY;
                     levelStartTimer = 0;
                 }
                 break;
+
             case NORMAL_PLAY:
                 updateStrategy(deltaTime);
                 paddle.update(deltaTime);

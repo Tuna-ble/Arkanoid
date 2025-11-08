@@ -70,7 +70,7 @@ public final class ConfirmResetState implements GameState {
                 150,
                 titleFont,
                 titleFill,
-                Color.color(0,0,0,0.9),
+                Color.color(0, 0, 0, 0.9),
                 2.0,
                 titleShadow
         );

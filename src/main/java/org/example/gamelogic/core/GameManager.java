@@ -10,6 +10,8 @@ import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.states.*;
 
+import java.util.Map;
+
 //singleton (co dung Bill Pugh Idiom de xu li multithreading)
 public final class GameManager {
     private final AnimationTimer gameLoop;
@@ -184,9 +186,18 @@ public final class GameManager {
                     ((PauseState) currentState).cleanUp();
                 }
                 if (currentGameMode == GameModeEnum.INFINITE) {
-                    levelToLoad = 1;
+                    Map<String, String> data=ProgressManager.loadSession(currentGameMode.toString());
+                    if (data.isEmpty()) {
+                        newState = new PlayingState(this, currentGameMode, 1, true);
+                    }
+                    else {
+                        newState = new PlayingState(this, currentGameMode, Integer.parseInt(data.get("level")), false);
+                    }
                 }
-                newState = new PlayingState(this, currentGameMode, levelToLoad, true);
+                else {
+                    newState = new PlayingState(this, currentGameMode, levelToLoad, true);
+                }
+
                 break;
 
             case GAME_MODE:
