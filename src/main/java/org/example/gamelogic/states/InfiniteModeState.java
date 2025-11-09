@@ -31,11 +31,14 @@ public final class InfiniteModeState implements GameState {
         this.continueButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT / 2 + 100,
-                "Continue"
+                GameConstants.UI_BUTTON_WIDTH,
+                GameConstants.UI_BUTTON_HEIGHT * (currentWave > 1 ? 1.2 : 1),
+                "Continue" + (currentWave > 1 ? "\nWave " + Integer.toString(currentWave) : "")
         );
         this.backButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
-                GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT / 2 + 200,
+                GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT / 2 +
+                        GameConstants.UI_BUTTON_HEIGHT * (currentWave > 1 ? 1.2 : 1) + 140,
                 "Back"
         );
     }

@@ -186,15 +186,13 @@ public final class GameManager {
                     ((PauseState) currentState).cleanUp();
                 }
                 if (currentGameMode == GameModeEnum.INFINITE) {
-                    Map<String, String> data=ProgressManager.loadSession(currentGameMode.toString());
+                    Map<String, String> data = ProgressManager.loadSession(currentGameMode.toString());
                     if (data.isEmpty()) {
                         newState = new PlayingState(this, currentGameMode, 1, true);
-                    }
-                    else {
+                    } else {
                         newState = new PlayingState(this, currentGameMode, Integer.parseInt(data.get("level")), false);
                     }
-                }
-                else {
+                } else {
                     newState = new PlayingState(this, currentGameMode, levelToLoad, true);
                 }
 
@@ -225,6 +223,8 @@ public final class GameManager {
                     ((PlayingState) currentState).cleanUp();
                 } else if (currentState instanceof PauseState) {
                     ((PauseState) currentState).cleanUp();
+                } else if (currentState instanceof ConfirmQuitToMenuState) {
+                    ((ConfirmQuitToMenuState) currentState).cleanUp();
                 }
                 newState = new MainMenuState();
                 break;
@@ -263,6 +263,8 @@ public final class GameManager {
             case PAUSED:
                 if (currentState instanceof PlayingState) {
                     newState = new PauseState(currentState);
+                } else if (currentState instanceof ConfirmQuitToMenuState) {
+                    newState = new PauseState(((ConfirmQuitToMenuState) currentState).getPreviousState());
                 }
                 break;
 
@@ -280,6 +282,12 @@ public final class GameManager {
 
             case CONFIRM_RESET:
                 newState = new ConfirmResetState();
+                break;
+
+            case CONFIRM_QUIT_TO_MENU:
+                if (currentState instanceof PauseState) {
+                    newState = new ConfirmQuitToMenuState(((PauseState) currentState).getPreviousState());
+                }
                 break;
         }
 

@@ -437,7 +437,7 @@ public final class PlayingState implements GameState {
         gc.fillText(this.formattedTime, x_slot2, y_value);
 
         gc.setFont(labelFont);
-        gc.fillText((currentGameMode == GameModeEnum.LEVEL ? "Round" : "Wave"), x_slot3, y_label);
+        gc.fillText((currentGameMode == GameModeEnum.LEVEL ? "ROUND" : "WAVE"), x_slot3, y_label);
         gc.setFont(valueFont);
         gc.fillText(String.valueOf(this.levelNumber), x_slot3, y_value);
 
