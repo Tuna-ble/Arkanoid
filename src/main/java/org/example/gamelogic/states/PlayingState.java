@@ -108,12 +108,8 @@ public final class PlayingState implements GameState {
 
         this.currentLives = LifeManager.getInstance().getLives();
 
-        try {
-            pauseIcon = new Image(getClass().getResourceAsStream("/GameIcon/pause.png"));
-        } catch (Exception e) {
-            System.err.println("Không thể tải ảnh pause.png từ resources!");
-            e.printStackTrace();
-        }
+        org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
+        this.pauseIcon = am.getImage("pause");
         subscribeToEvents();
 
         this.currentSubState = SubState.LEVEL_START;
@@ -121,19 +117,9 @@ public final class PlayingState implements GameState {
 
         this.levelNumber = levelNumber;
         this.enemyManager.loadLevelScript(this.levelNumber);
-        try {
-            this.gameFrameImage = new Image(getClass().getResourceAsStream("/GameIcon/GameFrame.png"));
-            this.hudFrameImage = new Image(getClass().getResourceAsStream("/GameIcon/HudFrame.png"));
 
-            if (this.gameFrameImage.isError()) throw new Exception("Lỗi nạp GameFrame.png");
-            if (this.hudFrameImage.isError()) throw new Exception("Lỗi nạp HudFrame.png");
-
-        } catch (Exception e) {
-            System.err.println("Không thể tải ảnh Frame từ /GameIcon/!");
-            e.printStackTrace();
-            this.gameFrameImage = null;
-            this.hudFrameImage = null;
-        }
+        this.gameFrameImage = am.getImage("frame");
+        this.hudFrameImage = am.getImage("hudFrame");
     }
 
     private void subscribeToEvents() {
@@ -270,21 +256,17 @@ public final class PlayingState implements GameState {
                 GameConstants.PLAY_AREA_WIDTH,
                 GameConstants.PLAY_AREA_HEIGHT);
 
-        gc.setFill(Color.WHITE);
-        gc.fillRect(0,
-                GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT,
-                GameConstants.SCREEN_WIDTH,
-                GameConstants.UI_BAR_HEIGHT);
-
-        if (this.gameFrameImage != null) {
-            gc.drawImage(this.gameFrameImage, 0, 0, 900, 580);
-        }
-
-        if (this.hudFrameImage != null) {
-            gc.drawImage(this.hudFrameImage, 0, GameConstants.SCREEN_HEIGHT - GameConstants.UI_BAR_HEIGHT, 900, 170);
-        }
+        gc.setFill(Color.BLACK);
+        gc.fillRect(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH + GameConstants.FRAME_RIGHT_BORDER,
+                0,
+                GameConstants.UI_BAR_WIDTH + GameConstants.FRAME_RIGHT_BORDER,
+                GameConstants.SCREEN_HEIGHT);
 
         renderHUD(gc);
+        if (gameFrameImage != null) {
+            gc.drawImage(gameFrameImage, 0, 0,
+                    GameConstants.SCREEN_WIDTH - GameConstants.UI_BAR_WIDTH, GameConstants.SCREEN_HEIGHT);
+        }
 
         gc.save();
         gc.beginPath();
@@ -338,42 +320,37 @@ public final class PlayingState implements GameState {
     }
 
     private void renderHUD(GraphicsContext gc) {
+        double hudAreaStartX = GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH + GameConstants.FRAME_RIGHT_BORDER;
+        double hudAreaWidth = GameConstants.UI_BAR_WIDTH;
+        double hudCenterX = hudAreaStartX + (hudAreaWidth / 2.0);
 
-        double slotWidth = GameConstants.PLAY_AREA_WIDTH / 4.0;
-
-        double x_slot1 = GameConstants.PLAY_AREA_X + slotWidth / 2.0;
-        double x_slot2 = x_slot1 + slotWidth;
-        double x_slot3 = x_slot2 + slotWidth;
-        double x_slot4 = x_slot3 + slotWidth;
-
-        double y_center = GameConstants.SCREEN_HEIGHT - (GameConstants.UI_BAR_HEIGHT / 2.0);
-        double y_label = y_center - 15;
-        double y_value = y_center + 25;
+        double startY = 150.0;
+        double spacingY = 120.0;
 
         int currentScore = ScoreManager.getInstance().getScore();
 
         gc.setTextAlign(TextAlignment.CENTER);
-        gc.setFill(Color.BLACK);
+        gc.setFill(Color.WHITE);
 
         gc.setFont(labelFont);
-        gc.fillText("SCORE", x_slot1, y_label);
+        gc.fillText("SCORE", hudCenterX, startY);
         gc.setFont(valueFont);
-        gc.fillText(String.valueOf(currentScore), x_slot1, y_value);
+        gc.fillText(String.valueOf(currentScore), hudCenterX, startY + 40);
 
         gc.setFont(labelFont);
-        gc.fillText("TIME", x_slot2, y_label);
+        gc.fillText("TIME", hudCenterX, startY + spacingY);
         gc.setFont(valueFont);
-        gc.fillText(this.formattedTime, x_slot2, y_value);
+        gc.fillText(this.formattedTime, hudCenterX, startY + spacingY + 40);
 
         gc.setFont(labelFont);
-        gc.fillText("ROUND", x_slot3, y_label);
+        gc.fillText("ROUND", hudCenterX, startY + (spacingY * 2));
         gc.setFont(valueFont);
-        gc.fillText(String.valueOf(this.levelNumber), x_slot3, y_value);
+        gc.fillText(String.valueOf(this.levelNumber), hudCenterX, startY + (spacingY * 2) + 40);
 
         gc.setFont(labelFont);
-        gc.fillText("LIVES", x_slot4, y_label);
+        gc.fillText("LIVES", hudCenterX, startY + (spacingY * 3));
         gc.setFont(valueFont);
-        gc.fillText(String.valueOf(this.currentLives), x_slot4, y_value);
+        gc.fillText(String.valueOf(this.currentLives), hudCenterX, startY + (spacingY * 3) + 40);
     }
 
     private void renderPauseButton(GraphicsContext gc) {
