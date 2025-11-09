@@ -36,7 +36,8 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
     private void subscribeToPowerUpCollectedEvent() {
         EventManager.getInstance().subscribe(
                 PowerUpCollectedEvent.class,
-                this::onPowerUpCollected);
+                this::onPowerUpCollected
+        );
     }
 
     protected void onPowerUpCollected(PowerUpCollectedEvent event) {

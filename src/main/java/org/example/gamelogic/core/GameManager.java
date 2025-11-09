@@ -250,7 +250,12 @@ public final class GameManager {
 
                 if (currentState instanceof PlayingState) {
                     PlayingState playingState = (PlayingState) currentState;
-                    currentLevel = playingState.getLevelNumber();
+                    if (currentGameMode == GameModeEnum.LEVEL) {
+                        currentLevel = playingState.getLevelNumber();
+                    }
+                    else {
+                         ProgressManager.clearSession(currentGameMode.toString());
+                    }
 
                     int finalScore = ScoreManager.getInstance().getScore();
                     HighscoreManager.saveNewScore(finalScore);

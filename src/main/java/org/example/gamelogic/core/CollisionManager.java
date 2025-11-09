@@ -131,8 +131,8 @@ public final class CollisionManager {
             collisionOccurred = true;
         }
 
-        else if ((ball.getX() + ball.getWidth()) >= (GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH) - 25) {
-            ball.setPosition(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - 25 - ball.getWidth(), ball.getY());
+        else if ((ball.getX() + ball.getWidth()) >= (GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH)) {
+            ball.setPosition(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - ball.getWidth(), ball.getY());
             ball.reverseDirX();
             collisionOccurred = true;
         }
