@@ -192,7 +192,8 @@ public final class PlayingState implements GameState {
                         brickManager.isLevelComplete() &&
                         !enemyManager.hasBossSpawned())
                 {
-                    enemyManager.spawnEnemy("BOSS", GameConstants.SCREEN_WIDTH / 2, -GameConstants.BOSS_HEIGHT);
+                    enemyManager.spawnEnemy("BOSS", GameConstants.PLAY_AREA_X
+                            + GameConstants.PLAY_AREA_WIDTH / 2, -GameConstants.BOSS_HEIGHT);
 
                     this.currentSubState = SubState.BOSS_WARNING;
                     this.warningFlashTimer = 0.0;

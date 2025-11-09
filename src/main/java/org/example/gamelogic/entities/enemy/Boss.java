@@ -16,7 +16,7 @@ public class Boss extends AbstractEnemy {
 
         this.health = GameConstants.BOSS_HEATLTH;
         this.scoreValue = 1000;
-        this.startX = GameConstants.SCREEN_WIDTH / 2 - GameConstants.BOSS_WIDTH / 2;
+        this.startX = GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH / 2 - GameConstants.BOSS_WIDTH / 2;
 
         this.currentStrategy = new BossEntryStrategy();
     }
