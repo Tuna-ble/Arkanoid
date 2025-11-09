@@ -67,22 +67,7 @@ public final class SettingsState implements GameState {
         }
 
         org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
-        Image pre = am.getImage("settings");
-        if (pre != null) {
-            this.settingsImage = pre;
-        } else {
-            this.settingsImage = null;
-            try {
-                java.net.URL res = getClass().getResource("/GameIcon/settings.png");
-                if (res != null) {
-                    this.settingsImage = new Image(res.toExternalForm(), true);
-                }
-            } catch (Exception e) {
-                System.err.println("Không thể tải ảnh settings.png từ resources!");
-                e.printStackTrace();
-                this.settingsImage = null;
-            }
-        }
+        this.settingsImage = am.getImage("settings");
     }
 
     @Override

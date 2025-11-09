@@ -20,7 +20,15 @@ public class AssetManager {
     private boolean resourcesPreloaded = false;
 
     private AssetManager() {
-        loadAssets();  // Load assets ngay khi khởi tạo
+        loadAssets();
+    }
+
+    private static class SingletonHolder {
+        private static final AssetManager INSTANCE = new AssetManager();
+    }
+
+    public static AssetManager getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     public void loadAssets() {
@@ -36,36 +44,25 @@ public class AssetManager {
             System.err.println("Không thể tải file âm thanh: " + e.getMessage());
             e.printStackTrace();
         }
+
         try {
             // loadImage("ball", "/images/ball.png");
             // loadImage("paddle", "/images/paddle.png");
-            loadImage("frame", "/GameIcon/Frame.png");
+            loadImage("frame", "/GameIcon/GameFrame.png");
+            loadImage("hudFrame", "/GameIcon/HudFrame.png");
+            loadImage("pause", "/GameIcon/pause.png");
+
+            loadImage("mainMenu", "/GameIcon/MainMenu.png"); //
+            loadImage("ranking", "/GameIcon/ranking.png"); //
+            loadImage("settings", "/GameIcon/settings.png"); //
+            loadImage("gameOver", "/GameIcon/gameOverBackground.gif"); //
+            loadImage("victory", "/GameIcon/Victory.gif"); //
+            loadImage("level", "/GameIcon/Level.gif"); //
+
+            loadImage("icon_expand", "/GameIcon/expandpaddle.png"); //
+            loadImage("icon_extra_life", "/GameIcon/extra.png"); //
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private static class SingletonHolder {
-        private static final AssetManager INSTANCE = new AssetManager();
-    }
-
-    public static AssetManager getInstance() {
-        return SingletonHolder.INSTANCE;
-    }
-
-    public void loadSounds() {
-        try {
-
-            loadSound("brick_destroyed", "/sounds/brick_destroyed.wav");
-            loadSound("paddle_hit", "/sounds/paddle_hit.wav");
-            loadSound("ball_lost", "/sounds/ball_lost.wav");
-            loadSound("powerup", "/sounds/powerup.wav");
-            loadSound("brick_hit", "/sounds/brick_hit.wav");
-            loadSound("bomb", "/sounds/bomb.wav");
-
-        } catch (Exception e) {
-            System.err.println("Không thể tải file âm thanh: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -82,7 +79,6 @@ public class AssetManager {
             Clip clip = AudioSystem.getClip();
             clip.open(audioStream);
             sounds.put(name, clip);
-
         }
     }
     private void loadImage(String name, String path) throws Exception {

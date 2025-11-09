@@ -38,7 +38,7 @@ public final class BrickManager {
     }
 
     private void onBrickExploded(ExplosiveBrickEvent event) {
-        Iterator<Brick> iterator=bricks.iterator();
+        Iterator<Brick> iterator = bricks.iterator();
         while(iterator.hasNext()) {
             Brick other=iterator.next();
             if (event.getExplosiveBrick().withinRangeOf(other)) {
@@ -49,14 +49,16 @@ public final class BrickManager {
     }
 
     private void registerBrickPrototypes(BrickRegistry brickRegistry) {
-        final double TILE_WIDTH = 60;
-        final double TILE_HEIGHT = 20;
-
-        brickRegistry.register("H", new HardBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
-        brickRegistry.register("N", new NormalBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
-        brickRegistry.register("U", new UnbreakableBrick(0, 0, TILE_WIDTH, TILE_HEIGHT));
-        brickRegistry.register("E", new ExplosiveBrick(0,  0, TILE_WIDTH, TILE_HEIGHT));
-        brickRegistry.register("R", new HealingBrick(0, 0, TILE_WIDTH, TILE_HEIGHT));
+        brickRegistry.register("H", new HardBrick(0,  0,
+                GameConstants.BRICK_WIDTH, GameConstants.BRICK_HEIGHT));
+        brickRegistry.register("N", new NormalBrick(0,  0,
+                GameConstants.BRICK_WIDTH, GameConstants.BRICK_HEIGHT));
+        brickRegistry.register("U", new UnbreakableBrick(0, 0,
+                GameConstants.BRICK_WIDTH, GameConstants.BRICK_HEIGHT));
+        brickRegistry.register("E", new ExplosiveBrick(0,  0,
+                GameConstants.BRICK_WIDTH, GameConstants.BRICK_HEIGHT));
+        brickRegistry.register("R", new HealingBrick(0, 0,
+                GameConstants.BRICK_WIDTH, GameConstants.BRICK_HEIGHT));
         /// HNUE :)))
         /// bựa
     }
@@ -109,31 +111,34 @@ public final class BrickManager {
         for (int row = 0; row < layout.size(); row++) {
 
             String[] types = layout.get(row).trim().split("\\s+");
-            int numCols = 0;
-            for (String type : types) {
-                if (!type.equals("_")) {
-                    numCols++;
-                }
-            }
-            if (numCols == 0) continue;
-            double rowWidth = numCols * (GameConstants.BRICK_WIDTH + GameConstants.PADDING) - GameConstants.PADDING;
+            int totalCols = types.length;
+            if (totalCols == 0) continue;
+
+            // (Đảm bảo bạn dùng cùng 1 hằng số ở cả 2 nơi)
+            // Lấy từ GameConstants thay vì TILE_WIDTH nội bộ
+            double brickWidth = GameConstants.BRICK_WIDTH; //
+            double padding = GameConstants.PADDING; //
+
+            double rowWidth = totalCols * (brickWidth + padding) - padding;
+
+            // 2. Tính toán offset (lề) để căn giữa hàng gạch này
             double rowStartX = (GameConstants.PLAY_AREA_WIDTH - rowWidth) / 2.0;
 
-            int currentCol = 0;
-            for (int col = 0; col < types.length; col++) {
+            // 3. Dùng 'col', KHÔNG DÙNG 'currentCol'
+            for (int col = 0; col < totalCols; col++) {
                 String type = types[col];
                 if (type.equals("_")) {
-                    continue;
+                    continue; // Bỏ qua gạch trống, nhưng vẫn đúng vị trí
                 }
 
-                double x = GameConstants.PLAY_AREA_X + rowStartX + currentCol * (GameConstants.BRICK_WIDTH + GameConstants.PADDING);
-                double y = GameConstants.PLAY_AREA_Y + GameConstants.TOP_MARGIN + row * (GameConstants.BRICK_HEIGHT + GameConstants.PADDING);
+                // Tính toán vị trí X dựa trên 'col' (vị trí thật)
+                double x = GameConstants.PLAY_AREA_X + rowStartX + col * (brickWidth + padding);
+                double y = GameConstants.PLAY_AREA_Y + GameConstants.TOP_MARGIN + row * (GameConstants.BRICK_HEIGHT + padding); //
 
                 Brick brick = brickFactory.createBrick(type, x, y);
                 if (brick != null) {
                     this.bricks.add(brick);
                 }
-                currentCol++;
             }
         }
     }

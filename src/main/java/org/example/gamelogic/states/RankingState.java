@@ -95,23 +95,8 @@ public final class RankingState implements GameState {
     public RankingState() {
         this.highscores = HighscoreManager.loadHighscores();
         org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
-        Image pre = am.getImage("ranking");
-        if (pre != null) {
-            this.rankingIcon = pre;
-        } else {
-            try {
-                java.net.URL res = getClass().getResource("/GameIcon/ranking.png");
-                if (res != null) {
-                    this.rankingIcon = new Image(res.toExternalForm(), true);
-                } else {
-                    this.rankingIcon = null;
-                }
-            } catch (Exception e) {
-                System.err.println("Không thể tải ảnh ranking.png từ resources!");
-                e.printStackTrace();
-                this.rankingIcon = null;
-            }
-        }
+        this.rankingIcon = am.getImage("ranking");
+
         double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
         double btnY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 40;
         this.backButton = new Button(btnX, btnY, "Back to Menu");

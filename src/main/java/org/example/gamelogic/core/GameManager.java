@@ -3,6 +3,7 @@ package org.example.gamelogic.core;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.data.FileLevelRepository;
 import org.example.data.ILevelRepository;
 import org.example.data.InfiniteLevelRepository;
@@ -87,23 +88,11 @@ public final class GameManager {
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
-        // Preload some common UI images synchronously so returning to states
-        // (like Main Menu or Ranking) draws immediately without a visible delay.
-        try {
-            org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
-            // load images into asset manager cache (public wrapper)
-            am.loadImageResource("mainMenu", "/GameIcon/MainMenu.png");
-            am.loadImageResource("ranking", "/GameIcon/ranking.png");
-            am.loadImageResource("settings", "/GameIcon/settings.png");
-            am.loadImageResource("pause", "/GameIcon/pause.png");
-        } catch (Exception e) {
-            // non-fatal: if preload fails, states will fall back to background load
-            System.err.println("Warning: failed to preload UI images: " + e.getMessage());
-        }
 
         currentState = new MainMenuState();
         this.stateManager.setState(currentState);
 
+        AssetManager.getInstance();
         this.enemyManager = EnemyManager.getInstance();
         this.soundManager = SoundManager.getInstance();
         this.scoreManager = ScoreManager.getInstance();

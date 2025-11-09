@@ -31,20 +31,8 @@ public final class MainMenuState implements GameState {
 
     public MainMenuState() {
         org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
-        Image pre = am.getImage("mainMenu");
-        if (pre != null) {
-            mainMenuImage = pre;
-        } else {
-            try {
-                java.net.URL res = getClass().getResource("/GameIcon/MainMenu.png");
-                if (res != null) {
-                    mainMenuImage = new Image(res.toExternalForm(), true);
-                }
-            } catch (Exception e) {
-                System.err.println("Không thể tải ảnh MainMenu.png từ resources!");
-                e.printStackTrace();
-            }
-        }
+        this.mainMenuImage = am.getImage("mainMenu");
+
         double buttonGap = 70;
         startButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 0), "Start");
         rankingButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 1), "Ranking");
