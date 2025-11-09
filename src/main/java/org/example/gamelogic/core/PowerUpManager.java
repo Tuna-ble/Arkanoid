@@ -25,7 +25,7 @@ public final class PowerUpManager {
     private List<PowerUp> activePowerUps = new ArrayList<>();
 
     private final Random random = new Random();
-    private static final double POWERUP_DROP_CHANCE = 0.2;
+    private static final double POWERUP_DROP_CHANCE = 0.4;
 
     private static final String[] POWERUP_TYPES = {"E", "F", "M", "H", "L", "P"};
 
