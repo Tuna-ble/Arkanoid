@@ -14,8 +14,10 @@ import org.example.gamelogic.entities.bricks.UnbreakableBrick;
 import org.example.gamelogic.events.PowerUpCollectedEvent;
 
 
+
 public final class SoundManager {
     private AssetManager assetManager;
+    private Clip currentMusicClip = null;
 
     private static class SingletonHolder {
         private static final SoundManager INSTANCE = new SoundManager();
@@ -61,7 +63,6 @@ public final class SoundManager {
     private void setClipVolume(Clip clip, double volume) {
         if (clip == null) return;
 
-        // Gain (dB) là thang logarit. -80.0f là tắt, 6.0206f là tối đa
         try {
             FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
             float dB = (float) (Math.log10(Math.max(volume, 0.0001)) * 20.0);
@@ -89,18 +90,33 @@ public final class SoundManager {
         }
     }
 
-    private void loopMusic(String name) {
+    public void loopMusic(String name) {
+        stopMusic();
+
         if (!SettingsManager.getInstance().isMusicEnabled()) return;
 
         Clip clip = assetManager.getSound(name);
         if (clip != null) {
+            currentMusicClip = clip;
             double musicVolume = SettingsManager.getInstance().getMusicVolume();
-            setClipVolume(clip, musicVolume);
-            if (!clip.isRunning()) {
-                clip.setFramePosition(0);
-                clip.loop(Clip.LOOP_CONTINUOUSLY);
-            }
+            setClipVolume(currentMusicClip, musicVolume);
+
+            currentMusicClip.setFramePosition(0);
+            currentMusicClip.loop(Clip.LOOP_CONTINUOUSLY);
         }
+    }
+
+    public void playSelectedMusic() {
+        String musicName = SettingsManager.getInstance().getSelectedMusic();
+        loopMusic(musicName);
+    }
+
+    public void stopMusic() {
+        if (currentMusicClip != null && currentMusicClip.isRunning()) {
+            currentMusicClip.stop();
+            currentMusicClip.setFramePosition(0);
+        }
+        currentMusicClip = null;
     }
 
     public void updateAllVolumes() {
@@ -142,7 +158,7 @@ public final class SoundManager {
     public void onGameOver(GameOverEvent event) {
         // playSound("game_over");
         // Dừng nhạc nền (neu co)
-        // stopSound
+        stopMusic();
     }
 
     private void onBallHitBrick(BallHitBrickEvent event) {

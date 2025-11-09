@@ -39,7 +39,7 @@ public final class SettingsManager {
             this.musicEnabled = true;
             this.musicVolume = 1.0;
             this.sfxVolume = 1.0;
-            this.selectedMusic = "default_music";
+            this.selectedMusic = "music_1";
             saveSettings();
             return;
         }
@@ -54,7 +54,7 @@ public final class SettingsManager {
             this.musicVolume = Double.parseDouble(properties.getProperty("musicVolume", "0.8"));
             this.sfxVolume = Double.parseDouble(properties.getProperty("sfxVolume", "1.0"));
 
-            this.selectedMusic = properties.getProperty("selectedMusic", "default_music");
+            this.selectedMusic = properties.getProperty("selectedMusic", "music_1");
 
         } catch (IOException | NumberFormatException e) {
             System.err.println("Lỗi khi đọc file settings: " + e.getMessage());
@@ -62,7 +62,7 @@ public final class SettingsManager {
             this.musicEnabled = true;
             this.musicVolume = 1.0;
             this.sfxVolume = 1.0;
-            this.selectedMusic = "default_music";
+            this.selectedMusic = "music_1";
         }
     }
 

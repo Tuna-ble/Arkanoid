@@ -16,11 +16,11 @@ public class AssetManager {
     private Map<String, Font> fonts = new HashMap<>();
     private Map<String, Effect> effects = new HashMap<>();
     private Map<String, Paint> gradients = new HashMap<>();
-    
+
     private boolean resourcesPreloaded = false;
 
     private AssetManager() {
-        loadAssets();  // Load assets ngay khi khởi tạo
+        loadAssets();
     }
 
     public void loadAssets() {
@@ -36,6 +36,15 @@ public class AssetManager {
             System.err.println("Không thể tải file âm thanh: " + e.getMessage());
             e.printStackTrace();
         }
+        try {
+            loadSound("music_1", "/sounds/music_1.wav");
+            loadSound("music_2", "/sounds/music_2.wav");
+            loadSound("music_3", "/sounds/music_3.wav");
+        } catch (Exception e) {
+            System.err.println("Không thể tải file NHẠC NỀN: " + e.getMessage());
+            e.printStackTrace();
+        }
+
         try {
             // loadImage("ball", "/images/ball.png");
             // loadImage("paddle", "/images/paddle.png");
@@ -151,14 +160,14 @@ public class AssetManager {
 
     public void preloadResources() {
         if (resourcesPreloaded) return;
-        
+
         loadAssets();
-        
+
         // Cache common fonts
         cacheFont("title", new Font("Arial", 70));
         cacheFont("score", new Font("Arial", 40));
         cacheFont("rank", new Font("Arial", 32));
-        
+
         resourcesPreloaded = true;
     }
 
