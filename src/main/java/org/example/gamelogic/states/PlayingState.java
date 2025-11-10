@@ -9,7 +9,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
 import org.example.config.GameConstants;
-import org.example.data.Score;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.*;
 import org.example.gamelogic.entities.IBall;
@@ -110,11 +109,10 @@ public final class PlayingState implements GameState {
             ScoreManager.getInstance().resetScore();
             ScoreManager.getInstance().addScore(Integer.parseInt(data.get("score")));
             elapsedTime = Double.parseDouble(data.get("time"));
-            this.levelNumber=Integer.parseInt(data.get("level"));
-            this.currentLives=Integer.parseInt(data.get("lives"));
+            this.levelNumber = Integer.parseInt(data.get("level"));
+            this.currentLives = Integer.parseInt(data.get("lives"));
             LifeManager.getInstance().setLives(this.currentLives);
-        }
-        else if (startingNewGame) {
+        } else if (startingNewGame) {
             ScoreManager.getInstance().resetScore();
             LifeManager.getInstance().reset();
             this.currentLives = LifeManager.getInstance().getLives();
@@ -149,16 +147,6 @@ public final class PlayingState implements GameState {
             this.gameFrameImage = null;
             this.hudFrameImage = null;
         }
-
-        powerUpManager.spawnPowerUp("M", 400, 300);
-        powerUpManager.spawnPowerUp("M", 400, 320);
-        powerUpManager.spawnPowerUp("M", 400, 340);
-        powerUpManager.spawnPowerUp("M", 400, 360);
-        powerUpManager.spawnPowerUp("L", 400, 370);
-        powerUpManager.spawnPowerUp("L", 400, 375);
-        powerUpManager.spawnPowerUp("L", 400, 380);
-        powerUpManager.spawnPowerUp("L", 400, 385);
-        powerUpManager.spawnPowerUp("P", 400, 400);
     }
 
     private void subscribeToEvents() {
@@ -201,17 +189,20 @@ public final class PlayingState implements GameState {
 
         switch (currentSubState) {
             case LEVEL_START:
+                if (levelStartTimer == 0) {
+                    ProgressManager.saveSession(currentGameMode.toString(),
+                            ScoreManager.getInstance().getScore(),
+                            elapsedTime,
+                            levelNumber,
+                            LifeManager.getInstance().getLives());
+                }
+
                 levelStartTimer += deltaTime;
 
                 paddle.update(deltaTime);
                 updateAttachedBallPosition();
 
                 if (levelStartTimer >= LEVEL_START_DURATION) {
-                    ProgressManager.saveSession(currentGameMode.toString(),
-                            ScoreManager.getInstance().getScore(),
-                            elapsedTime,
-                            levelNumber,
-                            LifeManager.getInstance().getLives());
                     this.enemyManager.loadLevelScript(this.currentGameMode, this.levelNumber);
                     this.currentSubState = SubState.NORMAL_PLAY;
                     levelStartTimer = 0;
@@ -269,11 +260,14 @@ public final class PlayingState implements GameState {
 
                 enemyManager.updateBossOnly(deltaTime);
 
-                if (bossDyingTimer >= BOSS_DEATH_DURATION) {
-                    if (enemyManager.isBossDefeated()) {
+                if (bossDyingTimer >= BOSS_DEATH_DURATION && enemyManager.isBossDefeated()) {
+                    if (this.currentGameMode == GameModeEnum.LEVEL) {
                         EventManager.getInstance().publish(
                                 new ChangeStateEvent(GameStateEnum.VICTORY)
                         );
+                    } else if (this.currentGameMode == GameModeEnum.INFINITE) {
+                        clearManagers();
+                        this.currentSubState = SubState.WAVE_CLEARED;
                     }
                 }
                 break;
@@ -385,7 +379,7 @@ public final class PlayingState implements GameState {
             }
         }
 
-        if (currentSubState == SubState.BOSS_DYING) {
+        if (currentSubState == SubState.BOSS_DYING && currentGameMode == GameModeEnum.LEVEL) {
             double fadeAlpha = Math.min(1.0, bossDyingTimer / BOSS_DEATH_DURATION);
 
             gc.setFill(Color.color(1.0, 1.0, 1.0, fadeAlpha));
@@ -402,6 +396,11 @@ public final class PlayingState implements GameState {
             gc.fillText("WAVE CLEARED",
                     GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH / 2,
                     GameConstants.PLAY_AREA_Y + GameConstants.PLAY_AREA_HEIGHT / 2);
+
+            gc.setFont(new Font("Arial", 30));
+            gc.fillText("Loading next wave, please wait warmly...",
+                    GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH / 2,
+                    GameConstants.PLAY_AREA_Y + GameConstants.PLAY_AREA_HEIGHT / 2 + 60);
 
             gc.setTextAlign(TextAlignment.LEFT);
             gc.setTextBaseline(VPos.BASELINE);

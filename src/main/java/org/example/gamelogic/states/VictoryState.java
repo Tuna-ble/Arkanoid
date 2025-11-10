@@ -104,13 +104,13 @@ public final class VictoryState implements GameState {
                 150,
                 titleFont,
                 titleFill,
-                Color.color(0,0,0,0.9),
+                Color.color(0, 0, 0, 0.9),
                 3.0,
                 titleShadow
         );
 
         String starText = "";
-        for(int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             if (i < starsAwarded) {
                 starText += "★ ";
             } else {
@@ -122,10 +122,16 @@ public final class VictoryState implements GameState {
         gc.setFont(starFont);
         gc.fillText(starText, centerX, 280);
 
-
         quitButton.render(gc);
         menuButton.render(gc);
-        nextButton.render(gc);
+        if (levelCompleted < 5) {
+            nextButton.render(gc);
+        } else {
+            gc.save();
+            gc.setGlobalAlpha(0.5);
+            nextButton.render(gc);
+            gc.restore();
+        }
     }
 
     @Override
@@ -144,7 +150,7 @@ public final class VictoryState implements GameState {
             );
         }
 
-        if (nextButton.isClicked()) {
+        if (nextButton.isClicked() && levelCompleted < 5) {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.PLAYING, levelCompleted + 1)
             );
