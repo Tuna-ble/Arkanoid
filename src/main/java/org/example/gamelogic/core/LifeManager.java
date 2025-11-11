@@ -48,4 +48,8 @@ public final class LifeManager {
     public int getLives() {
         return this.lives;
     }
+
+    public void setLives(int newLives) {
+        this.lives = newLives;
+    }
 }

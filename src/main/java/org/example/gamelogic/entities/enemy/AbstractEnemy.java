@@ -147,4 +147,15 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
     public double getCenterY() {
         return this.y + (this.height / 2);
     }
+
+    @Override
+    public int getHealth() {
+        return (int) this.health;
+    }
+
+    @Override
+    public void setHealth(int health) {
+        this.health = health;
+    }
 }
+

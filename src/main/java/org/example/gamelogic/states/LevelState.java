@@ -16,6 +16,9 @@ import org.example.gamelogic.core.ProgressManager;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.Button;
 import org.example.gamelogic.graphics.TextRenderer;
+import org.example.data.SaveGameRepository;
+import org.example.gamelogic.core.GameManager;
+import org.example.gamelogic.states.ConfirmContinueState;
 import java.util.Map;
 
 public final class LevelState implements GameState {
@@ -145,9 +148,19 @@ public final class LevelState implements GameState {
             if (selectedLevel > maxLevelUnlocked) {
                 continue;
             }
-            EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.PLAYING, selectedLevel)
-            );
+
+            SaveGameRepository repo = new SaveGameRepository();
+
+            if (repo.hasSave(selectedLevel)) {
+                GameManager gm = GameManager.getInstance();
+                gm.getStateManager().setState(new ConfirmContinueState(selectedLevel));
+
+            } else {
+                EventManager.getInstance().publish(
+                        new ChangeStateEvent(GameStateEnum.PLAYING, selectedLevel)
+                );
+            }
+
             break;
         }
     }

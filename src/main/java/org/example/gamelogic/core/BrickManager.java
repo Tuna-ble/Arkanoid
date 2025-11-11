@@ -9,11 +9,16 @@ import org.example.gamelogic.events.BallHitBrickEvent;
 import org.example.gamelogic.factory.BrickFactory;
 import org.example.gamelogic.registry.BrickRegistry;
 import org.example.config.GameConstants;
+import org.example.data.SavedGameState;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.scene.canvas.GraphicsContext;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 public final class BrickManager {
     private ILevelRepository levelRepository;
@@ -131,6 +136,9 @@ public final class BrickManager {
 
                 Brick brick = brickFactory.createBrick(type, x, y);
                 if (brick != null) {
+
+                    int brickId = (row * 100) + currentCol;
+                    brick.setId(brickId);
                     this.bricks.add(brick);
                 }
                 currentCol++;
@@ -153,5 +161,55 @@ public final class BrickManager {
 
     public List<Brick> getBricks() {
         return bricks;
+    }
+
+    public List<SavedGameState.BrickData> getDataToSave() {
+        List<SavedGameState.BrickData> brickDataList = new ArrayList<>();
+        for (Brick brick : bricks) {
+            brickDataList.add(new SavedGameState.BrickData(
+                    brick.getId(),
+                    brick.getHealth(),
+                    brick.isDestroyed()
+            ));
+        }
+        return brickDataList;
+    }
+
+    public void loadData(List<SavedGameState.BrickData> savedBrickDataList) {
+
+        Set<Integer> savedBrickIds = new HashSet<>();
+        Map<Integer, Integer> savedBrickHealth = new HashMap<>();
+
+        for (SavedGameState.BrickData data : savedBrickDataList) {
+            savedBrickIds.add(data.id);
+            savedBrickHealth.put(data.id, data.health);
+        }
+
+        System.out.println("--- DEBUG (LOGIC MỚI): Bắt đầu tải gạch ---");
+        System.out.println("Số gạch CÒN SỐNG đã lưu: " + savedBrickIds.size());
+        System.out.println("Tổng số gạch MỚI (từ loadLevel): " + this.bricks.size());
+
+        Iterator<Brick> iterator = this.bricks.iterator();
+        int destroyedCount = 0;
+
+        while (iterator.hasNext()) {
+            Brick newBrick = iterator.next();
+            int newBrickId = newBrick.getId();
+
+            if (savedBrickIds.contains(newBrickId)) {
+
+                int savedHealth = savedBrickHealth.get(newBrickId);
+                newBrick.setHealth(savedHealth);
+            } else {
+
+                newBrick.setDestroyed(true);
+                destroyedCount++;
+            }
+        }
+
+        System.out.println("Số gạch đã bị phá hủy (được tải): " + destroyedCount);
+        System.out.println("--- DEBUG (LOGIC MỚI): Kết thúc tải gạch ---");
+
+        bricks.removeIf(Brick::isDestroyed);
     }
 }

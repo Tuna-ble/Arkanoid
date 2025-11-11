@@ -14,4 +14,14 @@ public interface Brick extends Collidable {
 
     void update(double deltaTime);
     void render(GraphicsContext gc);
+
+    int getId();
+
+    int getHealth();
+
+    void setHealth(int health);
+
+    void setId(int brickId);
+
+    void setDestroyed(boolean b);
 }

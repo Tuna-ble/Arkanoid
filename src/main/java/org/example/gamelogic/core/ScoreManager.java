@@ -43,6 +43,11 @@ public final class ScoreManager {
             this.currentScore += score;
         }
     }
+
+    public void setScore(int newScore) {
+        this.currentScore = newScore;
+    }
+
     public int getScore() {
         return this.currentScore;
     }

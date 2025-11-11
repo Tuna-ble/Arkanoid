@@ -85,4 +85,9 @@ public class Boss extends AbstractEnemy {
     public BossBehaviorStrategy getCurrentStrategy() {
         return currentStrategy;
     }
+
+    @Override
+    public String getType() {
+        return "BOSS";
+    }
 }

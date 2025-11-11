@@ -46,4 +46,8 @@ public class Enemy2 extends AbstractEnemy {
         /*EventManager.getInstance().publish(new BrickDestroyedEvent(this));
         EventManager.getInstance().publish(new ExplosiveBrickEvent(this));*/
     }
+    @Override
+    public String getType() {
+        return "E2";
+    }
 }
