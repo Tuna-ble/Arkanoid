@@ -1,14 +1,17 @@
 package org.example.gamelogic.entities.enemy;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.strategy.bossbehavior.*;
 import org.example.gamelogic.strategy.movement.StaticMovementStrategy;
 
 public class Boss extends AbstractEnemy {
     private BossBehaviorStrategy currentStrategy;
     private double startX;
+    private Image image;
 
     public Boss(double x, double y, double dx, double dy) {
         super(x, y, GameConstants.BOSS_WIDTH, GameConstants.BOSS_HEIGHT,
@@ -17,6 +20,7 @@ public class Boss extends AbstractEnemy {
         this.health = GameConstants.BOSS_HEATLTH;
         this.scoreValue = 1000;
         this.startX = GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH / 2 - GameConstants.BOSS_WIDTH / 2;
+        this.image = AssetManager.getInstance().getImage("boss");
 
         this.currentStrategy = new BossEntryStrategy();
     }
@@ -49,8 +53,9 @@ public class Boss extends AbstractEnemy {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.DARKRED);
-        gc.fillRect(x, y, width, height);
+        /*gc.setFill(Color.DARKRED);
+        gc.fillRect(x, y, width, height);*/
+        gc.drawImage(image, x, y, width, height);
 
         gc.setFill(Color.BLACK);
         gc.fillRect(x, y - 10, width, 8);

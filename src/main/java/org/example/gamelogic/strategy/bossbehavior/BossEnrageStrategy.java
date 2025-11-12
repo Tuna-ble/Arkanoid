@@ -25,7 +25,7 @@ public class BossEnrageStrategy implements BossBehaviorStrategy {
 
             double padding = 50.0;
             double minX = GameConstants.PLAY_AREA_X + padding;
-            double maxX = minX + GameConstants.PLAY_AREA_WIDTH - padding;
+            double maxX = GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - padding;
             boss.setMovementStrategy(new LRMovementStrategy(minX, maxX));
             boss.setStrategy(new BossPhase2Strategy());
         }
