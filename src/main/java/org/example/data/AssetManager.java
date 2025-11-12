@@ -16,6 +16,7 @@ public class AssetManager {
     private Map<String, Font> fonts = new HashMap<>();
     private Map<String, Effect> effects = new HashMap<>();
     private Map<String, Paint> gradients = new HashMap<>();
+    private Map<String, String> fontFamilies = new HashMap<>();
     
     private boolean resourcesPreloaded = false;
 
@@ -48,22 +49,46 @@ public class AssetManager {
         try {
             // loadImage("ball", "/images/ball.png");
             // loadImage("paddle", "/images/paddle.png");
-            loadImage("frame", "/GameIcon/GameFrame.png");
-            loadImage("hudFrame", "/GameIcon/HudFrame.png");
-            loadImage("pause", "/GameIcon/pause.png");
+            loadImage("normalBrick", "/images/cyanBrick.png");
+            loadImage("hardBrick1", "/images/hardBrick1.png");
+            loadImage("hardBrick2", "/images/hardBrick2.png");
+            loadImage("hardBrick3", "/images/hardBrick3.png");
+            loadImage("healingBrick", "/images/greenBrick.png");
+            loadImage("explosiveBrick", "/images/redBrick.png");
+            loadImage("unbreakableBrick", "/images/unbreakableBrick.png");
+            loadImage("unbreakableBrickHit", "/images/unbreakableBrickHit.png");
 
-            loadImage("mainMenu", "/GameIcon/MainMenu.png"); //
-            loadImage("ranking", "/GameIcon/ranking.png"); //
-            loadImage("settings", "/GameIcon/settings.png"); //
-            loadImage("gameOver", "/GameIcon/gameOverBackground.gif"); //
-            loadImage("victory", "/GameIcon/Victory.gif"); //
-            loadImage("level", "/GameIcon/Level.gif"); //
+            loadImage("enemy1", "/images/UFO.png");
+            loadImage("boss", "/images/moai.png");
+            loadImage("bossShoot", "/images/moaiShooting.png");
+            loadImage("minion", "/images/minion.png");
+            loadImage("minionShoot", "/images/minionShoot.png");
+            
+            loadImage("frame", "/images/GameFrame.png");
+            loadImage("hudFrame", "/images/HudFrame.png");
+            loadImage("pause", "/images/pause.png");
 
-            loadImage("icon_expand", "/GameIcon/expandpaddle.png"); //
-            loadImage("icon_extra_life", "/GameIcon/extra.png"); //
+            loadImage("mainMenu", "/images/MainMenu.png"); //
+            loadImage("ranking", "/images/ranking.png"); //
+            loadImage("settings", "/images/settings.png"); //
+            loadImage("gameOver", "/images/gameOverBackground.gif"); //
+            loadImage("victory", "/images/Victory.gif"); //
+            loadImage("level", "/images/Level.gif"); //
+            loadImage("button", "/images/button.png");
+            loadImage("hoveredButton", "/images/hoveredButton.png");
+
+            loadImage("icon_expand", "/images/expandpaddle.png"); //
+            loadImage("icon_extra_life", "/images/extra.png"); //
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());
             e.printStackTrace();
+        }
+
+        try {
+            loadFont("Anxel", "/fonts/Anxel.ttf");
+
+        } catch (Exception e) {
+            System.err.println("Lỗi nghiêm trọng khi tải fonts: " + e.getMessage());
         }
     }
 
@@ -109,16 +134,36 @@ public class AssetManager {
         return img;
     }
 
+    private void loadFont(String name, String path) throws Exception {
+        try (InputStream fontStream = getClass().getResourceAsStream(path)) {
+            if (fontStream == null) {
+                throw new Exception("Không tìm thấy file font: " + path);
+            }
+
+            Font loadedFont = Font.loadFont(fontStream, 1);
+
+            if (loadedFont == null) {
+                throw new Exception("Lỗi khi tải font: " + path);
+            }
+            String fontFamilyName = loadedFont.getFamily();
+
+            fontFamilies.put(name, fontFamilyName);
+        }
+    }
+
     public void cacheFont(String name, Font font) {
         fonts.put(name, font);
     }
 
-    public Font getFont(String name) {
-        Font font = fonts.get(name);
-        if (font == null) {
-            System.err.println("Yêu cầu font không tồn tại: " + name);
+    public Font getFont(String name, double size) {
+        String familyName = fontFamilies.get(name);
+
+        if (familyName != null) {
+            return new Font(familyName, size);
+        } else {
+            System.err.println("Yêu cầu font không tồn tại: " + name + ". Dùng Arial.");
+            return new Font("Arial", size);
         }
-        return font;
     }
 
     public void cacheEffect(String name, Effect effect) {
