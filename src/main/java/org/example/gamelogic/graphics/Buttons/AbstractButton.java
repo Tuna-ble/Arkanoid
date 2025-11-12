@@ -1,37 +1,40 @@
-package org.example.gamelogic.graphics;
+package org.example.gamelogic.graphics.Buttons;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
+import org.example.gamelogic.graphics.TextRenderer;
 
-public class Button {
-    private double x;
-    private double y;
-    private double width;
-    private double height;
-    private String text;
-    private Font font;
-    private boolean isHovered;
-    private boolean isClicked;
+public abstract class AbstractButton {
+    protected double x;
+    protected double y;
+    protected double width;
+    protected double height;
+    protected String text;
+    protected Font font;
+    protected boolean isHovered;
+    protected boolean isClicked;
     
     // Colors
-    private Color backgroundColor;
-    private Color hoverBackgroundColor;
-    private Color strokeColor;
-    private Color hoverStrokeColor;
-    private Color textColor;
-    
-    public Button(double x, double y, double width, double height, String text) {
+    protected Color backgroundColor;
+    protected Color hoverBackgroundColor;
+    protected Color strokeColor;
+    protected Color hoverStrokeColor;
+    protected Color textColor;
+
+    public AbstractButton(double x, double y, double width, double height, String text) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.text = text;
-        this.font = new Font("Arial", 20);
+        this.font = AssetManager.getInstance().getFont("Anxel", 25);
         this.isHovered = false;
         this.isClicked = false;
         
@@ -41,10 +44,6 @@ public class Button {
         this.strokeColor = Color.color(1, 1, 1, 0.8);
         this.hoverStrokeColor = Color.WHITE;
         this.textColor = Color.WHITE;
-    }
-    
-    public Button(double x, double y, String text) {
-        this(x, y, GameConstants.UI_BUTTON_WIDTH, GameConstants.UI_BUTTON_HEIGHT, text);
     }
     
     public void update(I_InputProvider inputProvider) {
@@ -63,40 +62,7 @@ public class Button {
         isClicked = isHovered && inputProvider.isMouseClicked();
     }
     
-    public void render(GraphicsContext gc) {
-        if (gc == null) return;
-        
-        TextAlignment previousAlignment = gc.getTextAlign();
-        
-        try {
-            // Draw background
-            Color currentBgColor = isHovered ? hoverBackgroundColor : backgroundColor;
-            gc.setFill(currentBgColor);
-            gc.fillRoundRect(x, y, width, height, 10, 10);
-            
-            // Draw stroke
-            Color currentStrokeColor = isHovered ? hoverStrokeColor : strokeColor;
-            gc.setStroke(currentStrokeColor);
-            gc.setLineWidth(2);
-            gc.strokeRoundRect(x, y, width, height, 10, 10);
-            
-            // Draw text
-            gc.setTextAlign(TextAlignment.CENTER);
-            TextRenderer.drawOutlinedText(
-                gc,
-                text,
-                x + width / 2,
-                y + height / 2 + 8,
-                font,
-                textColor,
-                Color.color(0, 0, 0, 0.85),
-                1.5,
-                new DropShadow(6, Color.color(0, 0, 0, 0.6))
-            );
-        } finally {
-            gc.setTextAlign(previousAlignment);
-        }
-    }
+    public abstract void render(GraphicsContext gc);
 
     public boolean isHovered() {
         return isHovered;
