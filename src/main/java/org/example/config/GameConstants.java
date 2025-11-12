@@ -46,9 +46,9 @@ public final class GameConstants {
 
     // Ball
     public static final double BALL_RADIUS = 8;
-    public static final double BALL_INITIAL_SPEED = 320.0;
-    public static final double BALL_MIN_SPEED = 240.0;
-    public static final double BALL_MAX_SPEED = 900.0;
+    public static final double BALL_INITIAL_SPEED = 500.0;
+    public static final double BALL_MIN_SPEED = 500.0;
+    public static final double BALL_MAX_SPEED = 800.0;
     public static final double BALL_SPEED_INCREMENT_PER_BRICK = 6.0;
     public static final double BALL_MIN_VY = 120.0;
     public static final double BALL_RESTITUTION = 1.0;
@@ -79,9 +79,11 @@ public final class GameConstants {
     // Enemies
     public static final double ENEMY_WIDTH = 40;
     public static final double ENEMY_HEIGHT = 40;
-    public static final double BOSS_WIDTH = 200;
-    public static final double BOSS_HEIGHT = 100;
-    public static final double BOSS_HEATLTH = 10.0;
+    public static final double BOSS_WIDTH = 190;
+    public static final double BOSS_HEIGHT = 350;
+    public static final double BOSS_HEATLTH = 20.0;
+    public static final double MINION_WIDTH = 25;
+    public static final double MINION_HEIGHT = 40;
 
     // Gameplay tuning
     public static final double BALL_INITIAL_ANGLE_RANDOM_RANGE = 15.0; // ±15 degrees
@@ -105,5 +107,5 @@ public final class GameConstants {
     // Damages
     public static final double BALL_DAMAGE = 1;
     public static final double EXPLOSIVE_BRICK_DAMAGE = 2;
-    public static final double LASER_BULLET_DAMAGE = 0.5;
+    public static final double LASER_BULLET_DAMAGE = 2;
 }
