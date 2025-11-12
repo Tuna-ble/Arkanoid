@@ -64,7 +64,6 @@ public final class BrickManager {
     }
 
     public void update(double deltaTime) {
-        System.out.println("there are "+bricks.size()+" exits");
         for (Brick brick : bricks) {
             brick.update(deltaTime);
         }
@@ -109,29 +108,21 @@ public final class BrickManager {
         List<String> layout = levelData.getLayout();
 
         for (int row = 0; row < layout.size(); row++) {
-
             String[] types = layout.get(row).trim().split("\\s+");
             int totalCols = types.length;
             if (totalCols == 0) continue;
 
-            // (Đảm bảo bạn dùng cùng 1 hằng số ở cả 2 nơi)
-            // Lấy từ GameConstants thay vì TILE_WIDTH nội bộ
             double brickWidth = GameConstants.BRICK_WIDTH; //
             double padding = GameConstants.PADDING; //
 
             double rowWidth = totalCols * (brickWidth + padding) - padding;
-
-            // 2. Tính toán offset (lề) để căn giữa hàng gạch này
             double rowStartX = (GameConstants.PLAY_AREA_WIDTH - rowWidth) / 2.0;
 
-            // 3. Dùng 'col', KHÔNG DÙNG 'currentCol'
             for (int col = 0; col < totalCols; col++) {
                 String type = types[col];
                 if (type.equals("_")) {
-                    continue; // Bỏ qua gạch trống, nhưng vẫn đúng vị trí
+                    continue;
                 }
-
-                // Tính toán vị trí X dựa trên 'col' (vị trí thật)
                 double x = GameConstants.PLAY_AREA_X + rowStartX + col * (brickWidth + padding);
                 double y = GameConstants.PLAY_AREA_Y + GameConstants.TOP_MARGIN + row * (GameConstants.BRICK_HEIGHT + padding); //
 

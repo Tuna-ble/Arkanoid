@@ -50,9 +50,9 @@ public final class EnemyManager {
 
         enemyRegistry.register("E2", new Enemy2(0.0, 0.0, GameConstants.ENEMY_WIDTH,
                 GameConstants.ENEMY_HEIGHT, 25.0, 50.0));
-        enemyRegistry.register("MINION", new BossMinion(0.0, 0.0, GameConstants.ENEMY_WIDTH,
-                GameConstants.ENEMY_HEIGHT, 25.0, 50.0));
-        enemyRegistry.register("BOSS", new Boss(0, 0, 0, 50));
+        enemyRegistry.register("MINION", new BossMinion(0.0, 0.0, GameConstants.MINION_WIDTH,
+                GameConstants.MINION_HEIGHT, 25.0, 50.0));
+        enemyRegistry.register("BOSS", new Boss(0, 0, 0, 100));
     }
 
     public void spawnEnemy(String type, double centerX, double centerY) {
