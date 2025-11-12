@@ -1,8 +1,10 @@
 package org.example.gamelogic.entities.enemy;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.core.LaserManager;
 import org.example.gamelogic.entities.BulletFrom;
 import org.example.gamelogic.entities.BulletType;
@@ -11,14 +13,21 @@ import org.example.gamelogic.strategy.movement.DownMovementStrategy;
 import org.example.gamelogic.strategy.movement.LRMovementStrategy;
 
 public class BossMinion extends AbstractEnemy {
+    private boolean isShooting;
     private double shootTimer;
     private final double SHOOT_COOLDOWN = 2.5;
+
+    private Image idleImage;
+    private Image shootImage;
 
     public BossMinion(double x, double y, double width, double height,
                       double dx, double dy) {
         super(x, y, width, height, dx, dy, new DashMovementStrategy());
         this.shootTimer = Math.random() * SHOOT_COOLDOWN;
         this.hasEnteredScreen = true;
+        AssetManager am = AssetManager.getInstance();
+        this.idleImage = am.getImage("minion");
+        this.shootImage = am.getImage("minionShoot");
     }
 
     @Override
@@ -50,10 +59,7 @@ public class BossMinion extends AbstractEnemy {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.BLACK);
-        gc.fillRect(x, y, width, height);
-        gc.setStroke(Color.BLACK);
-        gc.strokeRect(x, y, width, height);
+        gc.drawImage(idleImage, this.x, this.y, this.width, this.height);
     }
 
     public void takeDamage(double damage) {
