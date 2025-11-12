@@ -2,6 +2,7 @@ package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -10,17 +11,19 @@ import javafx.scene.text.Font;
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Button;
+import org.example.gamelogic.graphics.Buttons.AbstractButton;
+import org.example.gamelogic.graphics.Buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class GameModeState implements GameState {
 
-    private final Button infiniteButton;
-    private final Button levelsButton;
-    private final Button backButton;
+    private final AbstractButton infiniteButton;
+    private final AbstractButton levelsButton;
+    private final AbstractButton backButton;
 
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
@@ -36,21 +39,31 @@ public final class GameModeState implements GameState {
         double buttonY = 220;
         double buttonSpacing = 40;
 
+
+        AssetManager am = AssetManager.getInstance();
+        final Image normalImage = am.getImage("button");
+        final Image hoveredImage = am.getImage("hoveredButton");
         this.infiniteButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 buttonY,
+                normalImage,
+                hoveredImage,
                 "INFINITE"
         );
 
         this.levelsButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 buttonY + GameConstants.UI_BUTTON_HEIGHT + buttonSpacing,
+                normalImage,
+                hoveredImage,
                 "LEVELS"
         );
 
         this.backButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 buttonY + 2 * (GameConstants.UI_BUTTON_HEIGHT + buttonSpacing),
+                normalImage,
+                hoveredImage,
                 "Back"
         );
     }

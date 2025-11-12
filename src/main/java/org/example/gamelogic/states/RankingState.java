@@ -15,7 +15,8 @@ import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.HighscoreManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Button;
+import org.example.gamelogic.graphics.Buttons.AbstractButton;
+import org.example.gamelogic.graphics.Buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.List;
 public final class RankingState implements GameState {
 
     private final List<Integer> highscores;
-    private final Button backButton;
+    private final AbstractButton backButton;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
     private Image rankingIcon;
 
@@ -45,7 +46,6 @@ public final class RankingState implements GameState {
     // Pre-create effects
     private final DropShadow normalScoreShadow = new DropShadow(8, Color.web("#ffdd44", 0.6));
     private final DropShadow titleBaseShadow = new DropShadow(20, Color.web("#ffdd44", 0.4));
-
 
     private void drawScoreEntry(GraphicsContext gc, double x, double y,
                                         double width, double height, 
@@ -99,7 +99,9 @@ public final class RankingState implements GameState {
 
         double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
         double btnY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 40;
-        this.backButton = new Button(btnX, btnY, "Back to Menu");
+        final Image normalImage = am.getImage("button");
+        final Image hoveredImage = am.getImage("hoveredButton");
+        this.backButton = new Button(btnX, btnY, normalImage, hoveredImage, "Back to Menu");
     }
 
     @Override

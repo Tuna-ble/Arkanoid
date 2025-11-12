@@ -2,16 +2,18 @@ package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
-import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Button;
+import org.example.gamelogic.graphics.Buttons.AbstractButton;
+import org.example.gamelogic.graphics.Buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class PauseState implements GameState {
@@ -19,18 +21,23 @@ public final class PauseState implements GameState {
     private final Font titleFont = new Font("Arial", 48);
     private final Font buttonFont = new Font("Arial", 28);
 
+    private final Image normalImage;
+    private final Image hoveredImage;
     // Button layout uses GameConstants
 
     // Center screen position
     private double centerX, centerY;
 
     // Button instances
-    private Button resumeButton;
-    private Button settingsButton;
-    private Button quitButton;
+    private AbstractButton resumeButton;
+    private AbstractButton settingsButton;
+    private AbstractButton quitButton;
 
     public PauseState(GameState previousState) {
         this.previousState = previousState;
+        AssetManager am = AssetManager.getInstance();
+        this.normalImage = am.getImage("button");
+        this.hoveredImage = am.getImage("hoveredButton");
     }
 
     @Override
@@ -92,7 +99,7 @@ public final class PauseState implements GameState {
 
         // Initialize buttons if not already created
         if (resumeButton == null) {
-            resumeButton = new Button(buttonX, resumeY, "Resume");
+            resumeButton = new Button(buttonX, resumeY, normalImage, hoveredImage, "Resume");
             resumeButton.setFont(buttonFont);
             resumeButton.setColors(
                     Color.web("#444"),
@@ -107,7 +114,7 @@ public final class PauseState implements GameState {
         }
 
         if (quitButton == null) {
-            quitButton = new Button(buttonX, quitY, "Quit");
+            quitButton = new Button(buttonX, quitY, normalImage, hoveredImage, "Quit");
             quitButton.setFont(buttonFont);
             quitButton.setColors(
                     Color.web("#444"),
@@ -122,7 +129,7 @@ public final class PauseState implements GameState {
         }
 
         if (settingsButton == null) {
-            settingsButton = new Button(buttonX, settingsY, "Settings");
+            settingsButton = new Button(buttonX, settingsY, normalImage, hoveredImage, "Settings");
             settingsButton.setFont(buttonFont);
             settingsButton.setColors(
                     Color.web("#444"),

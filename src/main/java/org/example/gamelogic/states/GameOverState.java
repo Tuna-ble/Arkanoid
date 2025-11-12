@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.ScoreManager;
 import org.example.gamelogic.I_InputProvider;
@@ -14,7 +15,8 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.Stop;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Button;
+import org.example.gamelogic.graphics.Buttons.AbstractButton;
+import org.example.gamelogic.graphics.Buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class GameOverState implements GameState {
@@ -25,16 +27,32 @@ public final class GameOverState implements GameState {
     private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 30;
 
     // Button instances
-    private Button restartButton;
-    private Button menuButton;
-    private Button exitButton;
+    private AbstractButton restartButton;
+    private AbstractButton menuButton;
+    private AbstractButton exitButton;
 
     public GameOverState(int levelToRestart) {
         this.levelToRestart = levelToRestart;
         gameOverGif = new Image("/GameIcon/gameOverBackground.gif");
-        restartButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 0, "Restart");
-        menuButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 80, "Menu");
-        exitButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + 160, "Exit");
+
+        AssetManager am = AssetManager.getInstance();
+        final Image normalImage = am.getImage("button");
+        final Image hoveredImage = am.getImage("hoveredButton");
+        restartButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2,
+                baseY + 0,
+                normalImage,
+                hoveredImage,
+                "Restart");
+        menuButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2,
+                baseY + 80,
+                normalImage,
+                hoveredImage,
+                "Menu");
+        exitButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2,
+                baseY + 160,
+                normalImage,
+                hoveredImage,
+                "Exit");
     }
 
     @Override

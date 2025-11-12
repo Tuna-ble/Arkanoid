@@ -10,11 +10,13 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.ProgressManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Button;
+import org.example.gamelogic.graphics.Buttons.AbstractButton;
+import org.example.gamelogic.graphics.Buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class VictoryState implements GameState {
@@ -23,9 +25,9 @@ public final class VictoryState implements GameState {
     private final int levelCompleted;
     private final int starsAwarded;
 
-    private final Button quitButton;
-    private final Button menuButton;
-    private final Button nextButton;
+    private final AbstractButton quitButton;
+    private final AbstractButton menuButton;
+    private final AbstractButton nextButton;
 
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
@@ -63,9 +65,16 @@ public final class VictoryState implements GameState {
         double quitX = buttonSpacing;
         double menuX = quitX + buttonWidth + buttonSpacing;
         double nextX = menuX + buttonWidth + buttonSpacing;
-        this.quitButton = new Button(quitX, buttonY, buttonWidth, GameConstants.UI_BUTTON_HEIGHT, "Quit");
-        this.menuButton = new Button(menuX, buttonY, buttonWidth, GameConstants.UI_BUTTON_HEIGHT, "Menu");
-        this.nextButton = new Button(nextX, buttonY, buttonWidth, GameConstants.UI_BUTTON_HEIGHT, "Next Level");
+
+        AssetManager am = AssetManager.getInstance();
+        final Image normalImage = am.getImage("button");
+        final Image hoveredImage = am.getImage("hoveredButton");
+        this.quitButton = new Button(quitX, buttonY, buttonWidth,
+                GameConstants.UI_BUTTON_HEIGHT, normalImage, hoveredImage, "Quit");
+        this.menuButton = new Button(menuX, buttonY, buttonWidth,
+                GameConstants.UI_BUTTON_HEIGHT, normalImage, hoveredImage, "Menu");
+        this.nextButton = new Button(nextX, buttonY, buttonWidth,
+                GameConstants.UI_BUTTON_HEIGHT, normalImage, hoveredImage, "Next Level");
 
         victory = new Image("/GameIcon/victory.gif");
     }

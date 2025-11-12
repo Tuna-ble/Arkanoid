@@ -13,31 +13,41 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.Stop;
 import javafx.scene.effect.DropShadow;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Button;
+import org.example.gamelogic.graphics.Buttons.AbstractButton;
+import org.example.gamelogic.graphics.Buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class MainMenuState implements GameState {
     private Image mainMenuImage;
-    private Button startButton;
-    private Button rankingButton;
-    private Button settingsButton;
-    private Button newGameButton;
+    private Image normalImage;
+    private Image hoveredImage;
+    private AbstractButton startButton;
+    private AbstractButton rankingButton;
+    private AbstractButton settingsButton;
+    private AbstractButton newGameButton;
     private double elapsedTime = 0;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
     private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 100;
 
     public MainMenuState() {
-        org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
+        AssetManager am = AssetManager.getInstance();
         this.mainMenuImage = am.getImage("mainMenu");
+        this.normalImage = am.getImage("button");
+        this.hoveredImage = am.getImage("hoveredButton");
 
         double buttonGap = 70;
-        startButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 0), "Start");
-        rankingButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 1), "Ranking");
-        settingsButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 2), "Settings");
-        newGameButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2, baseY + (buttonGap * 3), "Reset Game");
+        startButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2,
+                baseY + (buttonGap * 0), normalImage, hoveredImage, "Start");
+        rankingButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2,
+                baseY + (buttonGap * 1), normalImage, hoveredImage, "Ranking");
+        settingsButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2,
+                baseY + (buttonGap * 2), normalImage, hoveredImage, "Settings");
+        newGameButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2,
+                baseY + (buttonGap * 3), normalImage, hoveredImage, "Reset Game");
     }
 
     @Override

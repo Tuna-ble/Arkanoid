@@ -1,32 +1,39 @@
 package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
-import javafx.scene.input.KeyCode;
 import org.example.gamelogic.core.EventManager;
-import org.example.gamelogic.entities.enemy.Enemy;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Button;
-import org.example.gamelogic.graphics.TextRenderer;
+import org.example.gamelogic.graphics.Buttons.AbstractButton;
+import org.example.gamelogic.graphics.Buttons.Button;
 
 
 public final class InfiniteModeState implements GameState {
 
-    private final Button playButton;
-    private final Button backButton;
+    private final AbstractButton playButton;
+    private final AbstractButton backButton;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
     public InfiniteModeState() {
+        AssetManager am = AssetManager.getInstance();
+        final Image normalImage = am.getImage("button");
+        final Image hoveredImage = am.getImage("hoveredButton");
         this.playButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT / 2,
+                normalImage,
+                hoveredImage,
                 "Play"
         );
         this.backButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT / 2 + playButton.getWidth(),
+                normalImage,
+                hoveredImage,
                 "Back"
         );
     }

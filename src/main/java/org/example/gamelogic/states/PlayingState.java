@@ -66,7 +66,7 @@ public final class PlayingState implements GameState {
     private final double LEVEL_START_DURATION = 1.5;
 
     private double warningFlashTimer = 0.0;
-    private double warningFlashDuration = 6.0;
+    private double warningFlashDuration = 7.0;
 
     private double bossDyingTimer = 0.0;
     private final double BOSS_DEATH_DURATION = 5.0;
@@ -162,9 +162,6 @@ public final class PlayingState implements GameState {
             case LEVEL_START:
                 levelStartTimer += deltaTime;
 
-                paddle.update(deltaTime);
-                updateAttachedBallPosition();
-
                 if (levelStartTimer >= LEVEL_START_DURATION) {
                     this.currentSubState = SubState.NORMAL_PLAY;
                 }
@@ -251,7 +248,7 @@ public final class PlayingState implements GameState {
         gc.setTransform(new Affine());
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        gc.setFill(Color.WHITE);
+        gc.setFill(Color.DARKBLUE);
         gc.fillRect(GameConstants.PLAY_AREA_X,
                 GameConstants.PLAY_AREA_Y,
                 GameConstants.PLAY_AREA_WIDTH,

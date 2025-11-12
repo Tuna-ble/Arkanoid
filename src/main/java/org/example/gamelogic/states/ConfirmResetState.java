@@ -2,6 +2,7 @@ package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -9,18 +10,20 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.HighscoreManager;
 import org.example.gamelogic.core.ProgressManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Button;
+import org.example.gamelogic.graphics.Buttons.AbstractButton;
+import org.example.gamelogic.graphics.Buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class ConfirmResetState implements GameState {
 
-    private final Button yesButton;
-    private final Button noButton;
+    private final AbstractButton yesButton;
+    private final AbstractButton noButton;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
     private final Font titleFont = new Font("Arial", 40);
@@ -35,15 +38,22 @@ public final class ConfirmResetState implements GameState {
         double buttonY = 350;
         double buttonSpacing = 40;
 
+        AssetManager am = AssetManager.getInstance();
+        final Image normalImage = am.getImage("button");
+        final Image hoveredImage = am.getImage("hoveredButton");
         this.yesButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 buttonY,
+                normalImage,
+                hoveredImage,
                 "YES (Reset All Data)"
         );
 
         this.noButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 buttonY + GameConstants.UI_BUTTON_HEIGHT + buttonSpacing,
+                normalImage,
+                hoveredImage,
                 "NO (Go Back)"
         );
     }

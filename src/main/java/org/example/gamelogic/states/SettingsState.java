@@ -6,25 +6,27 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.SettingsManager;
 import org.example.gamelogic.core.SoundManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Button;
+import org.example.gamelogic.graphics.Buttons.AbstractButton;
+import org.example.gamelogic.graphics.Buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class SettingsState implements GameState {
     private GameState previousState;
-    private Button musicButton;
-    private Button sfxButton;
-    private Button backButton;
-    private Button musicVolumeDown;
-    private Button musicVolumeUp;
-    private Button sfxVolumeDown;
-    private Button sfxVolumeUp;
-    private Button prevMusicButton;
-    private Button nextMusicButton;
+    private AbstractButton musicButton;
+    private AbstractButton sfxButton;
+    private AbstractButton backButton;
+    private AbstractButton musicVolumeDown;
+    private AbstractButton musicVolumeUp;
+    private AbstractButton sfxVolumeDown;
+    private AbstractButton sfxVolumeUp;
+    private AbstractButton prevMusicButton;
+    private AbstractButton nextMusicButton;
 
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
     private Image settingsImage = null;
@@ -38,25 +40,29 @@ public final class SettingsState implements GameState {
         boolean musicOn = SettingsManager.getInstance().isMusicEnabled();
         boolean sfxOn = SettingsManager.getInstance().isSfxEnabled();
 
-        this.musicButton = new Button(btnX, 200, "Music: " + (musicOn ? "ON" : "OFF"));
-        this.sfxButton = new Button(btnX, 380, "SFX: " + (sfxOn ? "ON" : "OFF"));
-        this.backButton = new Button(btnX, 510, "Back");
+        AssetManager am = AssetManager.getInstance();
+        final Image normalImage = am.getImage("button");
+        final Image hoveredImage = am.getImage("hoveredButton");
+
+        this.musicButton = new Button(btnX, 200, normalImage, hoveredImage, "Music: " + (musicOn ? "ON" : "OFF"));
+        this.sfxButton = new Button(btnX, 380, normalImage, hoveredImage, "SFX: " + (sfxOn ? "ON" : "OFF"));
+        this.backButton = new Button(btnX, 510, normalImage, hoveredImage, "Back");
 
         double smallBtnWidth = 50;
         double sliderWidth = 220;
         double sliderX = centerX - sliderWidth / 2;
 
-        this.musicVolumeDown = new Button(sliderX, 270, smallBtnWidth, 40, "-");
+        this.musicVolumeDown = new Button(sliderX, 270, smallBtnWidth, 40, normalImage, hoveredImage, "-");
         this.musicVolumeUp = new Button(sliderX + sliderWidth
-                - smallBtnWidth, 270, smallBtnWidth, 40, "+");
+                - smallBtnWidth, 270, smallBtnWidth, 40, normalImage, hoveredImage, "+");
 
-        this.sfxVolumeDown = new Button(sliderX, 450, smallBtnWidth, 40, "-");
+        this.sfxVolumeDown = new Button(sliderX, 450, smallBtnWidth, 40, normalImage, hoveredImage, "-");
         this.sfxVolumeUp = new Button(sliderX + sliderWidth
-                - smallBtnWidth, 450, smallBtnWidth, 40, "+");
+                - smallBtnWidth, 450, smallBtnWidth, 40, normalImage, hoveredImage, "+");
 
-        this.prevMusicButton = new Button(sliderX, 320, smallBtnWidth, 40, "<");
+        this.prevMusicButton = new Button(sliderX, 320, smallBtnWidth, 40, normalImage, hoveredImage, "<");
         this.nextMusicButton = new Button(sliderX + sliderWidth
-                - smallBtnWidth, 320, smallBtnWidth, 40, ">");
+                - smallBtnWidth, 320, smallBtnWidth, 40, normalImage, hoveredImage, ">");
 
         String currentMusic = SettingsManager.getInstance().getSelectedMusic();
         for (int i = 0; i < musicTracks.length; i++) {
@@ -65,8 +71,6 @@ public final class SettingsState implements GameState {
                 break;
             }
         }
-
-        org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
         this.settingsImage = am.getImage("settings");
     }
 

@@ -10,11 +10,13 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.ProgressManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Button;
+import org.example.gamelogic.graphics.Buttons.AbstractButton;
+import org.example.gamelogic.graphics.Buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 import java.util.Map;
 
@@ -22,19 +24,24 @@ public final class LevelState implements GameState {
 
     private static final int NUM_LEVELS = 5;
     private final Image level;
+    private final Image normalImage;
+    private final Image hoveredImage;
     private double elapsedTime = 0;
 
-    private final Button[] levelButtons;
+    private final AbstractButton[] levelButtons;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
     private final int maxLevelUnlocked;
     private final Map<Integer, Integer> starsMap;
 
-    private final Button backButton;
+    private final AbstractButton backButton;
 
     public LevelState() {
+        AssetManager am = AssetManager.getInstance();
         this.level = new Image("/GameIcon/level.gif");
-        this.levelButtons = new Button[NUM_LEVELS];
+        this.normalImage = am.getImage("button");
+        this.hoveredImage = am.getImage("hoveredButton");
+        this.levelButtons = new AbstractButton[NUM_LEVELS];
 
         this.maxLevelUnlocked = ProgressManager.getMaxLevelUnlocked();
         this.starsMap = ProgressManager.loadStars();
@@ -55,12 +62,12 @@ public final class LevelState implements GameState {
                 btnText = "Level " + currentLevel + "  " + getStarString(stars);
             }
 
-            levelButtons[i] = new Button(btnX, btnY, btnText);
+            levelButtons[i] = new Button(btnX, btnY, normalImage, hoveredImage, btnText);
         }
 
         double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
         double btnY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 40;
-        this.backButton = new Button(btnX, btnY, "Back");
+        this.backButton = new Button(btnX, btnY, normalImage, hoveredImage, "Back");
     }
 
     private String getStarString(int stars) {
@@ -81,7 +88,7 @@ public final class LevelState implements GameState {
     }
 
     private void updateButtons(I_InputProvider inputProvider) {
-        for (Button btn : levelButtons) {
+        for (AbstractButton btn : levelButtons) {
             if (btn != null) {
                 btn.update(inputProvider);
             }
@@ -107,7 +114,7 @@ public final class LevelState implements GameState {
         );
 
         for (int i = 0; i < levelButtons.length; i++) {
-            Button btn = levelButtons[i];
+            AbstractButton btn = levelButtons[i];
             if (btn == null) continue;
 
             int currentLevel = i + 1;
@@ -135,7 +142,7 @@ public final class LevelState implements GameState {
         }
 
         for (int i = 0; i < levelButtons.length; i++) {
-            Button btn = levelButtons[i];
+            AbstractButton btn = levelButtons[i];
             if (btn == null || !btn.isClicked()) {
                 continue;
             }
