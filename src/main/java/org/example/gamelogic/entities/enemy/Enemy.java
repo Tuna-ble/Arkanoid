@@ -30,4 +30,10 @@ public interface Enemy extends Collidable {
 
     boolean getHasEnteredScreen();
     void setHasEnteredScreen(boolean hasEnteredScreen);
+
+    String getType();
+
+    int getHealth();
+
+    void setHealth(int health);
 }

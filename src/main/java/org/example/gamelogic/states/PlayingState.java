@@ -17,11 +17,14 @@ import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.events.*;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
+import org.example.data.SavedGameState;
+import org.example.data.SaveGameRepository;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+
 
 public final class PlayingState implements GameState {
     BrickManager brickManager;
@@ -473,6 +476,46 @@ public final class PlayingState implements GameState {
 
     public BallManager getBallManager() {
         return ballManager;
+    }
+    public SavedGameState collectGameStateToSave() {
+        SavedGameState state = new SavedGameState();
+
+        state.levelId = this.levelNumber;
+        state.score = ScoreManager.getInstance().getScore();
+        state.lives = LifeManager.getInstance().getLives();
+
+        state.paddleX = paddle.getX();
+        state.paddleY = paddle.getY();
+        state.paddleWidth = paddle.getWidth();
+
+        state.balls = ballManager.getDataToSave();
+        state.bricks = brickManager.getDataToSave();
+        state.enemies = enemyManager.getDataToSave();
+        System.out.println("Đã thu thập trạng thái game (level " + this.levelNumber + ") để lưu.");
+        return state;
+    }
+
+    public void loadGame(SavedGameState state) {
+        System.out.println("Đang áp dụng trạng thái đã lưu cho level " + state.levelId);
+
+        ScoreManager.getInstance().setScore(state.score);
+        LifeManager.getInstance().setLives(state.lives);
+
+        this.levelNumber = state.levelId;
+        this.currentLives = state.lives;
+
+        System.out.println("--- DEBUG PADDLE ---");
+        System.out.println("Đang tải vị trí Paddle X: " + state.paddleX);
+
+        paddle.setPosition(state.paddleX, state.paddleY);
+        paddle.setWidth(state.paddleWidth);
+        ballManager.loadData(state.balls);
+        brickManager.loadData(state.bricks);
+        enemyManager.loadData(state.enemies);
+
+        // 5. Cập nhật lại các thứ khác nếu cần
+        // vd: tgian choi
+        // this.elapsedTime = state.elapsedTime; // (Nếu bạn thêm elapsedTime vào SavedGameState)
     }
 
     public void cleanUp() {

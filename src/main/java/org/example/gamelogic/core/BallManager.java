@@ -4,9 +4,12 @@ import javafx.scene.canvas.GraphicsContext;
 import org.example.config.GameConstants;
 import org.example.gamelogic.entities.Ball;
 import org.example.gamelogic.entities.IBall;
-import org.example.gamelogic.entities.Paddle; // MỚI: Import Paddle
+import org.example.gamelogic.entities.Paddle;
 import org.example.gamelogic.factory.BallFactory;
 import org.example.gamelogic.registry.BallRegistry;
+import org.example.data.SavedGameState;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +50,6 @@ public final class BallManager {
 
     public void releaseAttachedBalls() {
         for (IBall ball : activeBalls) {
-            // Ball cần có getter isAttachedToPaddle()
             if (ball instanceof Ball && ((Ball) ball).isAttachedToPaddle()) {
                 ball.release();
             }
@@ -85,5 +87,39 @@ public final class BallManager {
 
     public long countActiveBalls() {
         return activeBalls.stream().filter(IBall::isActive).count();
+    }
+
+    public List<SavedGameState.BallData> getDataToSave() {
+        List<SavedGameState.BallData> ballDataList = new ArrayList<>();
+        for (IBall ball : activeBalls) {
+
+
+            ballDataList.add(new SavedGameState.BallData(
+                    ball.getX(),
+                    ball.getY(),
+                    ball.getDx(),
+                    ball.getDy()
+            ));
+        }
+        return ballDataList;
+    }
+
+
+    public void loadData(List<SavedGameState.BallData> ballDataList) {
+        activeBalls.clear();
+
+        for (SavedGameState.BallData data : ballDataList) {
+
+            IBall ball = ballFactory.createBall("STANDARD", 0, 0);
+
+            if (ball != null) {
+                ball.setPosition(data.x, data.y);
+                ball.setDx(data.vx);
+                ball.setDy(data.vy);
+
+                ball.release();
+                activeBalls.add(ball);
+            }
+        }
     }
 }

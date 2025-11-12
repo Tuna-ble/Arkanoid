@@ -8,6 +8,10 @@ import org.example.gamelogic.events.BrickDamagedEvent;
 import org.example.gamelogic.events.BallHitBrickEvent;
 
 public abstract class AbstractBrick extends GameObject implements Brick {
+
+    protected int health;
+    private int id;
+
     public AbstractBrick(double x, double y, double width, double height) {
         super(x, y, width, height);
         subscribeToBrickEvents();
@@ -90,5 +94,30 @@ public abstract class AbstractBrick extends GameObject implements Brick {
     @Override
     public GameObject getGameObject() {
         return this;
+    }
+
+    @Override
+    public int getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
+    public int getHealth() {
+        return this.health;
+    }
+
+    @Override
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    @Override
+    public void setDestroyed(boolean destroyed) {
+        this.isActive = !destroyed;
     }
 }

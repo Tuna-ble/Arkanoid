@@ -82,4 +82,24 @@ public class Paddle extends MovableObject {
         super.setWidth(width);
         this.maxX = GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - this.width;
     }
+
+    @Override
+    public double getX() {
+        return this.x;
+    }
+
+    @Override
+    public double getY() {
+        return this.y;
+    }
+
+    @Override
+    public double getWidth() {
+        return this.width;
+    }
+
+    public void setPosition(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
 }

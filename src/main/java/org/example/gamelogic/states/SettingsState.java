@@ -15,6 +15,7 @@ import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.Buttons.AbstractButton;
 import org.example.gamelogic.graphics.Buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
+import javafx.scene.input.KeyCode;
 
 public final class SettingsState implements GameState {
     private GameState previousState;
@@ -31,7 +32,7 @@ public final class SettingsState implements GameState {
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
     private Image settingsImage = null;
 
-    private final String[] musicTracks = {"default_music"};
+    private final String[] musicTracks = {"music_1", "music_2", "music_3"};
     private int currentMusicIndex = 0;
 
     public SettingsState(GameState previousState) {
@@ -76,13 +77,12 @@ public final class SettingsState implements GameState {
 
     @Override
     public void update(double deltaTime) {
-
+        SoundManager.getInstance().updateAllVolumes();
     }
 
     @Override
     public void render(GraphicsContext gc) {
         SettingsManager settings = SettingsManager.getInstance();
-
         gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         if (settingsImage != null) {
             gc.drawImage(settingsImage, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
@@ -108,12 +108,10 @@ public final class SettingsState implements GameState {
         prevMusicButton.render(gc);
         nextMusicButton.render(gc);
 
-        double sliderWidth = 100; // Chiều rộng thanh (220 - 50 - 50 - 20)
+        double sliderWidth = 100;
         double musicSliderX = musicVolumeDown.getX() + musicVolumeDown.getWidth() + 10;
         double sfxSliderX = sfxVolumeDown.getX() + sfxVolumeDown.getWidth() + 10;
-
         renderSlider(gc, musicSliderX, 275, sliderWidth, 30, settings.getMusicVolume());
-
         renderSlider(gc, sfxSliderX, 455, sliderWidth, 30, settings.getSfxVolume());
 
         gc.setFill(Color.WHITE);
@@ -125,10 +123,8 @@ public final class SettingsState implements GameState {
     private void renderSlider(GraphicsContext gc, double x, double y, double width, double height, double percent) {
         gc.setFill(Color.DARKGRAY);
         gc.fillRoundRect(x, y, width, height, 10, 10);
-
         gc.setFill(Color.LIGHTGREEN);
         gc.fillRoundRect(x, y, width * percent, height, 10, 10);
-
         gc.setStroke(Color.WHITE);
         gc.strokeRoundRect(x, y, width, height, 10, 10);
     }
@@ -151,41 +147,51 @@ public final class SettingsState implements GameState {
 
         if (musicButton.isClicked()) {
             settings.toggleMusic();
+
+            if (settings.isMusicEnabled()) {
+                SoundManager.getInstance().playSelectedMusic();
+            } else {
+                SoundManager.getInstance().stopMusic();
+            }
         }
 
         if (sfxButton.isClicked()) {
             settings.toggleSfx();
         }
 
-        boolean volumeChanged = false;
+        boolean sfxVolumeChanged = false;
+
         if (musicVolumeDown.isClicked()) {
             settings.setMusicVolume(settings.getMusicVolume() - 0.1);
-            volumeChanged = true;
         }
         if (musicVolumeUp.isClicked()) {
             settings.setMusicVolume(settings.getMusicVolume() + 0.1);
-            volumeChanged = true;
         }
+
         if (sfxVolumeDown.isClicked()) {
             settings.setSfxVolume(settings.getSfxVolume() - 0.1);
+            sfxVolumeChanged = true;
         }
         if (sfxVolumeUp.isClicked()) {
             settings.setSfxVolume(settings.getSfxVolume() + 0.1);
+            sfxVolumeChanged = true;
         }
+
+        boolean trackChanged = false;
 
         if (prevMusicButton.isClicked()) {
             currentMusicIndex = (currentMusicIndex - 1 + musicTracks.length) % musicTracks.length;
             settings.setSelectedMusic(musicTracks[currentMusicIndex]);
-            volumeChanged = true;
+            trackChanged = true;
         }
         if (nextMusicButton.isClicked()) {
             currentMusicIndex = (currentMusicIndex + 1) % musicTracks.length;
             settings.setSelectedMusic(musicTracks[currentMusicIndex]);
-            volumeChanged = true;
+            trackChanged = true;
         }
 
-        if (volumeChanged || musicButton.isClicked()) {
-            SoundManager.getInstance().updateAllVolumes();
+        if (trackChanged) {
+            SoundManager.getInstance().playSelectedMusic();
         }
 
         if (backButton.isClicked()) {

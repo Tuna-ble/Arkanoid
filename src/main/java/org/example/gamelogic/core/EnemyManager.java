@@ -6,6 +6,7 @@ import org.example.gamelogic.entities.enemy.*;
 import org.example.gamelogic.factory.EnemyFactory;
 import org.example.gamelogic.registry.EnemyRegistry;
 import org.example.gamelogic.strategy.bossbehavior.BossDyingStrategy;
+import org.example.data.SavedGameState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -207,5 +208,45 @@ public final class EnemyManager {
             }
         }
         return false;
+    }
+
+    public List<SavedGameState.EnemyData> getDataToSave() {
+        List<SavedGameState.EnemyData> enemyDataList = new ArrayList<>();
+        for (Enemy enemy : activeEnemies) {
+
+            enemyDataList.add(new SavedGameState.EnemyData(
+                    enemy.getType(),
+                    enemy.getX(),
+                    enemy.getY(),
+                    enemy.getHealth()
+            ));
+        }
+        return enemyDataList;
+    }
+
+    public void loadData(List<SavedGameState.EnemyData> enemyDataList) {
+        activeEnemies.clear();
+        enemiesToSpawn.clear();
+
+        for (SavedGameState.EnemyData data : enemyDataList) {
+            Enemy enemy = enemyFactory.createEnemy(data.type, 0, 0);
+
+            if (enemy != null) {
+
+                enemy.setPosition(data.x, data.y);
+                enemy.setHealth(data.health);
+                enemy.setHasEnteredScreen(true);
+
+                activeEnemies.add(enemy);
+            }
+        }
+
+        this.bossSpawned = false;
+        for (Enemy enemy : activeEnemies) {
+            if (enemy instanceof Boss) {
+                this.bossSpawned = true;
+                break;
+            }
+        }
     }
 }

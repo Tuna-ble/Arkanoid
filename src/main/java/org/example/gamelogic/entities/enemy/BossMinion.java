@@ -75,4 +75,9 @@ public class BossMinion extends AbstractEnemy {
     public void handleEntry(double deltaTime) {
 
     }
+
+    @Override
+    public String getType() {
+        return "MINION";
+    }
 }

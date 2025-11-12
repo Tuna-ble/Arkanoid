@@ -101,6 +101,7 @@ public final class GameManager {
         this.particleManager = ParticleManager.getInstance();
 
         this.enemyManager.setBrickManager(this.brickManager);
+        this.soundManager.playSelectedMusic();
 
         subscribeToEvents();
     }
@@ -198,6 +199,7 @@ public final class GameManager {
                     ((PauseState) currentState).cleanUp();
                 }
                 newState = new MainMenuState();
+                soundManager.playSelectedMusic();
                 break;
 
             case VICTORY:
@@ -211,7 +213,7 @@ public final class GameManager {
                     HighscoreManager.saveNewScore(finalScore);
 
                     playingState.cleanUp();
-
+                    soundManager.stopMusic();
                     newState = new VictoryState(livesLeft, levelCompleted);
                 }
                 break;
