@@ -2,7 +2,7 @@ package org.example.gamelogic.core;
 
 import org.example.gamelogic.entities.Paddle;
 
-public class ObjectAccess {
+public final class ObjectAccess {
     private static class SingletonHolder {
         private static final ObjectAccess INSTANCE = new ObjectAccess();
     }
