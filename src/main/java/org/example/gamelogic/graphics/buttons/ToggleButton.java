@@ -1,4 +1,4 @@
-package org.example.gamelogic.graphics.Buttons;
+package org.example.gamelogic.graphics.buttons;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
