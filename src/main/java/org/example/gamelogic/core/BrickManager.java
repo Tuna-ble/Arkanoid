@@ -134,7 +134,7 @@ public final class BrickManager {
                 Brick brick = brickFactory.createBrick(type, x, y);
                 if (brick != null) {
 
-                    int brickId = (row * 100) + currentCol;
+                    int brickId = (row * 100) + col;
                     brick.setId(brickId);
                     this.bricks.add(brick);
                 }
