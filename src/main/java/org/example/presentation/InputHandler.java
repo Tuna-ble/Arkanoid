@@ -16,12 +16,14 @@ public class InputHandler implements I_InputProvider {
     private int mouseX;
     private int mouseY;
     private boolean mouseClicked;
+    private boolean mouseIsPressed;
 
     public InputHandler() {
         this.pressedKeys = new HashSet<>();
         this.mouseX = 0;
         this.mouseY = 0;
         this.mouseClicked = false;
+        this.mouseIsPressed = false;
     }
 
     public void addKey(KeyCode code) {
@@ -39,6 +41,14 @@ public class InputHandler implements I_InputProvider {
 
     public void setMouseClicked(boolean clicked) {
         this.mouseClicked = clicked;
+    }
+
+    public void setMousePressed(boolean pressed) {
+        this.mouseIsPressed = pressed;
+    }
+
+    public void setMouseReleased() {
+        this.mouseIsPressed = false;
     }
 
     @Override
@@ -70,6 +80,12 @@ public class InputHandler implements I_InputProvider {
         return mouseClicked;
     }
 
+    @Override
+    public boolean isMousePressed() {
+        return mouseIsPressed;
+    }
+
+    @Override
     public void resetMouseClick() {
         mouseClicked = false;
     }

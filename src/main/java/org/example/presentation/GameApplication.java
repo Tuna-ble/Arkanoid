@@ -44,8 +44,19 @@ public class GameApplication extends Application {
             inputHandler.setMousePos(event.getX(), event.getY());
         });
 
-        scene.setOnMouseClicked(event -> {
+        /*scene.setOnMouseClicked(event -> {
             inputHandler.setMouseClicked(true);
+        });*/
+
+        scene.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown()) {
+                inputHandler.setMouseClicked(true);
+                inputHandler.setMousePressed(true);
+            }
+        });
+
+        scene.setOnMouseReleased(event -> {
+            inputHandler.setMouseReleased();
         });
 
         primaryStage.setTitle("Arkanoid");
