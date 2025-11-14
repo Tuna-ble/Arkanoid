@@ -15,8 +15,8 @@ public class Slider extends AbstractUIElement {
     private Image fillImage;
     private Image handleImage;
 
-    private double trackOffsetX;
-    private double trackOffsetY;
+    private double trackX;
+    private double trackY;
     private double trackWidth;
     private double trackHeight;
     private double handleX;
@@ -27,7 +27,6 @@ public class Slider extends AbstractUIElement {
 
     public Slider(double x, double y, double width, double height, double initialValue) {
         super(x, y, width, height);
-        setValue(initialValue); // Đặt giá trị ban đầu
 
         AssetManager am = AssetManager.getInstance();
         this.frameImage = am.getImage("barFrame");
@@ -35,16 +34,19 @@ public class Slider extends AbstractUIElement {
         this.handleImage = am.getImage("barHandle");
 
         this.bounds = new Rectangle(x, y, width, height);
-        this.trackOffsetX = 1;
-        this.trackOffsetY = 1;
-        this.trackWidth = width - (2 * trackOffsetX);
-        this.trackHeight = height - (2 * trackOffsetX);
+        double PADDING = 1;
+        this.trackX = this.x + PADDING;
+        this.trackY = this.y + PADDING;
+        this.trackWidth = this.width - (2 * PADDING);
+        this.trackHeight = this.height - (2 * PADDING);
+
+        setValue(initialValue);
     }
 
     public void setValue(double value) {
         this.value = Math.max(0.0, Math.min(1.0, value));
-        // Cập nhật vị trí X của núm dựa trên giá trị
-        this.handleX = this.x + (this.width * this.value);
+
+        this.handleX = this.trackX + (this.trackWidth * this.value);
     }
 
     public double getValue() {
@@ -56,57 +58,44 @@ public class Slider extends AbstractUIElement {
         int mouseY = input.getMouseY();
         boolean mousePressed = input.isMousePressed();
 
-        // Tính khoảng cách từ chuột đến tâm núm
-        double distToHandle = Math.hypot(mouseX - handleX, mouseY - (y + height / 2));
+        if (mousePressed) {
+            if (!isDragging && bounds.contains(mouseX, mouseY)) {
+                isDragging = true;
+            }
 
-        // 1. Bắt đầu kéo?
-        if (mousePressed && distToHandle <= handleWidth / 2.0 && !isDragging) {
-            isDragging = true;
-        }
+            if (isDragging) {
+                double newHandleX = Math.max(this.trackX, Math.min(mouseX, this.trackX + this.trackWidth));
 
-        // 2. Dừng kéo?
-        if (!mousePressed) {
+                this.value = (newHandleX - this.trackX) / this.trackWidth;
+                this.handleX = newHandleX;
+            }
+        } else {
             isDragging = false;
-        }
-
-        // 3. Đang kéo?
-        if (isDragging) {
-            // Tìm vị trí X mới, kẹp (clamp) trong khoảng [x, x + width]
-            double newHandleX = Math.max(this.x, Math.min(mouseX, this.x + this.width));
-
-            // Cập nhật giá trị
-            this.value = (newHandleX - this.x) / this.width;
-
-            // Cập nhật vị trí X của núm
-            this.handleX = newHandleX;
         }
     }
 
     public void renderDefault(GraphicsContext gc) {
-        // 1. Vẽ thanh rãnh (track)
         gc.drawImage(frameImage, x, y, width, height);
 
-        // 2. Vẽ phần "đã điền" (filled)
-        double sx = 0;
-        double sy = 0;
-        // Đây là mấu chốt: chỉ lấy một phần chiều rộng của ảnh fill
-        double sw = width * value;
-        double sh = height;
+        if (value > 0 && fillImage != null) {
+            double dw = this.trackWidth * value;
+            double dh = this.trackHeight;
 
-        // Tọa độ và kích thước đích (destination)
-        // (Vẽ nó đè lên frame, có xét khoảng đệm)
-        double dx = this.x + trackOffsetX;
-        double dy = this.y + trackOffsetY;
-        // Chiều rộng đích bằng chiều rộng nguồn
-        double dw = sw;
-        double dh = sh;
+            double sw = this.fillImage.getWidth() * value;
+            double sh = this.fillImage.getHeight();
 
-        // Chỉ vẽ nếu có giá trị
-        if (value > 0) {
-            gc.drawImage(fillImage, sx, sy, sw, sh, dx, dy, dw, dh);
+            gc.drawImage(
+                    fillImage,
+                    0, 0, sw, sh,
+                    trackX, trackY, dw, dh
+            );
         }
 
-        // 3. Vẽ núm (knob)
-        gc.drawImage(handleImage, handleX, y, handleWidth, handleHeight);
+        if (handleImage != null) {
+            double drawHandleX = this.handleX - (this.handleWidth / 2.0);
+            double drawHandleY = this.y + (this.height / 2.0) - (this.handleHeight / 2.0);
+
+            gc.drawImage(handleImage, drawHandleX, drawHandleY, handleWidth, handleHeight);
+        }
     }
 }
