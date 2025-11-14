@@ -80,11 +80,19 @@ public class AssetManager {
             loadImage("icon_expand", "/images/expandpaddle.png"); //
             loadImage("icon_extra_life", "/images/extra.png"); //
 
+            loadImage("banner", "/images/banner.png");
             loadImage("holo_tl", "/images/holo_top_left.png");
             loadImage("holo_tr", "/images/holo_top_right.png");
             loadImage("holo_bl", "/images/holo_bottom_left.png");
             loadImage("holo_br", "/images/holo_bottom_right.png");
             loadImage("holo_fill", "/images/window.png");
+            loadImage("popup_fill", "/images/popup.png");
+
+            loadImage("toggleOn", "/images/toggleOn.png");
+            loadImage("toggleOff", "/images/toggleOff.png");
+            loadImage("barFrame", "/images/barFrame.png");
+            loadImage("barFill", "/images/barFill.png");
+            loadImage("barHandle", "/images/barHandle.png");
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());
             e.printStackTrace();
