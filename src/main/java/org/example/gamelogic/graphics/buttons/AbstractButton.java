@@ -6,28 +6,23 @@ import javafx.scene.text.Font;
 import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
 
-public abstract class AbstractButton {
-    protected double x;
-    protected double y;
-    protected double width;
-    protected double height;
+public abstract class AbstractButton extends AbstractUIElement{
     protected String text;
     protected Font font;
     protected boolean isHovered;
     protected boolean isClicked;
-    
-    // Colors
+
     protected Color backgroundColor;
     protected Color hoverBackgroundColor;
     protected Color strokeColor;
     protected Color hoverStrokeColor;
     protected Color textColor;
 
+    private double timer = 0.0;
+    private final double DURATION = 0.5;
+
     public AbstractButton(double x, double y, double width, double height, String text) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        super(x, y, width, height);
         this.text = text;
         this.font = AssetManager.getInstance().getFont("Anxel", 25);
         this.isHovered = false;
@@ -41,7 +36,7 @@ public abstract class AbstractButton {
         this.textColor = Color.WHITE;
     }
     
-    public void update(I_InputProvider inputProvider) {
+    public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) {
             isHovered = false;
             isClicked = false;
@@ -56,8 +51,8 @@ public abstract class AbstractButton {
 
         isClicked = isHovered && inputProvider.isMouseClicked();
     }
-    
-    public abstract void render(GraphicsContext gc);
+
+    public abstract void renderDefault(GraphicsContext gc);
 
     public boolean isHovered() {
         return isHovered;
@@ -70,38 +65,6 @@ public abstract class AbstractButton {
     public boolean contains(double mouseX, double mouseY) {
         return mouseX >= x && mouseX <= x + width &&
                mouseY >= y && mouseY <= y + height;
-    }
-    
-    public double getX() {
-        return x;
-    }
-    
-    public void setX(double x) {
-        this.x = x;
-    }
-    
-    public double getY() {
-        return y;
-    }
-    
-    public void setY(double y) {
-        this.y = y;
-    }
-    
-    public double getWidth() {
-        return width;
-    }
-    
-    public void setWidth(double width) {
-        this.width = width;
-    }
-    
-    public double getHeight() {
-        return height;
-    }
-    
-    public void setHeight(double height) {
-        this.height = height;
     }
     
     public String getText() {

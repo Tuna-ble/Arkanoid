@@ -25,7 +25,7 @@ public class Button extends AbstractButton {
     }
 
     @Override
-    public void render(GraphicsContext gc) {
+    public void renderDefault(GraphicsContext gc) {
         if (gc == null) return;
         Image imgToDraw = isHovered ? hoverImage : normalImage;
 
