@@ -80,8 +80,8 @@ public final class ConfirmContinueState implements GameState {
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
 
-        continueButton.update(inputProvider);
-        resetButton.update(inputProvider);
+        continueButton.handleInput(inputProvider);
+        resetButton.handleInput(inputProvider);
 
         if (continueButton.isClicked()) {
             SaveGameRepository repo = new SaveGameRepository();

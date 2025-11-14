@@ -20,11 +20,15 @@ import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 import org.example.data.SaveGameRepository;
 import org.example.gamelogic.core.GameManager;
+import org.example.gamelogic.graphics.windows.Window;
+import org.example.gamelogic.strategy.transition.button.WipeElementTransitionStrategy;
+import org.example.gamelogic.strategy.transition.window.HologramTransitionStrategy;
+import org.example.gamelogic.strategy.transition.window.ITransitionStrategy;
+import org.example.gamelogic.strategy.transition.window.ScrollDownTransitionStrategy;
 
 import java.util.Map;
 
 public final class LevelState implements GameState {
-
     private static final int NUM_LEVELS = 5;
     private final Image level;
     private final Image normalImage;
@@ -39,7 +43,13 @@ public final class LevelState implements GameState {
 
     private final AbstractButton backButton;
 
+    private Window window;
+
     public LevelState() {
+        ITransitionStrategy transition = new ScrollDownTransitionStrategy();
+        this.window = new Window(null, 500, 450, transition,
+                "LEVELS", null);
+
         AssetManager am = AssetManager.getInstance();
         this.level = new Image("/images/level.gif");
         this.normalImage = am.getImage("button");
@@ -66,11 +76,17 @@ public final class LevelState implements GameState {
             }
 
             levelButtons[i] = new Button(btnX, btnY, normalImage, hoveredImage, btnText);
+            levelButtons[i].setTransition(new WipeElementTransitionStrategy(0.5));
+
+            this.window.addButton(levelButtons[i]);
         }
 
         double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
         double btnY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 40;
         this.backButton = new Button(btnX, btnY, normalImage, hoveredImage, "Back");
+        this.backButton.setTransition(new WipeElementTransitionStrategy(0.5));
+
+        this.window.addButton(backButton);
     }
 
     private String getStarString(int stars) {
@@ -88,15 +104,7 @@ public final class LevelState implements GameState {
     @Override
     public void update(double deltaTime) {
         elapsedTime += deltaTime;
-    }
-
-    private void updateButtons(I_InputProvider inputProvider) {
-        for (AbstractButton btn : levelButtons) {
-            if (btn != null) {
-                btn.update(inputProvider);
-            }
-        }
-        backButton.update(inputProvider);
+        window.update(deltaTime);
     }
 
     @Override
@@ -122,21 +130,19 @@ public final class LevelState implements GameState {
 
             int currentLevel = i + 1;
             if (currentLevel > maxLevelUnlocked) {
-                gc.save();
-                gc.setGlobalAlpha(0.5);
-                btn.render(gc);
-                gc.restore();
+                btn.setDisabled(true);
             } else {
-                btn.render(gc);
+                btn.setDisabled(false);
             }
         }
-        backButton.render(gc);
+        window.render(gc);
     }
 
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
-        updateButtons(inputProvider);
+
+        window.handleInput(inputProvider);
 
         if (backButton.isClicked()) {
             EventManager.getInstance().publish(

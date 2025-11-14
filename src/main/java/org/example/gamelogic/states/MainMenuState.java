@@ -132,10 +132,10 @@ public final class MainMenuState implements GameState {
     }
 
     private void updateButtons(I_InputProvider inputProvider) {
-        if (startButton != null) startButton.update(inputProvider);
-        if (rankingButton != null) rankingButton.update(inputProvider);
-        if (settingsButton != null) settingsButton.update(inputProvider);
-        if (newGameButton != null) newGameButton.update(inputProvider);
+        if (startButton != null) startButton.handleInput(inputProvider);
+        if (rankingButton != null) rankingButton.handleInput(inputProvider);
+        if (settingsButton != null) settingsButton.handleInput(inputProvider);
+        if (newGameButton != null) newGameButton.handleInput(inputProvider);
     }
 }
 

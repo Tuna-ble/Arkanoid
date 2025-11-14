@@ -162,7 +162,7 @@ public final class RankingState implements GameState {
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
-        backButton.update(inputProvider);
+        backButton.handleInput(inputProvider);
         if (backButton.isClicked()) {
             rankingIcon = null;
             EventManager.getInstance().publish(

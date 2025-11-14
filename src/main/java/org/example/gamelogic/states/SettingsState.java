@@ -14,22 +14,23 @@ import org.example.gamelogic.core.SoundManager;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.buttons.AbstractButton;
 import org.example.gamelogic.graphics.buttons.Button;
-import org.example.gamelogic.graphics.TextRenderer;
-import org.example.gamelogic.graphics.windows.AbstractWindow;
-import org.example.gamelogic.graphics.windows.HologramWindow;
+import org.example.gamelogic.graphics.buttons.Slider;
+import org.example.gamelogic.graphics.windows.Window;
+import org.example.gamelogic.strategy.transition.button.WipeElementTransitionStrategy;
+import org.example.gamelogic.strategy.transition.window.HologramTransitionStrategy;
+import org.example.gamelogic.strategy.transition.window.ITransitionStrategy;
 
 public final class SettingsState implements GameState {
     private GameState previousState;
-    private AbstractWindow window;
+    private Window window;
     private AbstractButton musicButton;
     private AbstractButton sfxButton;
     private AbstractButton backButton;
-    private AbstractButton musicVolumeDown;
-    private AbstractButton musicVolumeUp;
-    private AbstractButton sfxVolumeDown;
-    private AbstractButton sfxVolumeUp;
     private AbstractButton prevMusicButton;
     private AbstractButton nextMusicButton;
+
+    private Slider musicSlider;
+    private Slider sfxSlider;
 
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
     private Image settingsImage = null;
@@ -39,35 +40,49 @@ public final class SettingsState implements GameState {
 
     public SettingsState(GameState previousState) {
         this.previousState = previousState;
-        this.window = new HologramWindow(previousState);
 
-        double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
-        boolean musicOn = SettingsManager.getInstance().isMusicEnabled();
-        boolean sfxOn = SettingsManager.getInstance().isSfxEnabled();
+        ITransitionStrategy transition = new HologramTransitionStrategy();
+        this.window = new Window(previousState, 500, 450, transition,
+                "SETTINS", null);
 
         AssetManager am = AssetManager.getInstance();
+        SettingsManager settings = SettingsManager.getInstance();
+
+        double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
+        boolean musicOn = settings.isMusicEnabled();
+        boolean sfxOn = settings.isSfxEnabled();
+
         final Image normalImage = am.getImage("button");
         final Image hoveredImage = am.getImage("hoveredButton");
 
-        this.musicButton = new Button(btnX, 200, normalImage, hoveredImage, "Music: " + (musicOn ? "ON" : "OFF"));
-        this.sfxButton = new Button(btnX, 380, normalImage, hoveredImage, "SFX: " + (sfxOn ? "ON" : "OFF"));
-        this.backButton = new Button(btnX, 510, normalImage, hoveredImage, "Back");
+        this.musicButton = new Button(btnX, 200, normalImage,
+                hoveredImage, "Music: " + (musicOn ? "ON" : "OFF"));
+        this.musicButton.setTransition(new WipeElementTransitionStrategy(0.5));
+
+        this.sfxButton = new Button(btnX, 380, normalImage,
+                hoveredImage, "SFX: " + (sfxOn ? "ON" : "OFF"));
+        this.sfxButton.setTransition(new WipeElementTransitionStrategy(0.5));
+
+        this.backButton = new Button(btnX, 510, normalImage,
+                hoveredImage, "Back");
+        this.backButton.setTransition(new WipeElementTransitionStrategy(0.5));
 
         double smallBtnWidth = 50;
         double sliderWidth = 220;
         double sliderX = centerX - sliderWidth / 2;
 
-        this.musicVolumeDown = new Button(sliderX, 270, smallBtnWidth, 40, normalImage, hoveredImage, "-");
-        this.musicVolumeUp = new Button(sliderX + sliderWidth
-                - smallBtnWidth, 270, smallBtnWidth, 40, normalImage, hoveredImage, "+");
+        this.musicSlider = new Slider(sliderX, 255, sliderWidth, 10, settings.getMusicVolume());
+        this.musicSlider.setTransition(new WipeElementTransitionStrategy(0.5));
 
-        this.sfxVolumeDown = new Button(sliderX, 450, smallBtnWidth, 40, normalImage, hoveredImage, "-");
-        this.sfxVolumeUp = new Button(sliderX + sliderWidth
-                - smallBtnWidth, 450, smallBtnWidth, 40, normalImage, hoveredImage, "+");
+        this.sfxSlider = new Slider(sliderX, 405, sliderWidth, 10, settings.getSfxVolume());
+        this.sfxSlider.setTransition(new WipeElementTransitionStrategy(0.5));
 
         this.prevMusicButton = new Button(sliderX, 320, smallBtnWidth, 40, normalImage, hoveredImage, "<");
+        this.prevMusicButton.setTransition(new WipeElementTransitionStrategy(0.5));
+
         this.nextMusicButton = new Button(sliderX + sliderWidth
                 - smallBtnWidth, 320, smallBtnWidth, 40, normalImage, hoveredImage, ">");
+        this.nextMusicButton.setTransition(new WipeElementTransitionStrategy(0.5));
 
         String currentMusic = SettingsManager.getInstance().getSelectedMusic();
         for (int i = 0; i < musicTracks.length; i++) {
@@ -81,10 +96,8 @@ public final class SettingsState implements GameState {
         this.window.addButton(musicButton);
         this.window.addButton(sfxButton);
         this.window.addButton(backButton);
-        this.window.addButton(musicVolumeDown);
-        this.window.addButton(musicVolumeUp);
-        this.window.addButton(sfxVolumeDown);
-        this.window.addButton(sfxVolumeUp);
+        this.window.addButton(musicSlider);
+        this.window.addButton(sfxSlider);
         this.window.addButton(prevMusicButton);
         this.window.addButton(nextMusicButton);
     }
@@ -104,38 +117,16 @@ public final class SettingsState implements GameState {
         }
 
         window.render(gc);
-        if (window.isFinished()) {
-            gc.setTextAlign(TextAlignment.CENTER);
-            TextRenderer.drawOutlinedText(
-                    gc, "SETTINGS", centerX, 110,
-                    new Font("Arial", 70), Color.WHITE, Color.BLACK, 2.0, null
-            );
 
-            boolean musicOn = settings.isMusicEnabled();
-            boolean sfxOn = settings.isSfxEnabled();
-            musicButton.setText("Music: " + (musicOn ? "ON" : "OFF"));
-            sfxButton.setText("SFX: " + (sfxOn ? "ON" : "OFF"));
+        boolean musicOn = settings.isMusicEnabled();
+        boolean sfxOn = settings.isSfxEnabled();
+        musicButton.setText("Music: " + (musicOn ? "ON" : "OFF"));
+        sfxButton.setText("SFX: " + (sfxOn ? "ON" : "OFF"));
 
-            double sliderWidth = 100;
-            double musicSliderX = musicVolumeDown.getX() + musicVolumeDown.getWidth() + 10;
-            double sfxSliderX = sfxVolumeDown.getX() + sfxVolumeDown.getWidth() + 10;
-            renderSlider(gc, musicSliderX, 275, sliderWidth, 30, settings.getMusicVolume());
-            renderSlider(gc, sfxSliderX, 455, sliderWidth, 30, settings.getSfxVolume());
-
-            gc.setFill(Color.WHITE);
-            gc.setFont(new Font("Arial", 20));
-            gc.setTextAlign(TextAlignment.CENTER);
-            gc.fillText(settings.getSelectedMusic(), centerX, 345);
-        }
-    }
-
-    private void renderSlider(GraphicsContext gc, double x, double y, double width, double height, double percent) {
-        gc.setFill(Color.DARKGRAY);
-        gc.fillRoundRect(x, y, width, height, 10, 10);
-        gc.setFill(Color.LIGHTGREEN);
-        gc.fillRoundRect(x, y, width * percent, height, 10, 10);
-        gc.setStroke(Color.WHITE);
-        gc.strokeRoundRect(x, y, width, height, 10, 10);
+        gc.setFill(Color.WHITE);
+        gc.setFont(new Font("Arial", 20));
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.fillText(settings.getSelectedMusic(), centerX, 345);
     }
 
     @Override
@@ -162,20 +153,17 @@ public final class SettingsState implements GameState {
 
         boolean sfxVolumeChanged = false;
 
-        if (musicVolumeDown.isClicked()) {
-            settings.setMusicVolume(settings.getMusicVolume() - 0.1);
-        }
-        if (musicVolumeUp.isClicked()) {
-            settings.setMusicVolume(settings.getMusicVolume() + 0.1);
+        double newMusicVol = musicSlider.getValue();
+        double newSfxVol = sfxSlider.getValue();
+        boolean volumeChanged = false;
+
+        if (newMusicVol != settings.getMusicVolume()) {
+            settings.setMusicVolume(newMusicVol);
+            volumeChanged = true;
         }
 
-        if (sfxVolumeDown.isClicked()) {
-            settings.setSfxVolume(settings.getSfxVolume() - 0.1);
-            sfxVolumeChanged = true;
-        }
-        if (sfxVolumeUp.isClicked()) {
-            settings.setSfxVolume(settings.getSfxVolume() + 0.1);
-            sfxVolumeChanged = true;
+        if (newSfxVol != settings.getSfxVolume()) {
+            settings.setSfxVolume(newSfxVol);
         }
 
         boolean trackChanged = false;
@@ -193,6 +181,10 @@ public final class SettingsState implements GameState {
 
         if (trackChanged) {
             SoundManager.getInstance().playSelectedMusic();
+        }
+
+        if (volumeChanged || musicButton.isClicked()) {
+            SoundManager.getInstance().updateAllVolumes();
         }
 
         if (backButton.isClicked()) {

@@ -63,8 +63,8 @@ public final class ConfirmResetState implements GameState {
     }
 
     private void updateButtons(I_InputProvider inputProvider) {
-        yesButton.update(inputProvider);
-        noButton.update(inputProvider);
+        yesButton.handleInput(inputProvider);
+        noButton.handleInput(inputProvider);
     }
 
     @Override
