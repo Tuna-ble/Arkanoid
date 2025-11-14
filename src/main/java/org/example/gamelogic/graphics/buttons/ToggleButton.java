@@ -24,15 +24,16 @@ public class ToggleButton extends AbstractButton {
     }
 
     @Override
-    public void update(I_InputProvider inputProvider) {
-        super.update(inputProvider);
+    public void handleInput(I_InputProvider inputProvider) {
+        super.handleInput(inputProvider);
 
         if (isClicked) {
             this.isOn = !this.isOn;
         }
     }
 
-    public void render(GraphicsContext gc) {
+    @Override
+    public void renderDefault(GraphicsContext gc) {
         Image imgToDraw = isOn ? onImage : offImage;
 
         if (imgToDraw != null) {
