@@ -15,12 +15,12 @@ import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.ProgressManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Buttons.AbstractButton;
-import org.example.gamelogic.graphics.Buttons.Button;
+import org.example.gamelogic.graphics.buttons.AbstractButton;
+import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 import org.example.data.SaveGameRepository;
 import org.example.gamelogic.core.GameManager;
-import org.example.gamelogic.states.ConfirmContinueState;
+
 import java.util.Map;
 
 public final class LevelState implements GameState {
@@ -41,7 +41,7 @@ public final class LevelState implements GameState {
 
     public LevelState() {
         AssetManager am = AssetManager.getInstance();
-        this.level = new Image("/GameIcon/level.gif");
+        this.level = new Image("/images/level.gif");
         this.normalImage = am.getImage("button");
         this.hoveredImage = am.getImage("hoveredButton");
         this.levelButtons = new AbstractButton[NUM_LEVELS];

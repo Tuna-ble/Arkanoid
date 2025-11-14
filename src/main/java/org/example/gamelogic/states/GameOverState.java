@@ -15,8 +15,8 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.Stop;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Buttons.AbstractButton;
-import org.example.gamelogic.graphics.Buttons.Button;
+import org.example.gamelogic.graphics.buttons.AbstractButton;
+import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class GameOverState implements GameState {
@@ -33,7 +33,7 @@ public final class GameOverState implements GameState {
 
     public GameOverState(int levelToRestart) {
         this.levelToRestart = levelToRestart;
-        gameOverGif = new Image("/GameIcon/gameOverBackground.gif");
+        gameOverGif = new Image("/images/gameOverBackground.gif");
 
         AssetManager am = AssetManager.getInstance();
         final Image normalImage = am.getImage("button");

@@ -15,8 +15,8 @@ import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.ProgressManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Buttons.AbstractButton;
-import org.example.gamelogic.graphics.Buttons.Button;
+import org.example.gamelogic.graphics.buttons.AbstractButton;
+import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class VictoryState implements GameState {
@@ -76,7 +76,7 @@ public final class VictoryState implements GameState {
         this.nextButton = new Button(nextX, buttonY, buttonWidth,
                 GameConstants.UI_BUTTON_HEIGHT, normalImage, hoveredImage, "Next Level");
 
-        victory = new Image("/GameIcon/victory.gif");
+        victory = new Image("/images/victory.gif");
     }
 
     @Override

@@ -15,8 +15,8 @@ import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.HighscoreManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Buttons.AbstractButton;
-import org.example.gamelogic.graphics.Buttons.Button;
+import org.example.gamelogic.graphics.buttons.AbstractButton;
+import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 import java.util.List;
