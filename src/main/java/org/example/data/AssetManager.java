@@ -85,8 +85,10 @@ public class AssetManager {
             loadImage("holo_tr", "/images/holo_top_right.png");
             loadImage("holo_bl", "/images/holo_bottom_left.png");
             loadImage("holo_br", "/images/holo_bottom_right.png");
-            loadImage("holo_fill", "/images/window.png");
-            loadImage("popup_fill", "/images/popup.png");
+            loadImage("holo_fill", "/images/hologram_fill.png");
+            loadImage("popup_fill", "/images/popup_fill.png");
+            loadImage("scroll_fill", "/images/scroll_fill.png");
+            loadImage("scroll_bar", "/images/scroll_bar.png");
 
             loadImage("toggleOn", "/images/toggleOn.png");
             loadImage("toggleOff", "/images/toggleOff.png");
