@@ -85,9 +85,9 @@ public final class VictoryState implements GameState {
     }
 
     private void updateButtons(I_InputProvider inputProvider) {
-        quitButton.update(inputProvider);
-        menuButton.update(inputProvider);
-        nextButton.update(inputProvider);
+        quitButton.handleInput(inputProvider);
+        menuButton.handleInput(inputProvider);
+        nextButton.handleInput(inputProvider);
     }
 
     @Override

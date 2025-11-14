@@ -72,9 +72,9 @@ public final class GameModeState implements GameState {
     public void update(double deltaTime) { }
 
     private void updateButtons(I_InputProvider inputProvider) {
-        infiniteButton.update(inputProvider);
-        levelsButton.update(inputProvider);
-         backButton.update(inputProvider);
+        infiniteButton.handleInput(inputProvider);
+        levelsButton.handleInput(inputProvider);
+         backButton.handleInput(inputProvider);
     }
 
     @Override

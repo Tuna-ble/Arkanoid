@@ -145,8 +145,8 @@ public final class GameOverState implements GameState {
     }
 
     private void updateButtons(I_InputProvider inputProvider) {
-        if (restartButton != null) restartButton.update(inputProvider);
-        if (menuButton != null) menuButton.update(inputProvider);
-        if (exitButton != null) exitButton.update(inputProvider);
+        if (restartButton != null) restartButton.handleInput(inputProvider);
+        if (menuButton != null) menuButton.handleInput(inputProvider);
+        if (exitButton != null) exitButton.handleInput(inputProvider);
     }
 }

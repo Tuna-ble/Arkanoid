@@ -45,10 +45,10 @@ public final class InfiniteModeState implements GameState {
 
     private void updateButtons(I_InputProvider inputProvider) {
         if (playButton != null) {
-            playButton.update(inputProvider);
+            playButton.handleInput(inputProvider);
         }
         if (backButton != null) {
-            backButton.update(inputProvider);
+            backButton.handleInput(inputProvider);
         }
     }
 
