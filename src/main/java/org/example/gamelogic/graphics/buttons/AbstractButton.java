@@ -37,7 +37,7 @@ public abstract class AbstractButton extends AbstractUIElement{
     }
     
     public void handleInput(I_InputProvider inputProvider) {
-        if (inputProvider == null) {
+        if (inputProvider == null || isDisabled()) {
             isHovered = false;
             isClicked = false;
             return;

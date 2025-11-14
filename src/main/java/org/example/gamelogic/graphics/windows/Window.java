@@ -41,7 +41,7 @@ public class Window {
 
         this.windowTransition = windowTransition;
         if (this.windowTransition == null) {
-            this.windowTransitionFinished = true; // Không có -> xong luôn
+            this.windowTransitionFinished = true;
         }
     }
 
@@ -53,20 +53,17 @@ public class Window {
             }
         }
 
-        // 2. "SAU KHI" nó xong...
         if (windowTransitionFinished) {
 
-            // 2a. Ra lệnh cho TẤT CẢ con bắt đầu (chỉ 1 lần)
             if (!childrenTransitionsStarted) {
                 for (AbstractUIElement element : elements) {
-                    element.startTransition(); // Bảo chúng nó "Chạy đi!"
+                    element.startTransition();
                 }
                 childrenTransitionsStarted = true;
             }
 
-            // 2b. Update transition CỦA CON
             for (AbstractUIElement element : elements) {
-                element.updateTransition(deltaTime); // "Tiếp tục chạy đi!"
+                element.updateTransition(deltaTime);
             }
         }
     }
@@ -83,7 +80,7 @@ public class Window {
         }
         if (windowTransitionFinished) {
             for (AbstractUIElement element : elements) {
-                element.render(gc); // Element tự biết vẽ (strategy hay default)
+                element.render(gc);
             }
         }
     }
@@ -115,10 +112,9 @@ public class Window {
             }
         }
 
-        // CHỈ xử lý input KHI CẢ Window VÀ TẤT CẢ con đã xong
         if (windowTransitionFinished && allChildrenFinished) {
             for (AbstractUIElement element : elements) {
-                element.handleInput(input); // Gọi logic check hover/click
+                element.handleInput(input);
             }
         }
     }
