@@ -100,6 +100,7 @@ public final class GameConstants {
     public static final double UI_BUTTON_WIDTH = 200;
     public static final double UI_BUTTON_HEIGHT = 60;
     public static final double UI_BUTTON_SPACING = 20;
+    public static final double UI_BUTTON_PADDING = 20;
 
     // UI - Windows
     public static final double UI_WINDOW_WIDTH = 500;
