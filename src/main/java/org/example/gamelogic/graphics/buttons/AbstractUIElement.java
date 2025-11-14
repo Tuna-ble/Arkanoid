@@ -13,6 +13,7 @@ public abstract class AbstractUIElement {
     protected IUIElementTransitionStrategy transition;
     protected boolean transitionStarted = false;
     protected boolean transitionFinished;
+    protected boolean isDisabled = false;
 
     public AbstractUIElement(double x, double y, double width, double height) {
         this.x = x;
@@ -48,12 +49,20 @@ public abstract class AbstractUIElement {
     }
 
     public void render(GraphicsContext gc) {
-        if (transition != null && !transitionFinished) {
-            transition.renderElement(gc, this);
+        try {
+            if (this.isDisabled) {
+                gc.setGlobalAlpha(0.5);
+            }
+            if (transition != null && !transitionFinished) {
+                transition.renderElement(gc, this);
+            }
+            else {
+                renderDefault(gc);
+            }
+        } finally {
+            gc.restore();
         }
-        else {
-            renderDefault(gc);
-        }
+
     }
 
     public abstract void renderDefault(GraphicsContext gc);
@@ -62,6 +71,14 @@ public abstract class AbstractUIElement {
 
     public boolean isTransitionFinished() {
         return (transition == null) || transitionFinished;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.isDisabled = disabled;
+    }
+
+    public boolean isDisabled() {
+        return this.isDisabled;
     }
 
     public double getX() {
