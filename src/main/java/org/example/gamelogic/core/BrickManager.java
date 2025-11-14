@@ -113,23 +113,27 @@ public final class BrickManager {
         List<String> layout = levelData.getLayout();
 
         for (int row = 0; row < layout.size(); row++) {
+
             String[] types = layout.get(row).trim().split("\\s+");
-            int totalCols = types.length;
-            if (totalCols == 0) continue;
-
-            double brickWidth = GameConstants.BRICK_WIDTH; //
-            double padding = GameConstants.PADDING; //
-
-            double rowWidth = totalCols * (brickWidth + padding) - padding;
+            int numCols = 0;
+            for (String type : types) {
+                if (!type.equals("_")) {
+                    numCols++;
+                }
+            }
+            if (numCols == 0) continue;
+            double rowWidth = numCols * (GameConstants.BRICK_WIDTH + GameConstants.PADDING) - GameConstants.PADDING;
             double rowStartX = (GameConstants.PLAY_AREA_WIDTH - rowWidth) / 2.0;
 
-            for (int col = 0; col < totalCols; col++) {
+            int currentCol = 0;
+            for (int col = 0; col < types.length; col++) {
                 String type = types[col];
                 if (type.equals("_")) {
                     continue;
                 }
-                double x = GameConstants.PLAY_AREA_X + rowStartX + col * (brickWidth + padding);
-                double y = GameConstants.PLAY_AREA_Y + GameConstants.TOP_MARGIN + row * (GameConstants.BRICK_HEIGHT + padding); //
+
+                double x = GameConstants.PLAY_AREA_X + rowStartX + currentCol * (GameConstants.BRICK_WIDTH + GameConstants.PADDING);
+                double y = GameConstants.PLAY_AREA_Y + GameConstants.TOP_MARGIN + row * (GameConstants.BRICK_HEIGHT + GameConstants.PADDING);
 
                 Brick brick = brickFactory.createBrick(type, x, y);
                 if (brick != null) {
@@ -138,6 +142,7 @@ public final class BrickManager {
                     brick.setId(brickId);
                     this.bricks.add(brick);
                 }
+                currentCol++;
             }
         }
     }

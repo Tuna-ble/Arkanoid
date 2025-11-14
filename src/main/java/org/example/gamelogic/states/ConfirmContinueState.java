@@ -13,13 +13,14 @@ import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Buttons.Button;
+import org.example.gamelogic.graphics.buttons.AbstractButton;
+import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class ConfirmContinueState implements GameState {
 
-    private final Button continueButton;
-    private final Button resetButton;
+    private final AbstractButton continueButton;
+    private final AbstractButton resetButton;
     private final int levelId;
     private final Font titleFont = new Font("Arial", 48);
     private final double centerX;
@@ -28,15 +29,17 @@ public final class ConfirmContinueState implements GameState {
         this.levelId = levelId;
         this.centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
+        double buttonWidth = GameConstants.UI_BUTTON_WIDTH + 50;
+        double buttonX = this.centerX - buttonWidth / 2;
+
         AssetManager am = AssetManager.getInstance();
-        Image normalImage = am.getImage("button");
-        Image hoveredImage = am.getImage("hoveredButton");
-
-        double buttonX = this.centerX - GameConstants.UI_BUTTON_WIDTH / 2;
-
+        final Image normalImage = am.getImage("button");
+        final Image hoveredImage = am.getImage("hoveredButton");
         this.continueButton = new Button(
                 buttonX,
                 GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT - 10,
+                buttonWidth,
+                GameConstants.UI_BUTTON_HEIGHT,
                 normalImage,
                 hoveredImage,
                 "Continue"
@@ -45,12 +48,13 @@ public final class ConfirmContinueState implements GameState {
         this.resetButton = new Button(
                 buttonX,
                 GameConstants.SCREEN_HEIGHT / 2.0 + 10,
+                buttonWidth,
+                GameConstants.UI_BUTTON_HEIGHT,
                 normalImage,
                 hoveredImage,
                 "Reset Level"
         );
     }
-
 
     @Override
     public void update(double deltaTime) {

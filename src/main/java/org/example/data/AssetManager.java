@@ -79,6 +79,12 @@ public class AssetManager {
 
             loadImage("icon_expand", "/images/expandpaddle.png"); //
             loadImage("icon_extra_life", "/images/extra.png"); //
+
+            loadImage("holo_tl", "/images/holo_top_left.png");
+            loadImage("holo_tr", "/images/holo_top_right.png");
+            loadImage("holo_bl", "/images/holo_bottom_left.png");
+            loadImage("holo_br", "/images/holo_bottom_right.png");
+            loadImage("holo_fill", "/images/window.png");
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());
             e.printStackTrace();

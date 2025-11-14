@@ -101,6 +101,11 @@ public final class GameConstants {
     public static final double UI_BUTTON_HEIGHT = 60;
     public static final double UI_BUTTON_SPACING = 20;
 
+    // UI - Windows
+    public static final double UI_WINDOW_WIDTH = 500;
+    public static final double UI_WINDOW_HEIGHT = 420;
+    public static final double UI_WINDOW_CORNER_SIZE = 34;
+
     // Lives
     public static final int INITIAL_LIVES = 3;
 
