@@ -1,15 +1,10 @@
-package org.example.gamelogic.graphics.Buttons;
+package org.example.gamelogic.graphics.buttons;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
-import org.example.config.GameConstants;
 import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
-import org.example.gamelogic.graphics.TextRenderer;
 
 public abstract class AbstractButton {
     protected double x;
