@@ -41,6 +41,9 @@ public class AssetManager {
             loadSound("powerup", "/sounds/powerup.wav");
             loadSound("brick_hit", "/sounds/brick_hit.wav");
             loadSound("bomb", "/sounds/Bomb.wav");
+            loadSound("music_1", "/sounds/music_1.wav");
+            loadSound("music_2", "/sounds/music_2.wav");
+            loadSound("music_3", "/sounds/music_3.wav");
         } catch (Exception e) {
             System.err.println("Không thể tải file âm thanh: " + e.getMessage());
             e.printStackTrace();
@@ -65,12 +68,12 @@ public class AssetManager {
             loadImage("minionShoot", "/images/minionShoot.png");
             
             loadImage("frame", "/images/GameFrame.png");
-            loadImage("hudFrame", "/images/HudFrame.png");
             loadImage("pause", "/images/pause.png");
 
             loadImage("mainMenu", "/images/MainMenu.png"); //
             loadImage("ranking", "/images/ranking.png"); //
-            loadImage("settings", "/images/settings.png"); //
+            loadImage("settings", "/images/settings.png");
+            loadImage("gameMode", "/images/gameMode.png");//
             loadImage("gameOver", "/images/gameOverBackground.gif"); //
             loadImage("victory", "/images/Victory.gif"); //
             loadImage("level", "/images/Level.gif"); //
@@ -80,15 +83,19 @@ public class AssetManager {
             loadImage("icon_expand", "/images/expandpaddle.png"); //
             loadImage("icon_extra_life", "/images/extra.png"); //
 
-            loadImage("banner", "/images/banner.png");
-            loadImage("holo_tl", "/images/holo_top_left.png");
-            loadImage("holo_tr", "/images/holo_top_right.png");
-            loadImage("holo_bl", "/images/holo_bottom_left.png");
-            loadImage("holo_br", "/images/holo_bottom_right.png");
-            loadImage("holo_fill", "/images/hologram_fill.png");
-            loadImage("popup_fill", "/images/popup_fill.png");
-            loadImage("scroll_fill", "/images/scroll_fill.png");
-            loadImage("scroll_bar", "/images/scroll_bar.png");
+            loadImage("banner1", "/images/banner1.png");
+            loadImage("banner2", "/images/banner2.png");
+            loadImage("sfxIcon", "/images/sfxIcon.png");
+            loadImage("musicIcon", "/images/musicIcon.png");
+            loadImage("backButton", "/images/backButton.png");
+            loadImage("backButtonHovered", "/images/backButtonHovered.png");
+            loadImage("nextButton", "/images/nextButton.png");
+            loadImage("prevButton", "/images/prevButton.png");
+            loadImage("hologram", "/images/hologram.png");
+            loadImage("popup_fill", "/images/hologram.png");
+            loadImage("textButton", "/images/textButton.png");
+            loadImage("selectButton", "/images/selectButton.png");
+            loadImage("selectButtonHovered", "/images/selectButtonHovered.png");
 
             loadImage("toggleOn", "/images/toggleOn.png");
             loadImage("toggleOff", "/images/toggleOff.png");
