@@ -12,9 +12,7 @@ import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.SettingsManager;
 import org.example.gamelogic.core.SoundManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.buttons.AbstractButton;
-import org.example.gamelogic.graphics.buttons.Button;
-import org.example.gamelogic.graphics.buttons.Slider;
+import org.example.gamelogic.graphics.buttons.*;
 import org.example.gamelogic.graphics.windows.Window;
 import org.example.gamelogic.strategy.transition.button.WipeElementTransitionStrategy;
 import org.example.gamelogic.strategy.transition.window.HologramTransitionStrategy;
@@ -25,9 +23,14 @@ public final class SettingsState implements GameState {
     private Window window;
     private AbstractButton musicButton;
     private AbstractButton sfxButton;
+    private AbstractButton musicToggleButton;
+    private AbstractButton sfxToggleButton;
     private AbstractButton backButton;
     private AbstractButton prevMusicButton;
     private AbstractButton nextMusicButton;
+    private AbstractButton musicDisplayLabel;
+    private AbstractButton banner;
+    private Font titleFont;
 
     private Slider musicSlider;
     private Slider sfxSlider;
@@ -37,52 +40,89 @@ public final class SettingsState implements GameState {
 
     private final String[] musicTracks = {"music_1", "music_2", "music_3"};
     private int currentMusicIndex = 0;
+    private String currentMusic;
 
     public SettingsState(GameState previousState) {
         this.previousState = previousState;
 
-        ITransitionStrategy transition = new HologramTransitionStrategy();
-        this.window = new Window(previousState, 500, 450, transition,
-                "SETTINS", null);
-
         AssetManager am = AssetManager.getInstance();
         SettingsManager settings = SettingsManager.getInstance();
 
-        double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
+        titleFont = am.getFont("Anxel", 48);
+        currentMusic = settings.getSelectedMusic();
+
+        ITransitionStrategy transition = new HologramTransitionStrategy();
+        this.window = new Window(previousState, 600, 500, transition);
+
+        double bannerX = window.getX() + GameConstants.UI_BUTTON_PADDING;
+        double bannerY = window.getY() + GameConstants.UI_BUTTON_PADDING;
+        double bannerWidth = GameConstants.UI_BANNER_WIDTH;
+        double bannerHeight = GameConstants.UI_BANNER_HEIGHT;
+        Image bannerImage = am.getImage("banner1");
+        this.banner = new Button(bannerX, bannerY, bannerWidth, bannerHeight, bannerImage, bannerImage, "SETTINGS");
+        this.banner.setTransition(new WipeElementTransitionStrategy(0.5));
+
+        double btnX = bannerX;
+        double firstRowY = bannerY + bannerHeight + 40;
+        double secondRowY = firstRowY + 80 + GameConstants.UI_BUTTON_PADDING;
+        double backButtonX = window.getX() + window.getWidth() - 90 - GameConstants.UI_BUTTON_PADDING;
+        double backButtonY = window.getY() + window.getHeight() - 60 - GameConstants.UI_BUTTON_PADDING;
         boolean musicOn = settings.isMusicEnabled();
         boolean sfxOn = settings.isSfxEnabled();
 
-        final Image normalImage = am.getImage("button");
-        final Image hoveredImage = am.getImage("hoveredButton");
+        final Image sfxImage = am.getImage("sfxIcon");
+        final Image musicImage = am.getImage("musicIcon");
+        final Image backImage = am.getImage("backButton");
+        final Image backHoveredImage = am.getImage("backButtonHovered");
+        final Image toggleOnImage = am.getImage("toggleOn");
+        final Image toggleOffImage = am.getImage("toggleOff");
+        final Image nextImage = am.getImage("nextButton");
+        final Image prevImage = am.getImage("prevButton");
 
-        this.musicButton = new Button(btnX, 200, normalImage,
-                hoveredImage, "Music: " + (musicOn ? "ON" : "OFF"));
-        this.musicButton.setTransition(new WipeElementTransitionStrategy(0.5));
-
-        this.sfxButton = new Button(btnX, 380, normalImage,
-                hoveredImage, "SFX: " + (sfxOn ? "ON" : "OFF"));
+        this.sfxButton = new Button(btnX, firstRowY, 80, 80, sfxImage, sfxImage, "");
         this.sfxButton.setTransition(new WipeElementTransitionStrategy(0.5));
 
-        this.backButton = new Button(btnX, 510, normalImage,
-                hoveredImage, "Back");
+        this.musicButton = new Button(btnX, secondRowY, 80, 80, musicImage, musicImage, "");
+        this.musicButton.setTransition(new WipeElementTransitionStrategy(0.5));
+
+        this.backButton = new Button(backButtonX, backButtonY, 90, 60, backImage,
+                backHoveredImage, "Back");
         this.backButton.setTransition(new WipeElementTransitionStrategy(0.5));
 
-        double smallBtnWidth = 50;
-        double sliderWidth = 220;
-        double sliderX = centerX - sliderWidth / 2;
+        double nextBtnX = btnX + 80 + GameConstants.UI_BUTTON_PADDING;
+        double toggleButtonWidth = 80;
+        double toggleButtonHeight = 35;
+        double sliderWidth = 300;
+        double sliderPadding = toggleButtonHeight + GameConstants.UI_BUTTON_PADDING;
+        double musicTextX = nextBtnX + sliderWidth / 2 - (sliderWidth - 60) / 2;
 
-        this.musicSlider = new Slider(sliderX, 255, sliderWidth, 10, settings.getMusicVolume());
-        this.musicSlider.setTransition(new WipeElementTransitionStrategy(0.5));
+        this.sfxToggleButton = new ToggleButton(nextBtnX, firstRowY + 10, toggleButtonWidth, toggleButtonHeight,
+                toggleOnImage, toggleOffImage, sfxOn);
+        this.sfxToggleButton.setTransition(new WipeElementTransitionStrategy(0.5));
 
-        this.sfxSlider = new Slider(sliderX, 405, sliderWidth, 10, settings.getSfxVolume());
+        this.musicToggleButton = new ToggleButton(nextBtnX, secondRowY + 10, toggleButtonWidth, toggleButtonHeight,
+                toggleOnImage, toggleOffImage, musicOn);
+        this.musicToggleButton.setTransition(new WipeElementTransitionStrategy(0.5));
+
+        this.sfxSlider = new Slider(nextBtnX, firstRowY + sliderPadding,
+                sliderWidth, 10, settings.getSfxVolume());
         this.sfxSlider.setTransition(new WipeElementTransitionStrategy(0.5));
 
-        this.prevMusicButton = new Button(sliderX, 320, smallBtnWidth, 40, normalImage, hoveredImage, "<");
+        this.musicSlider = new Slider(nextBtnX, secondRowY + sliderPadding ,
+                sliderWidth, 10, settings.getMusicVolume());
+        this.musicSlider.setTransition(new WipeElementTransitionStrategy(0.5));
+
+        this.prevMusicButton = new Button(nextBtnX, secondRowY + sliderPadding + 20,
+                30, 30, prevImage, prevImage, "");
         this.prevMusicButton.setTransition(new WipeElementTransitionStrategy(0.5));
 
-        this.nextMusicButton = new Button(sliderX + sliderWidth
-                - smallBtnWidth, 320, smallBtnWidth, 40, normalImage, hoveredImage, ">");
+        this.nextMusicButton = new Button(nextBtnX + sliderWidth - 30, secondRowY + sliderPadding + 20,
+                30, 30, nextImage, nextImage, "");
         this.nextMusicButton.setTransition(new WipeElementTransitionStrategy(0.5));
+
+        this.musicDisplayLabel = new TextLabel(musicTextX, secondRowY + sliderPadding + 20,
+                sliderWidth - 60, 30, currentMusic);
+        this.musicDisplayLabel.setTransition(new WipeElementTransitionStrategy(0.5));
 
         String currentMusic = SettingsManager.getInstance().getSelectedMusic();
         for (int i = 0; i < musicTracks.length; i++) {
@@ -93,19 +133,24 @@ public final class SettingsState implements GameState {
         }
         this.settingsImage = am.getImage("settings");
 
+        this.window.addButton(banner);
         this.window.addButton(musicButton);
         this.window.addButton(sfxButton);
         this.window.addButton(backButton);
+        this.window.addButton(sfxToggleButton);
+        this.window.addButton(musicToggleButton);
         this.window.addButton(musicSlider);
         this.window.addButton(sfxSlider);
         this.window.addButton(prevMusicButton);
         this.window.addButton(nextMusicButton);
+        this.window.addButton(musicDisplayLabel);
     }
 
     @Override
     public void update(double deltaTime) {
         SoundManager.getInstance().updateAllVolumes();
         window.update(deltaTime);
+        currentMusic = SettingsManager.getInstance().getSelectedMusic();
     }
 
     @Override
@@ -117,16 +162,6 @@ public final class SettingsState implements GameState {
         }
 
         window.render(gc);
-
-        boolean musicOn = settings.isMusicEnabled();
-        boolean sfxOn = settings.isSfxEnabled();
-        musicButton.setText("Music: " + (musicOn ? "ON" : "OFF"));
-        sfxButton.setText("SFX: " + (sfxOn ? "ON" : "OFF"));
-
-        gc.setFill(Color.WHITE);
-        gc.setFont(new Font("Arial", 20));
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.fillText(settings.getSelectedMusic(), centerX, 345);
     }
 
     @Override
@@ -137,7 +172,7 @@ public final class SettingsState implements GameState {
 
         SettingsManager settings = SettingsManager.getInstance();
 
-        if (musicButton.isClicked()) {
+        if (musicToggleButton.isClicked()) {
             settings.toggleMusic();
 
             if (settings.isMusicEnabled()) {
@@ -147,7 +182,7 @@ public final class SettingsState implements GameState {
             }
         }
 
-        if (sfxButton.isClicked()) {
+        if (sfxToggleButton.isClicked()) {
             settings.toggleSfx();
         }
 
@@ -181,6 +216,7 @@ public final class SettingsState implements GameState {
 
         if (trackChanged) {
             SoundManager.getInstance().playSelectedMusic();
+            musicDisplayLabel.setText(currentMusic);
         }
 
         if (volumeChanged || musicButton.isClicked()) {
