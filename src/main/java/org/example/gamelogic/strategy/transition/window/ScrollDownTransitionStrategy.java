@@ -9,14 +9,11 @@ public class ScrollDownTransitionStrategy implements ITransitionStrategy {
     private double timer = 0.0;
     private final double DURATION = 0.4;
 
-    private Image imgScrollBar;
-    private Image imgScrollFill;
-    private double barHeight;
+    private Image fillImage;
 
     public ScrollDownTransitionStrategy() {
         AssetManager am = AssetManager.getInstance();
-        imgScrollBar = am.getImage("scroll_bar");
-        imgScrollFill = am.getImage("scroll_fill");
+        fillImage = am.getImage("hologram");
     }
 
     @Override
@@ -41,23 +38,19 @@ public class ScrollDownTransitionStrategy implements ITransitionStrategy {
         double winWidth = window.getWidth();
         double winHeight = window.getHeight();
 
-        if (imgScrollBar != null) {
-            gc.drawImage(imgScrollBar, winX, winY, winWidth, barHeight);
-        }
-
-        double contentY = winY + barHeight;
-        double contentMaxHeight = winHeight - barHeight;
+        double contentY = winY;
+        double contentMaxHeight = winHeight;
         double currentContentHeight = contentMaxHeight * progress;
 
-        if (imgScrollFill != null && currentContentHeight > 0) {
+        if (fillImage != null && currentContentHeight > 0) {
 
             double sx = 0;
             double sy = 0;
-            double sw = imgScrollFill.getWidth();
-            double sh = imgScrollFill.getHeight() * progress;
+            double sw = fillImage.getWidth();
+            double sh = fillImage.getHeight() * progress;
 
             gc.drawImage(
-                    imgScrollFill,
+                    fillImage,
                     sx, sy, sw, sh,
                     winX, contentY,
                     winWidth, currentContentHeight
