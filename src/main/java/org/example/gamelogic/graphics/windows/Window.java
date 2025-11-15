@@ -1,24 +1,25 @@
 package org.example.gamelogic.graphics.windows;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.graphics.TextRenderer;
 import org.example.gamelogic.graphics.buttons.AbstractUIElement;
+import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.states.GameState;
+import org.example.gamelogic.strategy.transition.button.WipeElementTransitionStrategy;
 import org.example.gamelogic.strategy.transition.window.ITransitionStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Window {
-    private double x, y, width, height;
-    protected String title;
-    protected Font titleFont;
-    protected Color titleColor;
+    private double x, y, width, height;;
 
     protected List<AbstractUIElement> elements = new ArrayList<>();
     protected GameState previousState;
@@ -28,17 +29,13 @@ public class Window {
     private boolean childrenTransitionsStarted = false;
 
     public Window(GameState previousState, double windowWidth, double windowHeight,
-                  ITransitionStrategy windowTransition, String title, Font titleFont) {
+                  ITransitionStrategy windowTransition) {
         this.previousState = previousState;
 
         this.width = windowWidth;
         this.height = windowHeight;
         this.x = GameConstants.SCREEN_WIDTH / 2.0 - windowWidth / 2.0;
         this.y = GameConstants.SCREEN_HEIGHT / 2.0 - windowHeight / 2.0;
-        this.title = title;
-        this.titleFont = (titleFont != null) ? titleFont : new Font("Arial", 48);
-        this.titleColor = Color.WHITE;
-
         this.windowTransition = windowTransition;
         if (this.windowTransition == null) {
             this.windowTransitionFinished = true;
@@ -87,18 +84,6 @@ public class Window {
 
     public void renderContents(GraphicsContext gc) {
         for (AbstractUIElement element : elements) {
-            if (title != null) {
-                gc.setTextAlign(TextAlignment.CENTER);
-                TextRenderer.drawOutlinedText(
-                        gc,
-                        title,
-                        x + width / 2,
-                        y + 60,
-                        titleFont,
-                        titleColor,
-                        Color.BLACK, 2.0, null
-                );
-            }
             element.render(gc);
         }
     }
