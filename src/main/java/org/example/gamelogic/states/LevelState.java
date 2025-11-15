@@ -162,13 +162,17 @@ public final class LevelState implements GameState {
                 continue;
             }
 
-            SaveGameRepository repo = new SaveGameRepository();
+            System.out.println(GameManager.AccountId);
+
+            SaveGameRepository repo = new SaveGameRepository(GameManager.AccountId);
 
             if (repo.hasSave(selectedLevel)) {
+                System.out.println("ôiii");
                 GameManager gm = GameManager.getInstance();
                 gm.getStateManager().setState(new ConfirmContinueState(selectedLevel));
 
             } else {
+                System.out.println("vclon");
                 EventManager.getInstance().publish(
                         new ChangeStateEvent(GameStateEnum.PLAYING, selectedLevel)
                 );

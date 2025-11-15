@@ -38,7 +38,6 @@ public final class LogOutState implements GameState {
         this.previousState = previousState;
 
         ITransitionStrategy transition = new PopupTransitionStrategy();
-        // chiều cao thấp hơn Pause một chút
         this.window = new Window(previousState, 300, 260,
                 transition, "LOG OUT", null);
 
@@ -70,7 +69,6 @@ public final class LogOutState implements GameState {
         gc.setTextAlign(TextAlignment.LEFT);
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        // vẽ popup + nút (Window sẽ vẽ nền mờ / khung giúp bạn)
         window.render(gc);
         gc.setTextAlign(TextAlignment.LEFT);
     }
@@ -84,29 +82,14 @@ public final class LogOutState implements GameState {
         window.handleInput(inputProvider);
 
         if (yesButton != null && yesButton.isClicked()) {
-            // đổi currentAccountId về default
-            GameManager gm = GameManager.getInstance();
-            SaveGameRepository repo = gm.getSaveGameRepository();
-            repo.setCurrentAccountId("default");
-
-            // chuyển về BeginState
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.BEGIN)
             );
 
         } else if (noButton != null && noButton.isClicked()) {
-            // tắt bảng nhỏ -> quay lại Main Menu
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.MAIN_MENU)
             );
         }
-    }
-
-    public GameState getPreviousState() {
-        return previousState;
-    }
-
-    public void cleanUp() {
-        // không cần dọn đặc biệt cho logout
     }
 }

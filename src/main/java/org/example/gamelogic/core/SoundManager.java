@@ -29,7 +29,6 @@ public final class SoundManager {
 
     private SoundManager() {
         this.assetManager = AssetManager.getInstance();
-
         subscribeToEvents();
     }
 

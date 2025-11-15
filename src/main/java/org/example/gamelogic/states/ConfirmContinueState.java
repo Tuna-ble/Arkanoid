@@ -84,7 +84,7 @@ public final class ConfirmContinueState implements GameState {
         resetButton.handleInput(inputProvider);
 
         if (continueButton.isClicked()) {
-            SaveGameRepository repo = new SaveGameRepository();
+            SaveGameRepository repo = new SaveGameRepository(GameManager.AccountId);
             SavedGameState savedData = repo.loadGame(levelId);
 
             if (savedData != null) {
@@ -101,7 +101,7 @@ public final class ConfirmContinueState implements GameState {
         }
 
         if (resetButton.isClicked()) {
-            SaveGameRepository repo = new SaveGameRepository();
+            SaveGameRepository repo = new SaveGameRepository(GameManager.AccountId);
 
             repo.deleteSave(levelId);
 

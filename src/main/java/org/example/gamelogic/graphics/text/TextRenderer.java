@@ -25,7 +25,7 @@ public final class TextRenderer {
         try {
             gc.setFont(font);
             if (shadow != null) {
-                gc.setEffect(shadow);
+                //gc.setEffect(shadow);
             }
 
             if (strokePaint != null && strokeWidth > 0) {
@@ -38,7 +38,7 @@ public final class TextRenderer {
             gc.fillText(text, x, y);
         } finally {
             gc.setFont(previousFont);
-            gc.setEffect(null);
+            //gc.setEffect(null);
             gc.setFill(previousFill);
             gc.setStroke(previousStroke);
             gc.setLineWidth(previousLineWidth);

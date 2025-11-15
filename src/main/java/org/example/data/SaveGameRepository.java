@@ -11,34 +11,12 @@ public class SaveGameRepository {
 
     private static final String SAVE_ROOT_DIRECTORY = "saves";
     private static final String SAVE_FILE_EXTENSION = ".sav";
+    private String currentAccountId;
 
-    /**
-     * Account hiện tại, dùng làm tên folder con trong "saves".
-     * Mặc định là "default" nếu chưa đăng nhập.
-     */
-        private String currentAccountId = "default";
-
-    public SaveGameRepository() {
+    public SaveGameRepository(String accountId) {
+        this.currentAccountId = accountId;
         ensureRootDirectoryExists();
         ensureAccountDirectoryExists();
-    }
-
-    /**
-     * Đặt account hiện tại. Mỗi account sẽ lưu ở thư mục riêng:
-     * saves/<accountId>/
-     */
-    public void setCurrentAccountId(String accountId) {
-        if (accountId == null || accountId.trim().isEmpty()) {
-            this.currentAccountId = "default";
-        } else {
-            this.currentAccountId = accountId.trim();
-            System.out.println("*************");
-        }
-        ensureAccountDirectoryExists();
-    }
-
-    public String getCurrentAccountId() {
-        return currentAccountId;
     }
 
 

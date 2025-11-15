@@ -10,16 +10,76 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.example.gamelogic.core.GameManager;
+
 public final class ProgressManager {
 
-    private static final String PROGRESS_FILE_PATH =
-            System.getProperty("user.home") + File.separator + ".arkanoid_progress.properties";
+    // Thư mục gốc giống SaveGameRepository
+    private static final String SAVE_ROOT_DIRECTORY = "saves";
+    // Tên file progress cho mỗi account
+    private static final String PROGRESS_FILE_NAME = "progress.properties";
+
     private static final int TOTAL_LEVELS = 5;
+
+    private ProgressManager() {
+        // Utility class, không cho khởi tạo
+    }
+
+    private static String getCurrentAccountId() {
+        String accountId = GameManager.AccountId;
+        if (accountId == null || accountId.trim().isEmpty()) {
+            return "default";
+        }
+        return accountId.trim();
+    }
+
+    /**
+     * Đảm bảo thư mục gốc "saves" tồn tại.
+     */
+    private static File getRootDirectory() {
+        File dir = new File(SAVE_ROOT_DIRECTORY);
+        if (!dir.exists()) {
+            boolean created = dir.mkdirs();
+            if (!created) {
+                System.err.println("Không thể tạo thư mục gốc saves cho progress.");
+            }
+        }
+        return dir;
+    }
+
+    /**
+     * Thư mục của account hiện tại: saves/<accountId>
+     */
+    private static File getAccountDirectory() {
+        File root = getRootDirectory();
+        String accountId = getCurrentAccountId();
+        File dir = new File(root, accountId);
+        if (!dir.exists()) {
+            boolean created = dir.mkdirs();
+            if (!created) {
+                System.err.println("Không thể tạo thư mục progress cho account: " + accountId);
+            } else {
+                System.out.println("Đã tạo thư mục progress cho account: " + accountId);
+            }
+        }
+        return dir;
+    }
+
+    /**
+     * File progress cho account hiện tại: saves/<accountId>/progress.properties
+     */
+    private static File getProgressFile() {
+        return new File(getAccountDirectory(), PROGRESS_FILE_NAME);
+    }
+
+    // =========================
+    // CÁC METHOD CŨ (GIỮ NGUYÊN SIGNATURE)
+    // =========================
 
     public static Map<Integer, Integer> loadStars() {
         Map<Integer, Integer> starsMap = new HashMap<>();
         Properties props = new Properties();
-        File progressFile = new File(PROGRESS_FILE_PATH);
+        File progressFile = getProgressFile(); // ĐỔI Ở ĐÂY
 
         if (!progressFile.exists()) {
             return starsMap;
@@ -42,7 +102,7 @@ public final class ProgressManager {
 
     public static int getMaxLevelUnlocked() {
         Properties props = new Properties();
-        File progressFile = new File(PROGRESS_FILE_PATH);
+        File progressFile = getProgressFile(); // ĐỔI Ở ĐÂY
         int maxLevel = 1;
 
         if (progressFile.exists()) {
@@ -57,10 +117,12 @@ public final class ProgressManager {
     }
 
     public static void saveProgress(int levelCompleted, int starsAwarded) {
-        if (starsAwarded < 1) return;
+        if (starsAwarded < 1) {
+            return;
+        }
 
         Properties props = new Properties();
-        File progressFile = new File(PROGRESS_FILE_PATH);
+        File progressFile = getProgressFile(); // ĐỔI Ở ĐÂY
 
         if (progressFile.exists()) {
             try (InputStream input = new FileInputStream(progressFile)) {
@@ -91,7 +153,7 @@ public final class ProgressManager {
 
     public static void resetProgress() {
         try {
-            File progressFile = new File(PROGRESS_FILE_PATH);
+            File progressFile = getProgressFile(); // ĐỔI Ở ĐÂY
             if (progressFile.exists()) {
                 if (!progressFile.delete()) {
                     System.err.println("Không thể xóa file progress.");

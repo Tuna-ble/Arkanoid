@@ -27,6 +27,7 @@ public final class GameManager {
     private I_InputProvider inputProvider;
     private GameState currentState;
     private SaveGameRepository saveGameRepository;
+    public static String AccountId;
 
     private double accumulator = 0.0;
     private final double FIXED_TIMESTEP = GameConstants.FIXED_TIMESTEP;
@@ -80,13 +81,16 @@ public final class GameManager {
         this.brickManager.setLevelRepository(repo);
     }
 
+    public static void setAccountId(String accountId) {
+        AccountId = accountId;
+    }
+
     public void init() {
         this.stateManager = new StateManager();
         this.brickManager = new BrickManager(levelRepository);
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
-        this.saveGameRepository = new SaveGameRepository();
 
         currentState = new BeginState();
         this.stateManager.setState(currentState);
@@ -322,9 +326,5 @@ public final class GameManager {
 
     public EnemyManager getEnemyManager() {
         return this.enemyManager;
-    }
-
-    public SaveGameRepository getSaveGameRepository() {
-        return this.saveGameRepository;
     }
 }

@@ -385,22 +385,17 @@ public final class SignInState implements GameState {
             setErrorMessage("Username và mật khẩu không được để trống.");
             return;
         }
-
-        ensureAccountDirectoryExists();
-
         if (!checkCredentials(username, password)) {
             setErrorMessage("Sai tài khoản hoặc mật khẩu.");
             return;
         }
 
-        GameManager gm = GameManager.getInstance();
-        if (gm != null && gm.getSaveGameRepository() != null) {
-            gm.getSaveGameRepository().setCurrentAccountId(username);
-            System.out.println("vclll");
-        }
+        GameManager.setAccountId(username);
+
+        System.out.println(GameManager.AccountId);
 
         // Đảm bảo thư mục save cho user tồn tại
-        createUserSaveDirectory(username);
+        ensureAccountDirectoryExists();
 
         setSuccessMessage("Đăng nhập thành công!");
         System.out.println("User signed in: " + username);
@@ -446,27 +441,6 @@ public final class SignInState implements GameState {
         return false;
     }
 
-    private void createUserSaveDirectory(String username) {
-        File root = new File(SAVE_ROOT_DIRECTORY);
-        if (!root.exists()) {
-            boolean createdRoot = root.mkdirs();
-            if (!createdRoot) {
-                System.err.println("Không thể tạo thư mục saves root.");
-                return;
-            }
-        }
-
-        File userDir = new File(root, username);
-        if (!userDir.exists()) {
-            boolean createdUserDir = userDir.mkdirs();
-            if (createdUserDir) {
-                System.out.println("Đã tạo thư mục save cho user: " + username);
-            } else {
-                System.err.println("Không thể tạo thư mục save cho user: " + username);
-            }
-        }
-    }
-
     private void setErrorMessage(String msg) {
         this.message = msg;
         this.messageColor = Color.RED;
@@ -476,6 +450,5 @@ public final class SignInState implements GameState {
         this.message = msg;
         this.messageColor = Color.LIGHTGREEN;
     }
-
 
 }

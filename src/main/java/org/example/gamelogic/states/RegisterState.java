@@ -15,7 +15,6 @@ import org.example.config.GameConstants;
 import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
-import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.text.TextRenderer;
 import org.example.gamelogic.graphics.text.InputBox;
@@ -444,11 +443,6 @@ public final class RegisterState implements GameState {
         createUserSaveDirectory(username);
 
         // Lưu user hiện tại vào repository
-        GameManager gm = GameManager.getInstance();
-        if (gm != null && gm.getSaveGameRepository() != null) {
-            gm.getSaveGameRepository().setCurrentAccountId(username);
-            System.out.println("vclll");
-        }
 
         setSuccessMessage("Đăng ký thành công! Nhấn BACK để đăng nhập.");
 
