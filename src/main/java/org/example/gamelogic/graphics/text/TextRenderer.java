@@ -1,4 +1,4 @@
-package org.example.gamelogic.graphics;
+package org.example.gamelogic.graphics.text;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;

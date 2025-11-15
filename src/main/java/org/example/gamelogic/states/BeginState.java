@@ -6,8 +6,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.transform.Affine;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Affine;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.Stop;
@@ -21,33 +21,40 @@ import org.example.gamelogic.graphics.buttons.AbstractButton;
 import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.text.TextRenderer;
 
-public final class MainMenuState implements GameState {
-    private Image mainMenuImage;
+public final class BeginState implements GameState {
+    private Image backgroundImage;
     private Image normalImage;
     private Image hoveredImage;
-    private AbstractButton startButton;
-    private AbstractButton rankingButton;
-    private AbstractButton settingsButton;
-    private AbstractButton newGameButton;
+    private AbstractButton signInButton;
+    private AbstractButton registerButton;
     private double elapsedTime = 0;
-    private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
-    private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 100;
 
-    public MainMenuState() {
+    private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
+    private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 40;
+
+    public BeginState() {
         AssetManager am = AssetManager.getInstance();
-        this.mainMenuImage = am.getImage("mainMenu");
+        this.backgroundImage = am.getImage("mainMenu");
         this.normalImage = am.getImage("button");
         this.hoveredImage = am.getImage("hoveredButton");
 
         double buttonGap = 70;
-        startButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2,
-                baseY + (buttonGap * 0), normalImage, hoveredImage, "Start");
-        rankingButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2,
-                baseY + (buttonGap * 1), normalImage, hoveredImage, "Ranking");
-        settingsButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2,
-                baseY + (buttonGap * 2), normalImage, hoveredImage, "Settings");
-        newGameButton = new Button(centerX - GameConstants.UI_BUTTON_WIDTH / 2,
-                baseY + (buttonGap * 3), normalImage, hoveredImage, "Reset Game");
+
+        signInButton = new Button(
+                centerX - GameConstants.UI_BUTTON_WIDTH / 2,
+                baseY + (buttonGap * 0),
+                normalImage,
+                hoveredImage,
+                "Sign In"
+        );
+
+        registerButton = new Button(
+                centerX - GameConstants.UI_BUTTON_WIDTH / 2,
+                baseY + (buttonGap * 1),
+                normalImage,
+                hoveredImage,
+                "Register"
+        );
     }
 
     @Override
@@ -60,14 +67,22 @@ public final class MainMenuState implements GameState {
         gc.setTransform(new Affine());
         gc.setTextAlign(TextAlignment.LEFT);
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+
         // Background
-        if (mainMenuImage != null) {
-            gc.drawImage(mainMenuImage, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        if (backgroundImage != null) {
+            gc.drawImage(
+                    backgroundImage,
+                    0,
+                    0,
+                    GameConstants.SCREEN_WIDTH,
+                    GameConstants.SCREEN_HEIGHT
+            );
         } else {
             gc.setFill(Color.BLACK);
             gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         }
-        // Title (outlined with subtle shadow and gradient)
+
+        // Title
         gc.setTextAlign(TextAlignment.CENTER);
         LinearGradient titleFill = new LinearGradient(
                 0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
@@ -75,12 +90,13 @@ public final class MainMenuState implements GameState {
                 new Stop(1, Color.web("#228BE6"))
         );
         DropShadow titleShadow = new DropShadow(12, Color.color(0, 0, 0, 0.6));
-        Font titleFont = Font.font("Verdana", FontWeight.BOLD, 72);
+        Font titleFont = Font.font("Verdana", FontWeight.BOLD, 52);
+
         TextRenderer.drawOutlinedText(
                 gc,
-                "ARKANOID",
+                "ACCOUNT",
                 GameConstants.SCREEN_WIDTH / 2.0,
-                230,
+                200,
                 titleFont,
                 titleFill,
                 Color.color(0, 0, 0, 0.8),
@@ -89,42 +105,42 @@ public final class MainMenuState implements GameState {
         );
 
         // Buttons
-        if (startButton != null) startButton.render(gc);
-        if (rankingButton != null) rankingButton.render(gc);
-        if (settingsButton != null) settingsButton.render(gc);
-        if (newGameButton != null) newGameButton.render(gc);
+        if (signInButton != null) {
+            signInButton.render(gc);
+        }
+        if (registerButton != null) {
+            registerButton.render(gc);
+        }
 
-        // Nháy nhẹ phần gợi ý thoát
+        // Hint text (nhấp nháy)
         if ((int) (elapsedTime * 2) % 2 == 0) {
             gc.setFont(new Font("Arial", 16));
             gc.setFill(Color.WHITE);
-            gc.fillText("Press ESC to Exit", GameConstants.SCREEN_WIDTH / 2.0, GameConstants.SCREEN_HEIGHT - 40);
+            gc.fillText(
+                    "Press ESC to Exit",
+                    GameConstants.SCREEN_WIDTH / 2.0,
+                    GameConstants.SCREEN_HEIGHT - 40
+            );
         }
+
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
     @Override
     public void handleInput(I_InputProvider inputProvider) {
-        if (inputProvider == null) return;
-        
+        if (inputProvider == null) {
+            return;
+        }
+
         updateButtons(inputProvider);
 
-        if ((startButton != null && startButton.isClicked())
-                || inputProvider.isKeyPressed(KeyCode.SPACE)) {
+        if (signInButton != null && signInButton.isClicked()) {
             EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.GAME_MODE)
+                    new ChangeStateEvent(GameStateEnum.SIGN_IN)
             );
-        }  else if (rankingButton != null && rankingButton.isClicked()) {
+        } else if (registerButton != null && registerButton.isClicked()) {
             EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.RANKING_STATE)
-            );
-        } else if (settingsButton != null && settingsButton.isClicked()) {
-            EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.SETTINGS)
-            );
-        } else if (newGameButton != null && newGameButton.isClicked()) {
-            EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.CONFIRM_RESET)
+                    new ChangeStateEvent(GameStateEnum.REGISTER)
             );
         } else if (inputProvider.isKeyPressed(KeyCode.ESCAPE)) {
             System.exit(0);
@@ -132,11 +148,11 @@ public final class MainMenuState implements GameState {
     }
 
     private void updateButtons(I_InputProvider inputProvider) {
-        if (startButton != null) startButton.handleInput(inputProvider);
-        if (rankingButton != null) rankingButton.handleInput(inputProvider);
-        if (settingsButton != null) settingsButton.handleInput(inputProvider);
-        if (newGameButton != null) newGameButton.handleInput(inputProvider);
+        if (signInButton != null) {
+            signInButton.handleInput(inputProvider);
+        }
+        if (registerButton != null) {
+            registerButton.handleInput(inputProvider);
+        }
     }
 }
-
-

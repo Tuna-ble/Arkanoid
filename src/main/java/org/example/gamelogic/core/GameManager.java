@@ -3,10 +3,7 @@ package org.example.gamelogic.core;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import org.example.config.GameConstants;
-import org.example.data.AssetManager;
-import org.example.data.FileLevelRepository;
-import org.example.data.ILevelRepository;
-import org.example.data.InfiniteLevelRepository;
+import org.example.data.*;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.states.*;
@@ -29,6 +26,7 @@ public final class GameManager {
     private ILevelRepository levelRepository;
     private I_InputProvider inputProvider;
     private GameState currentState;
+    private SaveGameRepository saveGameRepository;
 
     private double accumulator = 0.0;
     private final double FIXED_TIMESTEP = GameConstants.FIXED_TIMESTEP;
@@ -89,7 +87,7 @@ public final class GameManager {
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
 
-        currentState = new MainMenuState();
+        currentState = new BeginState();
         this.stateManager.setState(currentState);
 
         AssetManager.getInstance();
@@ -167,6 +165,18 @@ public final class GameManager {
         }
 
         switch (event.targetState) {
+            case BEGIN:
+                newState = new BeginState();
+                break;
+
+            case SIGN_IN:
+                newState = new SignInState();
+                break;
+
+            case REGISTER:
+                newState = new RegisterState();
+                break;
+
             case PLAYING:
                 if (currentState instanceof PauseState) {
                     ((PauseState) currentState).cleanUp();
@@ -305,5 +315,9 @@ public final class GameManager {
 
     public EnemyManager getEnemyManager() {
         return this.enemyManager;
+    }
+
+    public SaveGameRepository getSaveGameRepository() {
+        return this.saveGameRepository;
     }
 }

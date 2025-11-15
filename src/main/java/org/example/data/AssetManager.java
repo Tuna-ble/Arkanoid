@@ -95,6 +95,8 @@ public class AssetManager {
             loadImage("barFrame", "/images/barFrame.png");
             loadImage("barFill", "/images/barFill.png");
             loadImage("barHandle", "/images/barHandle.png");
+
+            loadImage("laser", "/images/laser.png");
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());
             e.printStackTrace();

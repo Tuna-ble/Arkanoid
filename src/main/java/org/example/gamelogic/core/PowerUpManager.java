@@ -28,6 +28,7 @@ public final class PowerUpManager {
     private static final double POWERUP_DROP_CHANCE = 0.4;
 
     private static final String[] POWERUP_TYPES = {"E", "F", "M", "H", "L", "P"};
+    //private static final String[] POWERUP_TYPES = {"L", "L", "L", "L", "L", "L"};
 
     public PowerUpManager() {
         PowerUpRegistry registry = PowerUpRegistry.getInstance();

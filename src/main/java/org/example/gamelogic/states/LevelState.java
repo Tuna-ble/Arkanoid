@@ -17,7 +17,7 @@ import org.example.gamelogic.core.ProgressManager;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.buttons.AbstractButton;
 import org.example.gamelogic.graphics.buttons.Button;
-import org.example.gamelogic.graphics.TextRenderer;
+import org.example.gamelogic.graphics.text.TextRenderer;
 import org.example.data.SaveGameRepository;
 import org.example.gamelogic.core.GameManager;
 import org.example.gamelogic.graphics.windows.Window;

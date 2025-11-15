@@ -6,7 +6,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
 import org.example.gamelogic.I_InputProvider;
-import org.example.gamelogic.graphics.TextRenderer;
+import org.example.gamelogic.graphics.text.TextRenderer;
 import org.example.gamelogic.graphics.buttons.AbstractUIElement;
 import org.example.gamelogic.states.GameState;
 import org.example.gamelogic.strategy.transition.window.ITransitionStrategy;

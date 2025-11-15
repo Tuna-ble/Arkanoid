@@ -6,7 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
-import org.example.gamelogic.graphics.TextRenderer;
+import org.example.gamelogic.graphics.text.TextRenderer;
 
 public class Button extends AbstractButton {
     private Image normalImage;

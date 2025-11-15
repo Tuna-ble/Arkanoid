@@ -17,7 +17,7 @@ import javafx.scene.paint.Stop;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.buttons.AbstractButton;
 import org.example.gamelogic.graphics.buttons.Button;
-import org.example.gamelogic.graphics.TextRenderer;
+import org.example.gamelogic.graphics.text.TextRenderer;
 
 public final class GameOverState implements GameState {
     private Image gameOverGif;
