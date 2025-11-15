@@ -24,12 +24,14 @@ public final class PauseState implements GameState {
 
     private final Image normalImage;
     private final Image hoveredImage;
+    private final Image bannerImage;
     // Button layout uses GameConstants
 
     // Center screen position
     private double centerX, centerY;
 
     // Button instances
+    private AbstractButton banner;
     private AbstractButton resumeButton;
     private AbstractButton settingsButton;
     private AbstractButton quitButton;
@@ -38,22 +40,28 @@ public final class PauseState implements GameState {
         this.previousState = previousState;
 
         ITransitionStrategy transition = new PopupTransitionStrategy();
-        this.window = new Window(previousState, 300, 350,
-                transition, "PAUSE", null);
+        this.window = new Window(previousState, 300, 400, transition);
+
         AssetManager am = AssetManager.getInstance();
         this.normalImage = am.getImage("button");
         this.hoveredImage = am.getImage("hoveredButton");
+        this.bannerImage = am.getImage("banner2");
 
         centerX = GameConstants.SCREEN_WIDTH / 2;
         centerY = GameConstants.SCREEN_HEIGHT / 2;
+        double bannerX = centerX - GameConstants.UI_BANNER_WIDTH / 2;
         double buttonX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
-        double resumeY = window.getY() + 100;
+        double bannerY = window.getY() + GameConstants.UI_BUTTON_PADDING;
+        double resumeY = bannerY + GameConstants.UI_BANNER_HEIGHT + GameConstants.UI_BUTTON_PADDING + 20;
         double settingsY = resumeY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_SPACING;
         double quitY = settingsY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_SPACING;
+        banner = new Button(bannerX, bannerY,
+                GameConstants.UI_BANNER_WIDTH, GameConstants.UI_BANNER_HEIGHT, bannerImage, bannerImage, "PAUSED");
         resumeButton = new Button(buttonX, resumeY, normalImage, hoveredImage, "Resume");
         quitButton = new Button(buttonX, quitY, normalImage, hoveredImage, "Quit");
         settingsButton = new Button(buttonX, settingsY, normalImage, hoveredImage, "Settings");
 
+        window.addButton(banner);
         window.addButton(resumeButton);
         window.addButton(settingsButton);
         window.addButton(quitButton);
