@@ -1,6 +1,7 @@
 package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -14,6 +15,7 @@ import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.ProgressManager;
 import org.example.gamelogic.events.ChangeStateEvent;
+import org.example.gamelogic.graphics.TextRenderer;
 import org.example.gamelogic.graphics.buttons.AbstractButton;
 import org.example.gamelogic.graphics.buttons.Button;
 
@@ -39,9 +41,15 @@ public final class InfiniteModeState implements GameState {
     );
 
     public InfiniteModeState() {
+        AssetManager am = AssetManager.getInstance();
+        final Image buttonImage = am.getImage("button");
+        final Image hoveredImage = am.getImage("hoveredButton");
+
         this.newGameButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT / 2,
+                buttonImage,
+                hoveredImage,
                 "New Game"
         );
         this.continueButton = new Button(
@@ -49,12 +57,16 @@ public final class InfiniteModeState implements GameState {
                 GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT / 2 + 100,
                 GameConstants.UI_BUTTON_WIDTH,
                 GameConstants.UI_BUTTON_HEIGHT * (currentWave > 1 ? 1.2 : 1),
+                buttonImage,
+                hoveredImage,
                 "Continue" + (currentWave > 1 ? "\nWave " + Integer.toString(currentWave) : "")
         );
         this.backButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT / 2 +
                         GameConstants.UI_BUTTON_HEIGHT * (currentWave > 1 ? 1.2 : 1) + 140,
+                buttonImage,
+                hoveredImage,
                 "Back"
         );
     }

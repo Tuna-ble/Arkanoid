@@ -90,7 +90,7 @@ public final class ConfirmContinueState implements GameState {
             if (savedData != null) {
                 repo.deleteSave(levelId);
                 GameManager gm = GameManager.getInstance();
-                PlayingState playingState = new PlayingState(gm, levelId);
+                PlayingState playingState = new PlayingState(gm, GameModeEnum.LEVEL, levelId, true);
                 playingState.loadGame(savedData);
 
                 gm.getStateManager().setState(playingState);

@@ -2,16 +2,19 @@ package org.example.gamelogic.states;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.events.ChangeStateEvent;
-import org.example.gamelogic.graphics.Button;
 import org.example.gamelogic.graphics.TextRenderer;
+import org.example.gamelogic.graphics.buttons.AbstractButton;
+import org.example.gamelogic.graphics.buttons.Button;
 
 public final class ConfirmQuitToMenuState implements GameState {
     private final GameState previousState;
@@ -19,16 +22,21 @@ public final class ConfirmQuitToMenuState implements GameState {
     private final Font messageFont = new Font("Arial", 28);
 
     // Button layout uses GameConstants
+    private Image buttonImage;
+    private Image hoveredImage;
 
     // Center screen position
     private double centerX, centerY;
 
     // Button instances
-    private Button yesButton;
-    private Button noButton;
+    private AbstractButton yesButton;
+    private AbstractButton noButton;
 
     public ConfirmQuitToMenuState(GameState previousState) {
         this.previousState = previousState;
+        AssetManager am = AssetManager.getInstance();
+        buttonImage = am.getImage("button");
+        hoveredImage = am.getImage("hoveredButton");
     }
 
     @Override
@@ -110,7 +118,7 @@ public final class ConfirmQuitToMenuState implements GameState {
 
         // Initialize buttons if not already created
         if (yesButton == null) {
-            yesButton = new Button(yesX, buttonY, "Yes");
+            yesButton = new Button(yesX, buttonY, buttonImage, hoveredImage, "Yes");
             yesButton.setFont(messageFont);
             yesButton.setColors(
                     Color.web("#444"),
@@ -125,7 +133,7 @@ public final class ConfirmQuitToMenuState implements GameState {
         }
 
         if (noButton == null) {
-            noButton = new Button(noX, buttonY, "No");
+            noButton = new Button(noX, buttonY, buttonImage, hoveredImage, "No");
             noButton.setFont(messageFont);
             noButton.setColors(
                     Color.web("#444"),
@@ -151,8 +159,8 @@ public final class ConfirmQuitToMenuState implements GameState {
         if (inputProvider == null) return;
 
         // Update buttons to check hover and click states
-        if (yesButton != null) yesButton.update(inputProvider);
-        if (noButton != null) noButton.update(inputProvider);
+        if (yesButton != null) yesButton.handleInput(inputProvider);
+        if (noButton != null) noButton.handleInput(inputProvider);
 
         // Handle button clicks
         if (yesButton != null && yesButton.isClicked()) {

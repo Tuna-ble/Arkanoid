@@ -18,7 +18,10 @@ public class LaserPaddlePowerUp extends AbstractPowerUp {
     }
 
     @Override
-    public double getSpriteRow() {
-        return 0;
+    public void render(GraphicsContext gc) {
+        gc.setFill(Color.ORANGE);
+        gc.fillRect(x, y, width, height);
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(x, y, width, height);
     }
 }

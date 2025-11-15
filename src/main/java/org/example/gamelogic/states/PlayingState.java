@@ -606,6 +606,10 @@ public final class PlayingState implements GameState {
                 handleLifeAdded
         );
 
+        clearManagers();
+    }
+
+    private void clearManagers() {
         for (PowerUpStrategy strategy : activeStrategies) {
             strategy.remove(this);
         }

@@ -20,7 +20,6 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
     protected final Image powerUpSprites;
     protected int currentFrame = 0;
     protected double frameTimer = 0.0;
-    protected double spriteRow; // look up the sprite sheet and go to subclass
 
     public AbstractPowerUp(double x, double y, double width, double height,
                            double dx, double dy, PowerUpStrategy strategy) {
@@ -29,7 +28,6 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
         this.isActive = true;
 
         powerUpSprites = AssetManager.getInstance().getImage("powerups");
-        spriteRow = getSpriteRow();
         subscribeToPowerUpCollectedEvent();
     }
 
@@ -62,18 +60,7 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
     }
 
     @Override
-    public void render(GraphicsContext gc) {
-        double sourceX = GameConstants.POWERUP_SPRITE_OFFSET + currentFrame * (GameConstants.POWERUP_SPRITE_WIDTH + GameConstants.POWERUP_SPRITE_PADDING);
-        double sourceY = GameConstants.POWERUP_SPRITE_OFFSET + spriteRow * (GameConstants.POWERUP_SPRITE_WIDTH + GameConstants.POWERUP_SPRITE_PADDING);
-        double sourceWidth = GameConstants.POWERUP_SPRITE_WIDTH;
-        double sourceHeight = GameConstants.POWERUP_SPRITE_HEIGHT;
-
-        gc.drawImage(
-                powerUpSprites,
-                sourceX, sourceY, sourceWidth, sourceHeight,
-                this.x, this.y, this.width, this.height
-        );
-    }
+    public abstract void render(GraphicsContext gc);
 
     @Override
     public void setPosition(double x, double y) {
@@ -126,6 +113,4 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
         this.isTaken = true;
         destroy();
     }
-
-    public abstract double getSpriteRow();
 }

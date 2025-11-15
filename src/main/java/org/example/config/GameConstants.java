@@ -81,7 +81,7 @@ public final class GameConstants {
     public static final double ENEMY_HEIGHT = 40;
     public static final double BOSS_WIDTH = 190;
     public static final double BOSS_HEIGHT = 350;
-    public static final double BOSS_HEATLTH = 20.0;
+    public static final double BOSS_HEALTH = 20.0;
     public static final double MINION_WIDTH = 25;
     public static final double MINION_HEIGHT = 40;
 

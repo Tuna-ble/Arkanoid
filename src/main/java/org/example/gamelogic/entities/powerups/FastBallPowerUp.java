@@ -18,7 +18,10 @@ public class FastBallPowerUp extends AbstractPowerUp {
     }
 
     @Override
-    public double getSpriteRow() {
-        return 8;
+    public void render(GraphicsContext gc) {
+        gc.setFill(Color.CYAN);
+        gc.fillRect(x, y, width, height);
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(x, y, width, height);
     }
 }
