@@ -68,9 +68,9 @@ public class Window {
     public void render(GraphicsContext gc) {
         if (previousState != null) {
             previousState.render(gc);
+            gc.setFill(new Color(0, 0, 0, 0.6));
+            gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
         }
-        gc.setFill(new Color(0, 0, 0, 0.6));
-        gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
         if (windowTransition != null) {
             windowTransition.render(gc, this);
@@ -122,6 +122,10 @@ public class Window {
 
     public double getY() {
         return this.y;
+    }
+
+    public boolean transitionFinished() {
+        return this.windowTransitionFinished;
     }
 
     public List<AbstractUIElement> getElements() {

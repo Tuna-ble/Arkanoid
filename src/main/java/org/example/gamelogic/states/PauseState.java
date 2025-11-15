@@ -43,8 +43,8 @@ public final class PauseState implements GameState {
         this.window = new Window(previousState, 300, 400, transition);
 
         AssetManager am = AssetManager.getInstance();
-        this.normalImage = am.getImage("button");
-        this.hoveredImage = am.getImage("hoveredButton");
+        this.normalImage = am.getImage("selectButton");
+        this.hoveredImage = am.getImage("selectButtonHovered");
         this.bannerImage = am.getImage("banner2");
 
         centerX = GameConstants.SCREEN_WIDTH / 2;
