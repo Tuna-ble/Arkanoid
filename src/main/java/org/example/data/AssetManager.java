@@ -80,6 +80,9 @@ public class AssetManager {
             loadImage("button", "/images/button.png");
             loadImage("hoveredButton", "/images/hoveredButton.png");
 
+            loadImage("page1", "/images/page1.png");
+            loadImage("page2", "/images/page2.png");
+
             loadImage("icon_expand", "/images/expandpaddle.png"); //
             loadImage("icon_extra_life", "/images/extra.png"); //
 
