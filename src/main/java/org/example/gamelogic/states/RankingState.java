@@ -118,18 +118,6 @@ public final class RankingState implements GameState {
 
         gc.setTextAlign(TextAlignment.CENTER);
         double pulse = 0.75 + 0.25 * Math.abs(Math.sin(elapsed * 1.8));
-        titleBaseShadow.setColor(Color.web("#ffdd44", 0.4 * pulse));  // Only update color
-        TextRenderer.drawOutlinedText(
-                gc,
-                "HIGH SCORES",
-                centerX,
-                140,
-                titleFont,
-                titleGradient,
-                Color.web("#4A0404", 0.8),
-                2.5,
-                titleBaseShadow
-        );
 
         // Score entries
         double scoreY = 220;

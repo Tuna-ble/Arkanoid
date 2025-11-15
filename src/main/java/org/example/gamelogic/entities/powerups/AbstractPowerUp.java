@@ -1,7 +1,9 @@
 package org.example.gamelogic.entities.powerups;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.entities.GameObject;
 import org.example.gamelogic.entities.MovableObject;
@@ -15,23 +17,31 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
     // Kiểm tra powerup đã rơi khỏi cửa sổ chưa
     protected boolean outOfBounds = false;
 
+    protected final Image powerUpSprites;
+    protected int currentFrame = 0;
+    protected double frameTimer = 0.0;
+    protected double spriteRow; // look up the sprite sheet and go to subclass
+
     public AbstractPowerUp(double x, double y, double width, double height,
                            double dx, double dy, PowerUpStrategy strategy) {
         super(x, y, width, height, dx, dy);
         this.strategy = strategy;
         this.isActive = true;
 
+        powerUpSprites = AssetManager.getInstance().getImage("powerups");
+        spriteRow = getSpriteRow();
         subscribeToPowerUpCollectedEvent();
     }
 
     private void subscribeToPowerUpCollectedEvent() {
         EventManager.getInstance().subscribe(
                 PowerUpCollectedEvent.class,
-                this::onPowerUpCollected);
+                this::onPowerUpCollected
+        );
     }
 
     protected void onPowerUpCollected(PowerUpCollectedEvent event) {
-        if (event.getPowerUpCollected()==this) {
+        if (event.getPowerUpCollected() == this) {
             markAsTaken();
         }
     }
@@ -43,10 +53,27 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
     public void update(double deltaTime) {
         if (!outOfBounds) y += dy;
         if (y > GameConstants.SCREEN_HEIGHT) outOfBounds = true;
+
+        frameTimer += deltaTime;
+        if (frameTimer >= GameConstants.POWERUP_FRAME_DURATION) {
+            frameTimer = 0;
+            currentFrame = (currentFrame + 1) % GameConstants.POWERUP_TOTAL_FRAMES;
+        }
     }
 
     @Override
-    public abstract void render(GraphicsContext gc);
+    public void render(GraphicsContext gc) {
+        double sourceX = GameConstants.POWERUP_SPRITE_OFFSET + currentFrame * (GameConstants.POWERUP_SPRITE_WIDTH + GameConstants.POWERUP_SPRITE_PADDING);
+        double sourceY = GameConstants.POWERUP_SPRITE_OFFSET + spriteRow * (GameConstants.POWERUP_SPRITE_WIDTH + GameConstants.POWERUP_SPRITE_PADDING);
+        double sourceWidth = GameConstants.POWERUP_SPRITE_WIDTH;
+        double sourceHeight = GameConstants.POWERUP_SPRITE_HEIGHT;
+
+        gc.drawImage(
+                powerUpSprites,
+                sourceX, sourceY, sourceWidth, sourceHeight,
+                this.x, this.y, this.width, this.height
+        );
+    }
 
     @Override
     public void setPosition(double x, double y) {
@@ -74,7 +101,7 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
 
     @Override
     public void setActive(boolean active) {
-        this.isActive=active;
+        this.isActive = active;
     }
 
     @Override
@@ -99,4 +126,6 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
         this.isTaken = true;
         destroy();
     }
+
+    public abstract double getSpriteRow();
 }

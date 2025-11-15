@@ -11,6 +11,8 @@ import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.states.*;
 
+import java.util.Map;
+
 //singleton (co dung Bill Pugh Idiom de xu li multithreading)
 public final class GameManager {
     private final AnimationTimer gameLoop;
@@ -29,6 +31,7 @@ public final class GameManager {
     private ILevelRepository levelRepository;
     private I_InputProvider inputProvider;
     private GameState currentState;
+    private GameModeEnum currentGameMode;
 
     private double accumulator = 0.0;
     private final double FIXED_TIMESTEP = GameConstants.FIXED_TIMESTEP;
@@ -90,6 +93,7 @@ public final class GameManager {
         this.collisionManager = new CollisionManager();
 
         currentState = new MainMenuState();
+        currentGameMode = GameModeEnum.LEVEL;
         this.stateManager.setState(currentState);
 
         AssetManager.getInstance();
@@ -171,7 +175,17 @@ public final class GameManager {
                 if (currentState instanceof PauseState) {
                     ((PauseState) currentState).cleanUp();
                 }
-                newState = new PlayingState(this, levelToLoad);
+                if (currentGameMode == GameModeEnum.INFINITE) {
+                    Map<String, String> data = ProgressManager.loadSession(currentGameMode.toString());
+                    if (data.isEmpty()) {
+                        newState = new PlayingState(this, currentGameMode, 1, true);
+                    } else {
+                        newState = new PlayingState(this, currentGameMode, Integer.parseInt(data.get("level")), false);
+                    }
+                } else {
+                    newState = new PlayingState(this, currentGameMode, levelToLoad, true);
+                }
+
                 break;
 
             case GAME_MODE:
@@ -180,11 +194,13 @@ public final class GameManager {
 
             case LEVEL_STATE:
                 this.setLevelRepository(new FileLevelRepository());
+                this.currentGameMode = GameModeEnum.LEVEL;
                 newState = new LevelState();
                 break;
 
             case INFINITE_MODE:
                 this.setLevelRepository(new InfiniteLevelRepository());
+                this.currentGameMode = GameModeEnum.INFINITE;
                 newState = new InfiniteModeState();
                 break;
 
@@ -197,6 +213,8 @@ public final class GameManager {
                     ((PlayingState) currentState).cleanUp();
                 } else if (currentState instanceof PauseState) {
                     ((PauseState) currentState).cleanUp();
+                } else if (currentState instanceof ConfirmQuitToMenuState) {
+                    ((ConfirmQuitToMenuState) currentState).cleanUp();
                 }
                 newState = new MainMenuState();
                 soundManager.playSelectedMusic();
@@ -223,7 +241,12 @@ public final class GameManager {
 
                 if (currentState instanceof PlayingState) {
                     PlayingState playingState = (PlayingState) currentState;
-                    currentLevel = playingState.getLevelNumber();
+                    if (currentGameMode == GameModeEnum.LEVEL) {
+                        currentLevel = playingState.getLevelNumber();
+                    }
+                    else {
+                         ProgressManager.clearSession(currentGameMode.toString());
+                    }
 
                     int finalScore = ScoreManager.getInstance().getScore();
                     HighscoreManager.saveNewScore(finalScore);
@@ -236,6 +259,8 @@ public final class GameManager {
             case PAUSED:
                 if (currentState instanceof PlayingState) {
                     newState = new PauseState(currentState);
+                } else if (currentState instanceof ConfirmQuitToMenuState) {
+                    newState = new PauseState(((ConfirmQuitToMenuState) currentState).getPreviousState());
                 }
                 break;
 
@@ -254,6 +279,12 @@ public final class GameManager {
             case CONFIRM_RESET:
                 newState = new ConfirmResetState();
                 break;
+
+            case CONFIRM_QUIT_TO_MENU:
+                if (currentState instanceof PauseState) {
+                    newState = new ConfirmQuitToMenuState(((PauseState) currentState).getPreviousState());
+                }
+                break;
         }
 
         if (newState != null && stateManager != null) {
@@ -262,7 +293,7 @@ public final class GameManager {
     }
 
     public void startNewGame() {
-        GameState newPlayingState = new PlayingState(this, 1);
+        GameState newPlayingState = new PlayingState(this, currentGameMode, 1, true);
         stateManager.setState(newPlayingState);
     }
 

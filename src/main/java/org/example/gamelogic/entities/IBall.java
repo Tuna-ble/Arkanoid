@@ -20,6 +20,7 @@ public interface IBall {
     void multiplySpeed(double factor);
     void destroy();
     IBall clone();
+    IBall duplicate();
 
     void update(double deltaTime);
     void render(GraphicsContext gc);

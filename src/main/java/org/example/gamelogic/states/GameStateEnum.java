@@ -13,5 +13,6 @@ public enum GameStateEnum {
     VICTORY,
     GAME_MODE,
     INFINITE_MODE,
-    CONFIRM_RESET
+    CONFIRM_RESET,
+    CONFIRM_QUIT_TO_MENU
 }

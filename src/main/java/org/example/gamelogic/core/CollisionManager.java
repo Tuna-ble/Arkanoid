@@ -189,12 +189,12 @@ public final class CollisionManager {
             if (brick.isDestroyed()) continue;
             if (!ball.getGameObject().intersects(brick.getGameObject())) continue;
 
-            boolean alreadyPierced=false;
+            boolean alreadyPierced = false;
 
             // skip repeated damage on the same brick
             for (GameObject piercingObject : ball.getPiercingObjects()) {
                 if (brick.getGameObject().equals(piercingObject)) {
-                    alreadyPierced=true;
+                    alreadyPierced = true;
                     break;
                 }
             }
@@ -272,6 +272,7 @@ public final class CollisionManager {
                     // EventManager.getInstance().publish(new PaddleHitEvent(paddle));
                     LifeManager.getInstance().loseLife();
                     laser.setActive(false);
+                    break;
                 }
             }
         }
@@ -291,12 +292,12 @@ public final class CollisionManager {
             if (enemy.isDestroyed()) continue;
             if (!ball.getGameObject().intersects(enemy.getGameObject())) continue;
 
-            boolean alreadyPierced=false;
+            boolean alreadyPierced = false;
 
             // skip repeated damage on the same enemy
             for (GameObject piercingObject : ball.getPiercingObjects()) {
                 if (enemy.getGameObject().equals(piercingObject)) {
-                    alreadyPierced=true;
+                    alreadyPierced = true;
                 }
             }
 

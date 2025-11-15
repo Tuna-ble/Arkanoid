@@ -1,7 +1,13 @@
 package org.example.gamelogic.entities.enemy;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.entities.GameObject;
 import org.example.gamelogic.entities.LaserBullet;
@@ -15,6 +21,7 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
     protected double health;
     protected double scoreValue;
     protected boolean hasEnteredScreen;
+    protected final Image enemySprites;
 
     protected EnemyMovementStrategy movementStrategy;
 
@@ -24,6 +31,7 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
         this.isActive = true;
         this.hasEnteredScreen = false;
         this.movementStrategy = initialMovementStrategy;
+        this.enemySprites = AssetManager.getInstance().getImage("enemies");
 
         subscribeToEvents();
     }

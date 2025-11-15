@@ -31,7 +31,7 @@ public final class GameConstants {
 
     // Color
     public static final Color NORMAL_BALL_COLOR = Color.RED;
-    public static final Color PIERCING_BALL_COLOR = Color.CYAN;
+    public static final Color PIERCING_BALL_COLOR = Color.LIGHTYELLOW;
     public static final Color PADDLE_COLOR = Color.CYAN;
     public static final Color PADDLE_BORDER_COLOR = Color.DARKBLUE;
 
@@ -84,6 +84,16 @@ public final class GameConstants {
     public static final double BOSS_HEATLTH = 20.0;
     public static final double MINION_WIDTH = 25;
     public static final double MINION_HEIGHT = 40;
+
+    // Powerups
+    public static final double POWERUP_WIDTH = 40;
+    public static final double POWERUP_HEIGHT = 40;
+    public static final double POWERUP_SPRITE_WIDTH = 15;
+    public static final double POWERUP_SPRITE_HEIGHT = 15;
+    public static final double POWERUP_SPRITE_OFFSET = 0.5;
+    public static final double POWERUP_SPRITE_PADDING = 2;
+    public static final int POWERUP_TOTAL_FRAMES = 14;
+    public static final double POWERUP_FRAME_DURATION = 0.1;
 
     // Gameplay tuning
     public static final double BALL_INITIAL_ANGLE_RANDOM_RANGE = 15.0; // ±15 degrees

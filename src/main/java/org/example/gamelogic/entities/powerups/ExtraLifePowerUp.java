@@ -10,7 +10,7 @@ import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
 public class ExtraLifePowerUp extends AbstractPowerUp {
     private Image extra;
 
-    /// type: H
+    /// type: L
     public ExtraLifePowerUp(double x, double y, double width, double height,
                            double dx, double dy, PowerUpStrategy strategy) {
         super(x, y, width, height, dx, dy, strategy);

@@ -100,7 +100,7 @@ public final class PauseState implements GameState {
             );
         } else if (quitButton != null && quitButton.isClicked()) {
             EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.MAIN_MENU)
+                    new ChangeStateEvent(GameStateEnum.CONFIRM_QUIT_TO_MENU)
             );
         }
     }

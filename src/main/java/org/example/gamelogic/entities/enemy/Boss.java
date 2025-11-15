@@ -17,7 +17,7 @@ public class Boss extends AbstractEnemy {
         super(x, y, GameConstants.BOSS_WIDTH, GameConstants.BOSS_HEIGHT,
                 dx, dy, new StaticMovementStrategy());
 
-        this.health = GameConstants.BOSS_HEATLTH;
+        this.health = GameConstants.BOSS_HEALTH;
         this.scoreValue = 1000;
         this.startX = GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH / 2 - GameConstants.BOSS_WIDTH / 2;
         this.image = AssetManager.getInstance().getImage("boss");
@@ -41,7 +41,7 @@ public class Boss extends AbstractEnemy {
         if (currentStrategy instanceof BossEntryStrategy) {
             return;
         }
-        if (this.health <= GameConstants.BOSS_HEATLTH / 2.0
+        if (this.health <= GameConstants.BOSS_HEALTH / 2.0
                 && !(currentStrategy instanceof BossEnrageStrategy || currentStrategy instanceof BossPhase2Strategy)) {
             setStrategy(new BossEnrageStrategy(startX));
         }
@@ -60,7 +60,7 @@ public class Boss extends AbstractEnemy {
         gc.setFill(Color.BLACK);
         gc.fillRect(x, y - 10, width, 8);
         gc.setFill(Color.GREEN);
-        gc.fillRect(x, y - 10, width * (this.health / GameConstants.BOSS_HEATLTH), 8);
+        gc.fillRect(x, y - 10, width * (this.health / GameConstants.BOSS_HEALTH), 8);
     }
 
     @Override

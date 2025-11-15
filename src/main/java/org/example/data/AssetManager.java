@@ -17,7 +17,7 @@ public class AssetManager {
     private Map<String, Effect> effects = new HashMap<>();
     private Map<String, Paint> gradients = new HashMap<>();
     private Map<String, String> fontFamilies = new HashMap<>();
-    
+
     private boolean resourcesPreloaded = false;
 
     private AssetManager() {
@@ -66,7 +66,7 @@ public class AssetManager {
             loadImage("bossShoot", "/images/moaiShooting.png");
             loadImage("minion", "/images/minion.png");
             loadImage("minionShoot", "/images/minionShoot.png");
-            
+
             loadImage("frame", "/images/GameFrame.png");
             loadImage("pause", "/images/pause.png");
 
@@ -215,7 +215,7 @@ public class AssetManager {
 
     public void preloadResources() {
         if (resourcesPreloaded) return;
-        
+
         loadAssets();
         
         // Cache common fonts

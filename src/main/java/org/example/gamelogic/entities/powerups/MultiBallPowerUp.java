@@ -18,10 +18,7 @@ public class MultiBallPowerUp extends AbstractPowerUp {
     }
 
     @Override
-    public void render(GraphicsContext gc) {
-        gc.setFill(Color.RED);
-        gc.fillRect(x, y, width, height);
-        gc.setStroke(Color.BLACK);
-        gc.strokeRect(x, y, width, height);
+    public double getSpriteRow() {
+        return 6;
     }
 }
