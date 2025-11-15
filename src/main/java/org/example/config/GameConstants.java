@@ -16,10 +16,10 @@ public final class GameConstants {
     public static final double SCREEN_HEIGHT = 750;
 
     // UI
-    public static final double FRAME_TOP_BORDER = 25;
-    public static final double FRAME_LEFT_BORDER = 25;
-    public static final double FRAME_RIGHT_BORDER = 25;
-    public static final double FRAME_BOTTOM_BORDER = 25;
+    public static final double FRAME_TOP_BORDER = 15;
+    public static final double FRAME_LEFT_BORDER = 15;
+    public static final double FRAME_RIGHT_BORDER = 15;
+    public static final double FRAME_BOTTOM_BORDER = 15;
     public static final double UI_BAR_WIDTH = 200;
     public static final double UI_BAR_HEIGHT = 0;
 
@@ -100,12 +100,14 @@ public final class GameConstants {
     public static final double UI_BUTTON_WIDTH = 200;
     public static final double UI_BUTTON_HEIGHT = 60;
     public static final double UI_BUTTON_SPACING = 20;
-    public static final double UI_BUTTON_PADDING = 20;
+    public static final double UI_BUTTON_PADDING = 25;
 
     // UI - Windows
     public static final double UI_WINDOW_WIDTH = 500;
     public static final double UI_WINDOW_HEIGHT = 420;
     public static final double UI_WINDOW_CORNER_SIZE = 34;
+    public static final double UI_BANNER_WIDTH = 250;
+    public static final double UI_BANNER_HEIGHT = 75;
 
     // Lives
     public static final int INITIAL_LIVES = 3;

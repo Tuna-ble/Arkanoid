@@ -20,7 +20,7 @@ import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
 public final class GameModeState implements GameState {
-
+    private final Image backgroundImage;
     private final AbstractButton infiniteButton;
     private final AbstractButton levelsButton;
     private final AbstractButton backButton;
@@ -39,10 +39,10 @@ public final class GameModeState implements GameState {
         double buttonY = 220;
         double buttonSpacing = 40;
 
-
         AssetManager am = AssetManager.getInstance();
-        final Image normalImage = am.getImage("button");
-        final Image hoveredImage = am.getImage("hoveredButton");
+        backgroundImage = am.getImage("gameMode");
+        final Image normalImage = am.getImage("selectButton");
+        final Image hoveredImage = am.getImage("selectButtonHovered");
         this.infiniteButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 buttonY,
@@ -79,9 +79,7 @@ public final class GameModeState implements GameState {
 
     @Override
     public void render(GraphicsContext gc) {
-
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        gc.drawImage(backgroundImage, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
         gc.setTextAlign(TextAlignment.CENTER);
         TextRenderer.drawOutlinedText(

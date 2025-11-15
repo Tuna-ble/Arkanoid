@@ -33,6 +33,7 @@ public final class LevelState implements GameState {
     private final Image level;
     private final Image normalImage;
     private final Image hoveredImage;
+    private final Image bannerImage;
     private double elapsedTime = 0;
 
     private final AbstractButton[] levelButtons;
@@ -42,18 +43,19 @@ public final class LevelState implements GameState {
     private final Map<Integer, Integer> starsMap;
 
     private final AbstractButton backButton;
+    private final AbstractButton banner;
 
     private Window window;
 
     public LevelState() {
         ITransitionStrategy transition = new ScrollDownTransitionStrategy();
-        this.window = new Window(null, 500, 450, transition,
-                "LEVELS", null);
+        this.window = new Window(null, 800, 500, transition);
 
         AssetManager am = AssetManager.getInstance();
         this.level = new Image("/images/level.gif");
-        this.normalImage = am.getImage("button");
-        this.hoveredImage = am.getImage("hoveredButton");
+        this.normalImage = am.getImage("selectButton");
+        this.hoveredImage = am.getImage("selectButtonHovered");
+        this.bannerImage = am.getImage("banner1");
         this.levelButtons = new AbstractButton[NUM_LEVELS];
 
         this.maxLevelUnlocked = ProgressManager.getMaxLevelUnlocked();
@@ -81,11 +83,18 @@ public final class LevelState implements GameState {
             this.window.addButton(levelButtons[i]);
         }
 
+        double bannerX = this.window.getX() + GameConstants.UI_BUTTON_PADDING;
+        double bannerY = this.window.getY() + GameConstants.UI_BUTTON_PADDING;
         double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
         double btnY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 40;
+        this.banner = new Button(bannerX, bannerY, GameConstants.UI_BANNER_WIDTH, GameConstants.UI_BANNER_HEIGHT,
+                bannerImage, bannerImage, "LEVELS");
+        this.banner.setTransition(new WipeElementTransitionStrategy(0.5));
+
         this.backButton = new Button(btnX, btnY, normalImage, hoveredImage, "Back");
         this.backButton.setTransition(new WipeElementTransitionStrategy(0.5));
 
+        this.window.addButton(banner);
         this.window.addButton(backButton);
     }
 
