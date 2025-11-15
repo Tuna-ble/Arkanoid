@@ -16,5 +16,6 @@ public enum GameStateEnum {
     CONFIRM_RESET,
     BEGIN,
     SIGN_IN,
-    REGISTER
+    REGISTER,
+    LOGOUT
 }

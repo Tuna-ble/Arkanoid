@@ -168,11 +168,11 @@ public final class RegisterState implements GameState {
         titleShadow.setOffsetY(6);
 
         gc.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 40));
-        gc.setEffect(titleShadow);
+        //gc.setEffect(titleShadow);
         gc.setFill(Color.color(0, 0, 0, 0.8));
         gc.fillText("CREATE ACCOUNT", centerX + 3, 130 + 3);
 
-        gc.setEffect(null);
+        //gc.setEffect(null);
         gc.setFill(titleFill);
         gc.fillText("CREATE ACCOUNT", centerX, 130);
 
@@ -447,6 +447,7 @@ public final class RegisterState implements GameState {
         GameManager gm = GameManager.getInstance();
         if (gm != null && gm.getSaveGameRepository() != null) {
             gm.getSaveGameRepository().setCurrentAccountId(username);
+            System.out.println("vclll");
         }
 
         setSuccessMessage("Đăng ký thành công! Nhấn BACK để đăng nhập.");

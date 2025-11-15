@@ -85,8 +85,7 @@ public class GameApplication extends Application {
 
             SavedGameState dataToSave = playingState.collectGameStateToSave();
             int levelId = playingState.getLevelNumber();
-            SaveGameRepository repo = new SaveGameRepository();
-            repo.saveGame(dataToSave, levelId);
+            gameManager.getSaveGameRepository().saveGame(dataToSave, levelId);
 
             System.out.println("Đã tự động lưu game cho level " + levelId);
         } else {

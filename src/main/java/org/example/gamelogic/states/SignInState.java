@@ -158,11 +158,11 @@ public final class SignInState implements GameState {
         titleShadow.setOffsetY(6);
 
         gc.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 40));
-        gc.setEffect(titleShadow);
+        //gc.setEffect(titleShadow);
         gc.setFill(Color.color(0, 0, 0, 0.8));
         gc.fillText("SIGN IN", centerX + 3, 130 + 3);
 
-        gc.setEffect(null);
+        //gc.setEffect(null);
         gc.setFill(titleFill);
         gc.fillText("SIGN IN", centerX, 130);
 
@@ -396,8 +396,8 @@ public final class SignInState implements GameState {
         GameManager gm = GameManager.getInstance();
         if (gm != null && gm.getSaveGameRepository() != null) {
             gm.getSaveGameRepository().setCurrentAccountId(username);
+            System.out.println("vclll");
         }
-
 
         // Đảm bảo thư mục save cho user tồn tại
         createUserSaveDirectory(username);
@@ -476,4 +476,6 @@ public final class SignInState implements GameState {
         this.message = msg;
         this.messageColor = Color.LIGHTGREEN;
     }
+
+
 }

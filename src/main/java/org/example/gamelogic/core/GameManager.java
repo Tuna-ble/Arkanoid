@@ -86,6 +86,7 @@ public final class GameManager {
         this.powerUpManager = new PowerUpManager();
         this.ballManager = new BallManager();
         this.collisionManager = new CollisionManager();
+        this.saveGameRepository = new SaveGameRepository();
 
         currentState = new BeginState();
         this.stateManager.setState(currentState);
@@ -175,6 +176,12 @@ public final class GameManager {
 
             case REGISTER:
                 newState = new RegisterState();
+                break;
+
+            case LOGOUT:
+                if (currentState instanceof MainMenuState) {
+                    newState = new LogOutState(currentState);
+                }
                 break;
 
             case PLAYING:

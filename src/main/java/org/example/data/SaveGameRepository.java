@@ -16,7 +16,7 @@ public class SaveGameRepository {
      * Account hiện tại, dùng làm tên folder con trong "saves".
      * Mặc định là "default" nếu chưa đăng nhập.
      */
-    private String currentAccountId = "default";
+        private String currentAccountId = "default";
 
     public SaveGameRepository() {
         ensureRootDirectoryExists();
@@ -32,6 +32,7 @@ public class SaveGameRepository {
             this.currentAccountId = "default";
         } else {
             this.currentAccountId = accountId.trim();
+            System.out.println("*************");
         }
         ensureAccountDirectoryExists();
     }
@@ -40,7 +41,6 @@ public class SaveGameRepository {
         return currentAccountId;
     }
 
-    // ----------------- Thư mục lưu -----------------
 
     private void ensureRootDirectoryExists() {
         File dir = new File(SAVE_ROOT_DIRECTORY);
@@ -74,7 +74,6 @@ public class SaveGameRepository {
         return new File(getAccountDirectory(), fileName);
     }
 
-    // ----------------- SAVE / LOAD / DELETE -----------------
 
     public boolean saveGame(SavedGameState state, int levelId) {
         ensureAccountDirectoryExists();
