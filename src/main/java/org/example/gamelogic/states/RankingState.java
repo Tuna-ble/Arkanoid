@@ -27,10 +27,11 @@ public final class RankingState implements GameState {
     private final AbstractButton backButton;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
     private Image rankingIcon;
+    private Image scoreCardImage;
 
-    private final Font titleFont = new Font("Arial", 70);
-    private final Font scoreFont = new Font("Arial", 40);
-    private final Font rankFont = new Font("Arial", 32);
+    private final Font titleFont;
+    private final Font scoreFont;
+    private final Font rankFont;
     private double elapsed = 0.0;
 
     private final Color bgStart = Color.web("#FFF0F5");
@@ -50,16 +51,12 @@ public final class RankingState implements GameState {
     private void drawScoreEntry(GraphicsContext gc, double x, double y,
                                         double width, double height, 
                                     int rank, int score) {
-        Color cardBg = (rank == 1) ? Color.web("#FFE4E1", 0.4) : Color.web("#FFF0F5", 0.2);
-        Color stroke = (rank == 1) ? Color.web("#FFB6C1", 0.9) : Color.web("#FFB6C1", 0.4);
-        
-        // Draw card background
-        gc.setFill(cardBg);
-        gc.fillRoundRect(x, y, width, height, 15, 15);
-        
-        gc.setStroke(stroke);
-        gc.setLineWidth(rank == 1 ? 2.0 : 1.0);
-        gc.strokeRoundRect(x, y, width, height, 15, 15);
+        if (scoreCardImage != null) {
+            gc.drawImage(scoreCardImage, x, y, width, height);
+        } else {
+            gc.setFill(Color.web("#333", 0.5));
+            gc.fillRect(x, y, width, height);
+        }
 
         // Draw rank number and score with pre-created fonts
         gc.setTextAlign(TextAlignment.CENTER);
@@ -97,11 +94,16 @@ public final class RankingState implements GameState {
         org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
         this.rankingIcon = am.getImage("ranking");
 
+        this.titleFont = am.getFont("Anxel", 70);
+        this.scoreFont = am.getFont("Anxel", 40);
+        this.rankFont = am.getFont("Anxel", 32);
+
         double btnX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
         double btnY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT - 40;
         final Image normalImage = am.getImage("button");
         final Image hoveredImage = am.getImage("hoveredButton");
         this.backButton = new Button(btnX, btnY, normalImage, hoveredImage, "Back to Menu");
+        this.scoreCardImage = am.getImage("rankBanner");
     }
 
     @Override
@@ -121,7 +123,23 @@ public final class RankingState implements GameState {
 
         // Score entries
         double scoreY = 220;
-        double listWidth = Math.min(800, GameConstants.SCREEN_WIDTH - 200);
+        double top1Height = 70;
+        double top1Width = 650;
+
+        double normalHeight = 70;
+        double normalWidth = 600;
+
+        TextRenderer.drawOutlinedText(
+                gc,
+                "RANKING",
+                centerX,
+                scoreY,
+                titleFont,
+                scoreHighlightColor,
+                Color.web("#4A0404", 0.8),
+                2.0,
+                null
+        );
 
         if (highscores.isEmpty()) {
             TextRenderer.drawOutlinedText(
@@ -138,9 +156,15 @@ public final class RankingState implements GameState {
         } else {
             int maxToShow = Math.min(highscores.size(), 5);
             for (int i = 0; i < maxToShow; i++) {
-                double x = centerX - listWidth / 2.0;
-                double y = scoreY + (i * 90); 
-                drawScoreEntry(gc, x, y, listWidth, 70, i + 1, highscores.get(i));
+                double width = normalWidth;
+                double height = normalHeight;
+                if(i == 0) {
+                    width = top1Width;
+                    height = top1Height;
+                }
+                double x = centerX - width / 2.0;
+                double y = scoreY + 40 + (i * 90);
+                drawScoreEntry(gc, x, y, width, height, i + 1, highscores.get(i));
             }
         }
 

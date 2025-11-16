@@ -106,6 +106,7 @@ public class AssetManager {
             loadImage("barFrame", "/images/barFrame.png");
             loadImage("barFill", "/images/barFill.png");
             loadImage("barHandle", "/images/barHandle.png");
+            loadImage("rankBanner", "/images/rankBanner.png");
 
             loadImage("infiniteStatic", "/images/infiniteStatic.png");
             loadImage("infinite", "/images/infinite.png");

@@ -217,7 +217,7 @@ public final class LevelState implements GameState {
             try {
                 if (isLocked) {
                     gc.setFill(new Color(0, 0, 0, 0.7)); // Màu đen mờ 70%
-                    gc.fillRect(previewX, previewY, previewWidth, previewHeight);
+                    gc.fillRect(previewX, previewY + 5, previewWidth, previewHeight - 10);
 
                     gc.setTextAlign(TextAlignment.CENTER);
                     TextRenderer.drawOutlinedText(gc, "LOCKED",
@@ -259,7 +259,7 @@ public final class LevelState implements GameState {
 
             String starText;
             if (isLocked) {
-                starText = "---";
+                starText = "- - -";
             } else {
                 int stars = starsMap.getOrDefault(currentLevel, 0);
                 starText = getStarString(stars);

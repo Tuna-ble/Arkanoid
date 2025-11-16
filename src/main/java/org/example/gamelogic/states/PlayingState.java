@@ -123,11 +123,12 @@ public final class PlayingState implements GameState {
             this.levelNumber = levelNumber;
         }
 
-        this.scoreFont = new Font("Arial", 24);
-        this.labelFont = new Font("Arial", 18);
-        this.valueFont = new Font("Arial", 28);
-
         org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
+        this.scoreFont = am.getFont("Anxel", 24);
+        this.labelFont = am.getFont("Anxel", 18);
+        this.valueFont = am.getFont("Anxel", 28);
+
+
         this.pauseIcon = am.getImage("pause");
         subscribeToEvents();
 
@@ -347,7 +348,7 @@ public final class PlayingState implements GameState {
             if ((warningFlashTimer % 0.8) < 0.5) {
 
                 gc.setFill(Color.RED);
-                gc.setFont(new Font("Arial", 80));
+                gc.setFont(AssetManager.getInstance().getFont("Anxel", 80));
 
                 gc.setTextAlign(TextAlignment.CENTER);
                 gc.setTextBaseline(VPos.CENTER);
@@ -375,7 +376,7 @@ public final class PlayingState implements GameState {
 
         if (currentSubState == SubState.WAVE_CLEARED) {
             gc.setFill(Color.GREEN);
-            gc.setFont(new Font("Arial", 80));
+            gc.setFont(AssetManager.getInstance().getFont("Anxel", 80));
 
             gc.setTextAlign(TextAlignment.CENTER);
             gc.setTextBaseline(VPos.CENTER);
@@ -384,7 +385,7 @@ public final class PlayingState implements GameState {
                     GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH / 2,
                     GameConstants.PLAY_AREA_Y + GameConstants.PLAY_AREA_HEIGHT / 2);
 
-            gc.setFont(new Font("Arial", 30));
+            gc.setFont(AssetManager.getInstance().getFont("Anxel", 30));
             gc.fillText("Loading next wave, please wait warmly...",
                     GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH / 2,
                     GameConstants.PLAY_AREA_Y + GameConstants.PLAY_AREA_HEIGHT / 2 + 60);

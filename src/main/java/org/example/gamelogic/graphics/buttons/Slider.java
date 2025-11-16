@@ -34,7 +34,7 @@ public class Slider extends AbstractUIElement {
         this.handleImage = am.getImage("barHandle");
 
         this.bounds = new Rectangle(x, y, width, height);
-        double PADDING = 1;
+        double PADDING = 2;
         this.trackX = this.x + PADDING;
         this.trackY = this.y + PADDING;
         this.trackWidth = this.width - (2 * PADDING);

@@ -17,7 +17,6 @@ import org.example.gamelogic.graphics.buttons.Button;
 import org.example.presentation.SpriteAnimation;
 
 public final class GameModeState implements GameState {
-
     private boolean isHoveringLeft = false;
     private boolean isHoveringRight = false;
 
@@ -32,14 +31,16 @@ public final class GameModeState implements GameState {
 
     private final AbstractButton backButton;
 
-    private final Font titleFont = new Font("Arial", 50);
-    private final Font descFont = new Font("Arial", 18);
+    private final Font titleFont;
+    private final Font descFont;
 
     private final double SCALE_NORMAL = 1.0;
     private final double SCALE_HOVER = 1.2;
 
     public GameModeState() {
         AssetManager am = AssetManager.getInstance();
+        this.titleFont = am.getFont("Anxel", 50);
+        this.descFont = am.getFont("Anxel", 18);
 
         this.frameImage = am.getImage("modesFrame");
         this.bgLeft = am.getImage("victory");
