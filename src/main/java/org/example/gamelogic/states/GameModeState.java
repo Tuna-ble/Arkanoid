@@ -54,9 +54,9 @@ public final class GameModeState implements GameState {
             this.infiniteAnim = new SpriteAnimation(infiniteSheet, 32, 32, 1.0, true);
         }
 
-        Image casualSheet = am.getImage("bossShoot");
+        Image casualSheet = am.getImage("bossHit");
         if (casualSheet != null) {
-            this.casualAnim = new SpriteAnimation(casualSheet, 3, 3, 1.0, true);
+            this.casualAnim = new SpriteAnimation(casualSheet, 8, 8, 1.0, true);
         }
 
         Image btnImg = am.getImage("button");
