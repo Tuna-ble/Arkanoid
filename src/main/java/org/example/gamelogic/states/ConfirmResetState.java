@@ -19,14 +19,20 @@ import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.buttons.AbstractButton;
 import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
+import org.example.gamelogic.graphics.windows.Window;
+import org.example.gamelogic.strategy.transition.button.WipeElementTransitionStrategy;
+import org.example.gamelogic.strategy.transition.window.HologramTransitionStrategy;
+import org.example.gamelogic.strategy.transition.window.ITransitionStrategy;
+import org.example.gamelogic.strategy.transition.window.PopupTransitionStrategy;
 
 public final class ConfirmResetState implements GameState {
-
+    private final Window window;
     private final AbstractButton yesButton;
     private final AbstractButton noButton;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
-    private final Font titleFont = new Font("Arial", 40);
+    private final Font titleFont;
+    private final Font textFont;
     private final DropShadow titleShadow = new DropShadow(10, Color.color(0, 0, 0, 0.7));
     private final LinearGradient titleFill = new LinearGradient(
             0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
@@ -38,33 +44,39 @@ public final class ConfirmResetState implements GameState {
         double buttonY = 350;
         double buttonSpacing = 40;
 
+        ITransitionStrategy transition = new HologramTransitionStrategy();
+        this.window = new Window(null, 500, 500, transition);
+
         AssetManager am = AssetManager.getInstance();
-        final Image normalImage = am.getImage("button");
-        final Image hoveredImage = am.getImage("hoveredButton");
+        titleFont = am.getFont("Anxel", 45);
+        textFont = am.getFont("Anxel", 30);
+        final Image normalImage = am.getImage("selectButton");
+        final Image hoveredImage = am.getImage("selectButtonHovered");
         this.yesButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 buttonY,
                 normalImage,
                 hoveredImage,
-                "YES (Reset All Data)"
+                "YES"
         );
+        this.yesButton.setTransition(new WipeElementTransitionStrategy(0.5));
 
         this.noButton = new Button(
                 centerX - GameConstants.UI_BUTTON_WIDTH / 2,
                 buttonY + GameConstants.UI_BUTTON_HEIGHT + buttonSpacing,
                 normalImage,
                 hoveredImage,
-                "NO (Go Back)"
+                "NO"
         );
+        this.noButton.setTransition(new WipeElementTransitionStrategy(0.5));
+
+        window.addButton(yesButton);
+        window.addButton(noButton);
     }
 
     @Override
     public void update(double deltaTime) {
-    }
-
-    private void updateButtons(I_InputProvider inputProvider) {
-        yesButton.handleInput(inputProvider);
-        noButton.handleInput(inputProvider);
+        window.update(deltaTime);
     }
 
     @Override
@@ -72,32 +84,29 @@ public final class ConfirmResetState implements GameState {
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        gc.setTextAlign(TextAlignment.CENTER);
-        TextRenderer.drawOutlinedText(
-                gc,
-                "ARE YOU SURE?",
-                centerX,
-                150,
-                titleFont,
-                titleFill,
-                Color.color(0, 0, 0, 0.9),
-                2.0,
-                titleShadow
-        );
-        TextRenderer.drawOutlinedText(
-                gc,
-                "This will delete ALL highscores",
-                centerX,
-                220,
-                new Font("Arial", 24), Color.WHITE, Color.BLACK, 1.0, null
-        );
-        TextRenderer.drawOutlinedText(
-                gc,
-                "and reset ALL level progress.",
-                centerX,
-                260,
-                new Font("Arial", 24), Color.WHITE, Color.BLACK, 1.0, null
-        );
+        window.render(gc);
+
+        if (window.transitionFinished()) {
+            gc.setTextAlign(TextAlignment.CENTER);
+            TextRenderer.drawOutlinedText(
+                    gc,
+                    "ARE YOU SURE?",
+                    centerX,
+                    200,
+                    titleFont,
+                    titleFill,
+                    Color.color(0, 0, 0, 0.9),
+                    2.0,
+                    titleShadow
+            );
+            TextRenderer.drawOutlinedText(
+                    gc,
+                    "This will delete ALL highscores\nand reset ALL level progress.",
+                    centerX,
+                    260,
+                    textFont, Color.WHITE, Color.BLACK, 1.0, null
+            );
+        }
 
         yesButton.render(gc);
         noButton.render(gc);
@@ -107,7 +116,7 @@ public final class ConfirmResetState implements GameState {
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
 
-        updateButtons(inputProvider);
+        window.handleInput(inputProvider);
 
         if (yesButton.isClicked()) {
             HighscoreManager.resetHighscores();

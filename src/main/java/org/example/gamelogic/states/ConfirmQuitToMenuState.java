@@ -15,18 +15,24 @@ import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.TextRenderer;
 import org.example.gamelogic.graphics.buttons.AbstractButton;
 import org.example.gamelogic.graphics.buttons.Button;
+import org.example.gamelogic.graphics.windows.Window;
+import org.example.gamelogic.strategy.transition.button.WipeElementTransitionStrategy;
+import org.example.gamelogic.strategy.transition.window.ITransitionStrategy;
+import org.example.gamelogic.strategy.transition.window.PopupTransitionStrategy;
 
 public final class ConfirmQuitToMenuState implements GameState {
     private final GameState previousState;
-    private final Font warningFont = new Font("Arial", 48);
-    private final Font messageFont = new Font("Arial", 28);
+    private final Window window;
+    private final Font warningFont;
+    private final Font messageFont;
 
     // Button layout uses GameConstants
     private Image buttonImage;
     private Image hoveredImage;
 
     // Center screen position
-    private double centerX, centerY;
+    private double centerX = GameConstants.SCREEN_WIDTH / 2;
+    private double centerY = GameConstants.SCREEN_HEIGHT / 2;
 
     // Button instances
     private AbstractButton yesButton;
@@ -34,122 +40,80 @@ public final class ConfirmQuitToMenuState implements GameState {
 
     public ConfirmQuitToMenuState(GameState previousState) {
         this.previousState = previousState;
+
         AssetManager am = AssetManager.getInstance();
-        buttonImage = am.getImage("button");
-        hoveredImage = am.getImage("hoveredButton");
+        warningFont = am.getFont("Anxel", 45);
+        messageFont = am.getFont("Anxel", 30);
+
+        ITransitionStrategy transition = new PopupTransitionStrategy();
+        this.window = new Window(previousState, 500, 400, transition);
+
+        buttonImage = am.getImage("selectButton");
+        hoveredImage = am.getImage("selectButtonHovered");
+
+        double buttonX = window.getX() + window.getWidth() / 2 - GameConstants.UI_BUTTON_WIDTH / 2;
+        double buttonY = window.getY() + 210;
+
+        yesButton = new Button(buttonX, buttonY, buttonImage, hoveredImage, "Yes");
+        yesButton.setTransition(new WipeElementTransitionStrategy(0.5));
+
+        noButton = new Button(buttonX, buttonY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_PADDING,
+                buttonImage, hoveredImage, "No");
+        noButton.setTransition(new WipeElementTransitionStrategy(0.5));
+
+        window.addButton(yesButton);
+        window.addButton(noButton);
     }
 
     @Override
     public void update(double deltaTime) {
         // No physics or updates while paused
+        window.update(deltaTime);
     }
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setTransform(new Affine());
-        gc.setTextAlign(TextAlignment.LEFT);
-        gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
-        double width = gc.getCanvas().getWidth();
-        double height = gc.getCanvas().getHeight();
+        window.render(gc);
 
-        centerX = width / 2;
-        centerY = height / 2;
-
-        // Render previous frame (frozen gameplay)
-        previousState.render(gc);
-
-        // Semi-transparent dark overlay
-        gc.setFill(new Color(0, 0, 0, 0.6));
-        gc.fillRect(0, 0, width, height);
-
-        // Draw pause panel (card)
-        double panelWidth = 500;
-        double panelHeight = 310;
-        double panelX = centerX - panelWidth / 2;
-        double panelY = centerY - panelHeight / 2;
-
-        gc.setFill(Color.web("#222"));
-        gc.fillRoundRect(panelX, panelY, panelWidth, panelHeight, 20, 20);
-
-        gc.setStroke(Color.WHITE);
-        gc.setLineWidth(3);
-        gc.strokeRoundRect(panelX, panelY, panelWidth, panelHeight, 20, 20);
-
-        // Title text (centered, outlined, shadow)
-        gc.setTextAlign(TextAlignment.CENTER);
-        DropShadow titleShadow = new DropShadow(10, Color.color(0, 0, 0, 0.7));
-        TextRenderer.drawOutlinedText(
-                gc,
-                "WARNING",
-                centerX,
-                panelY + 60,
-                warningFont,
-                Color.WHITE,
-                Color.color(0, 0, 0, 0.9),
-                2.0,
-                titleShadow
-        );
-        TextRenderer.drawOutlinedText(
-                gc,
-                "Your progress on this level\nwill not be saved.",
-                centerX,
-                panelY + 108,
-                messageFont,
-                Color.WHITE,
-                Color.color(0, 0, 0, 0.9),
-                2.0,
-                titleShadow
-        );
-        TextRenderer.drawOutlinedText(
-                gc,
-                "Continue?",
-                centerX,
-                panelY + 180,
-                messageFont,
-                Color.YELLOW,
-                Color.color(0, 0, 0, 0.9),
-                2.0,
-                titleShadow
-        );
-        // Calculate button positions
-        double yesX = centerX - GameConstants.UI_BUTTON_WIDTH - GameConstants.UI_BUTTON_SPACING;
-        double noX = centerX + GameConstants.UI_BUTTON_SPACING;
-        double buttonY = panelY + 210;
-
-        // Initialize buttons if not already created
-        if (yesButton == null) {
-            yesButton = new Button(yesX, buttonY, buttonImage, hoveredImage, "Yes");
-            yesButton.setFont(messageFont);
-            yesButton.setColors(
-                    Color.web("#444"),
-                    Color.web("#555"),
-                    Color.WHITE,
-                    Color.WHITE,
-                    Color.WHITE
+        if (window.transitionFinished()) {
+            // Title text (centered, outlined, shadow)
+            gc.setTextAlign(TextAlignment.CENTER);
+            DropShadow titleShadow = new DropShadow(10, Color.color(0, 0, 0, 0.7));
+            TextRenderer.drawOutlinedText(
+                    gc,
+                    "WARNING",
+                    centerX,
+                    window.getY() + 60,
+                    warningFont,
+                    Color.RED,
+                    Color.color(0, 0, 0, 0.9),
+                    2.0,
+                    titleShadow
             );
-        } else {
-            yesButton.setX(yesX);
-            yesButton.setY(buttonY);
+            TextRenderer.drawOutlinedText(
+                    gc,
+                    "Your progress on this level\nwill not be saved.",
+                    centerX,
+                    window.getY() + 98,
+                    messageFont,
+                    Color.WHITE,
+                    Color.color(0, 0, 0, 0.9),
+                    2.0,
+                    titleShadow
+            );
+            TextRenderer.drawOutlinedText(
+                    gc,
+                    "Continue?",
+                    centerX,
+                    window.getY() + 180,
+                    messageFont,
+                    Color.YELLOW,
+                    Color.color(0, 0, 0, 0.9),
+                    2.0,
+                    titleShadow
+            );
         }
 
-        if (noButton == null) {
-            noButton = new Button(noX, buttonY, buttonImage, hoveredImage, "No");
-            noButton.setFont(messageFont);
-            noButton.setColors(
-                    Color.web("#444"),
-                    Color.web("#555"),
-                    Color.WHITE,
-                    Color.WHITE,
-                    Color.WHITE
-            );
-        } else {
-            noButton.setX(noX);
-            noButton.setY(buttonY);
-        }
-
-        // Render buttons
-        if (yesButton != null) yesButton.render(gc);
-        if (noButton != null) noButton.render(gc);
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
@@ -158,9 +122,7 @@ public final class ConfirmQuitToMenuState implements GameState {
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
 
-        // Update buttons to check hover and click states
-        if (yesButton != null) yesButton.handleInput(inputProvider);
-        if (noButton != null) noButton.handleInput(inputProvider);
+        window.handleInput(inputProvider);
 
         // Handle button clicks
         if (yesButton != null && yesButton.isClicked()) {

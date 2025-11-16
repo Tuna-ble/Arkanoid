@@ -16,9 +16,12 @@ import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.buttons.AbstractButton;
 import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
+import org.example.gamelogic.graphics.windows.Window;
+import org.example.gamelogic.strategy.transition.window.ITransitionStrategy;
+import org.example.gamelogic.strategy.transition.window.PopupTransitionStrategy;
 
 public final class ConfirmContinueState implements GameState {
-
+    private final Window window;
     private final AbstractButton continueButton;
     private final AbstractButton resetButton;
     private final int levelId;
@@ -26,6 +29,9 @@ public final class ConfirmContinueState implements GameState {
     private final double centerX;
 
     public ConfirmContinueState(int levelId) {
+        ITransitionStrategy transition = new PopupTransitionStrategy();
+        this.window = new Window(null, 500, 400, transition);
+
         this.levelId = levelId;
         this.centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
@@ -33,8 +39,8 @@ public final class ConfirmContinueState implements GameState {
         double buttonX = this.centerX - buttonWidth / 2;
 
         AssetManager am = AssetManager.getInstance();
-        final Image normalImage = am.getImage("button");
-        final Image hoveredImage = am.getImage("hoveredButton");
+        final Image normalImage = am.getImage("selectButton");
+        final Image hoveredImage = am.getImage("selectButtonHovered");
         this.continueButton = new Button(
                 buttonX,
                 GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT - 10,
@@ -54,11 +60,14 @@ public final class ConfirmContinueState implements GameState {
                 hoveredImage,
                 "Reset Level"
         );
+
+        window.addButton(continueButton);
+        window.addButton(resetButton);
     }
 
     @Override
     public void update(double deltaTime) {
-
+        window.update(deltaTime);
     }
 
     @Override
@@ -66,22 +75,22 @@ public final class ConfirmContinueState implements GameState {
         gc.setFill(Color.color(0, 0, 0, 0.7)); // Màu đen mờ 70%
         gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        gc.setTextAlign(TextAlignment.CENTER);
-        TextRenderer.drawOutlinedText(
-                gc, "Load Progress?", this.centerX, 200, titleFont,
-                Color.WHITE, Color.BLACK, 2.0, null
-        );
+        window.render(gc);
 
-        continueButton.render(gc);
-        resetButton.render(gc);
+        if (window.transitionFinished()) {
+            gc.setTextAlign(TextAlignment.CENTER);
+            TextRenderer.drawOutlinedText(
+                    gc, "Load Progress?", this.centerX, 200, titleFont,
+                    Color.WHITE, Color.BLACK, 2.0, null
+            );
+        }
     }
 
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
 
-        continueButton.handleInput(inputProvider);
-        resetButton.handleInput(inputProvider);
+        window.handleInput(inputProvider);
 
         if (continueButton.isClicked()) {
             SaveGameRepository repo = new SaveGameRepository();
