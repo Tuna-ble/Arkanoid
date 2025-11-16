@@ -43,10 +43,13 @@ public class Particle extends MovableObject {
         double alpha = Math.max(0, lifeSpan / maxLifeSpan);
 
         gc.save();
-        gc.setGlobalAlpha(alpha);
-        gc.setFill(this.color);
-        gc.fillRect(this.x, this.y, this.width, this.height);
-        gc.restore();
+        try {
+            gc.setGlobalAlpha(alpha);
+            gc.setFill(this.color);
+            gc.fillRect(this.x, this.y, this.width, this.height);
+        } finally {
+            gc.restore();
+        }
     }
 
     public boolean isDestroyed() {

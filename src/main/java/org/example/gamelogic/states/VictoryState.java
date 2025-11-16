@@ -182,16 +182,20 @@ public final class VictoryState implements GameState {
         double buttonAnimProgress = elapsedTime - (star3Time + 0.5);
         if (buttonAnimProgress > 0) {
             double buttonAlpha = Math.min(1.0, buttonAnimProgress / BUTTON_FADE_IN_TIME);
-            gc.setGlobalAlpha(buttonAlpha);
 
-            quitButton.render(gc);
-            menuButton.render(gc);
-            restartButton.render(gc);
-            if (levelCompleted < 5) {
-                nextButton.render(gc);
+            gc.save();
+            try {
+                gc.setGlobalAlpha(buttonAlpha);
+
+                quitButton.render(gc);
+                menuButton.render(gc);
+                restartButton.render(gc);
+                if (levelCompleted < 5) {
+                    nextButton.render(gc);
+                }
+            } finally {
+                gc.restore();
             }
-
-            gc.setGlobalAlpha(1.0);
         }
     }
 

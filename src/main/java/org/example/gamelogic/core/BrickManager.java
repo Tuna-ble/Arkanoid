@@ -100,9 +100,12 @@ public final class BrickManager {
             double alpha = Math.min(1.0, timeSinceSpawn / timePerBrick);
 
             gc.save();
-            gc.setGlobalAlpha(alpha);
-            brick.render(gc);
-            gc.restore();
+            try {
+                gc.setGlobalAlpha(alpha);
+                brick.render(gc);
+            } finally {
+                gc.restore();
+            }
         }
     }
 

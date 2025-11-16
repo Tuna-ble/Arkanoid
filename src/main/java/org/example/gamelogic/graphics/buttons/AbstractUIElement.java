@@ -49,6 +49,7 @@ public abstract class AbstractUIElement {
     }
 
     public void render(GraphicsContext gc) {
+        gc.save();
         try {
             if (this.isDisabled) {
                 gc.setGlobalAlpha(0.5);

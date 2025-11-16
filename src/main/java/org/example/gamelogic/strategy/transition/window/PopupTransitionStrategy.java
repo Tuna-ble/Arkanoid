@@ -32,11 +32,14 @@ public class PopupTransitionStrategy implements ITransitionStrategy {
         AssetManager am = AssetManager.getInstance();
         fillImage = am.getImage("popup_fill");
 
-        gc.setGlobalAlpha(alpha);
-        gc.drawImage(fillImage, targetX, targetY, targetWidth, targetHeight);
-        window.renderContents(gc);
-
-        gc.setGlobalAlpha(1.0);
+        gc.save();
+        try {
+            gc.setGlobalAlpha(alpha);
+            gc.drawImage(fillImage, targetX, targetY, targetWidth, targetHeight);
+            window.renderContents(gc);
+        } finally {
+            gc.restore();
+        }
     }
 
     @Override

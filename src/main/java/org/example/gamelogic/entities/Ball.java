@@ -110,27 +110,30 @@ public class Ball extends MovableObject implements IBall {
         if (isActive) {
 
             gc.save();
-            for (int i = 0; i < trail.size(); i++) {
-                GhostSnapshot ghost = trail.get(i);
+            try {
+                for (int i = 0; i < trail.size(); i++) {
+                    GhostSnapshot ghost = trail.get(i);
 
-                double progress = 1.0 - (double) i / MAX_GHOSTS;
+                    double progress = 1.0 - (double) i / MAX_GHOSTS;
 
-                double opacity = 0.5 * progress;
+                    double opacity = 0.5 * progress;
 
-                double scale = 0.5 + (0.5 * progress);
+                    double scale = 0.5 + (0.5 * progress);
 
-                double ghostWidth = ghost.width * scale;
-                double ghostHeight = ghost.height * scale;
+                    double ghostWidth = ghost.width * scale;
+                    double ghostHeight = ghost.height * scale;
 
-                double ghostX = ghost.x + (ghost.width - ghostWidth) / 2.0;
-                double ghostY = ghost.y + (ghost.height - ghostHeight) / 2.0;
+                    double ghostX = ghost.x + (ghost.width - ghostWidth) / 2.0;
+                    double ghostY = ghost.y + (ghost.height - ghostHeight) / 2.0;
 
-                gc.setGlobalAlpha(opacity);
-                gc.setFill(currentColor);
-                gc.fillOval(ghostX, ghostY, ghostWidth, ghostHeight);
+                    gc.setGlobalAlpha(opacity);
+                    gc.setFill(currentColor);
+                    gc.fillOval(ghostX, ghostY, ghostWidth, ghostHeight);
+                }
+
+            } finally {
+                gc.restore();
             }
-
-            gc.restore();
 
             // Tạo gradient nhẹ để bóng có cảm giác 3D
             RadialGradient gradient = new RadialGradient(

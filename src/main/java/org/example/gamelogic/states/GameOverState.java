@@ -67,64 +67,74 @@ public final class GameOverState implements GameState {
         gc.drawImage(gameOverGif, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
         double lineOffset = (elapsedTime * 100) % 4.0;
-        gc.setGlobalAlpha(0.3);
-        gc.setStroke(Color.CYAN);
-        gc.setLineWidth(1);
-        for (double y = lineOffset; y < GameConstants.SCREEN_HEIGHT; y += 4.0) {
-            gc.strokeLine(0, y, GameConstants.SCREEN_WIDTH, y);
-        }
 
-        gc.setGlobalAlpha(1.0);
+        gc.save();
+        try {
+            gc.setGlobalAlpha(0.3);
+            gc.setStroke(Color.CYAN);
+            gc.setLineWidth(1);
+            for (double y = lineOffset; y < GameConstants.SCREEN_HEIGHT; y += 4.0) {
+                gc.strokeLine(0, y, GameConstants.SCREEN_WIDTH, y);
+            }
+        } finally {
+            gc.restore();
+        }
 
         double alpha = Math.min(1.0, elapsedTime / FADE_IN_DURATION);
-        gc.setGlobalAlpha(alpha);
 
-        gc.setTextAlign(TextAlignment.CENTER);
-        Color flickerColor = Color.web("#ff4444");
-        if (Math.random() < 0.1) { // (10% cơ hội nháy sang màu trắng)
-            flickerColor = Color.WHITE;
+        gc.save();
+        try {
+            gc.setGlobalAlpha(alpha);
+
+            gc.setTextAlign(TextAlignment.CENTER);
+            Color flickerColor = Color.web("#ff4444");
+            if (Math.random() < 0.1) { // (10% cơ hội nháy sang màu trắng)
+                flickerColor = Color.WHITE;
+            }
+
+            LinearGradient titleFill = new LinearGradient(
+                    0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                    new Stop(0, Color.web("#ff8888")),
+                    new Stop(1, flickerColor)
+            );
+            DropShadow titleShadow = new DropShadow(14, Color.color(0, 0, 0, 0.7));
+            Font titleFont = AssetManager.getInstance().getFont("Anxel", 70);
+
+            double glitchX = centerX + (Math.random() - 0.5) * 10;
+            double glitchY = 230 + (Math.random() - 0.5) * 4;
+
+            TextRenderer.drawOutlinedText(
+                    gc,
+                    "GAME OVER",
+                    glitchX,
+                    glitchY,
+                    titleFont,
+                    titleFill,
+                    Color.color(0,0,0,0.9),
+                    3.0,
+                    titleShadow
+            );
+
+            int finalScore = ScoreManager.getInstance().getScore();
+            Font scoreFont = AssetManager.getInstance().getFont("Anxel", 40);
+            TextRenderer.drawOutlinedText(
+                    gc,
+                    "Final Score: " + finalScore,
+                    centerX,
+                    280,
+                    scoreFont,
+                    Color.web("#ffffcc"),
+                    Color.color(0,0,0,0.85),
+                    2.0,
+                    new DropShadow(8, Color.color(0,0,0,0.6))
+            );
+
+            if (restartButton != null) restartButton.render(gc);
+            if (menuButton != null) menuButton.render(gc);
+            if (exitButton != null) exitButton.render(gc);
+        } finally {
+            gc.restore();
         }
-
-        LinearGradient titleFill = new LinearGradient(
-                0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                new Stop(0, Color.web("#ff8888")),
-                new Stop(1, flickerColor)
-        );
-        DropShadow titleShadow = new DropShadow(14, Color.color(0, 0, 0, 0.7));
-        Font titleFont = AssetManager.getInstance().getFont("Anxel", 70);
-
-        double glitchX = centerX + (Math.random() - 0.5) * 10;
-        double glitchY = 230 + (Math.random() - 0.5) * 4;
-
-        TextRenderer.drawOutlinedText(
-                gc,
-                "GAME OVER",
-                glitchX,
-                glitchY,
-                titleFont,
-                titleFill,
-                Color.color(0,0,0,0.9),
-                3.0,
-                titleShadow
-        );
-
-        int finalScore = ScoreManager.getInstance().getScore();
-        Font scoreFont = AssetManager.getInstance().getFont("Anxel", 40);
-        TextRenderer.drawOutlinedText(
-                gc,
-                "Final Score: " + finalScore,
-                centerX,
-                280,
-                scoreFont,
-                Color.web("#ffffcc"),
-                Color.color(0,0,0,0.85),
-                2.0,
-                new DropShadow(8, Color.color(0,0,0,0.6))
-        );
-
-        if (restartButton != null) restartButton.render(gc);
-        if (menuButton != null) menuButton.render(gc);
-        if (exitButton != null) exitButton.render(gc);
     }
 
 

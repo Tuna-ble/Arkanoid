@@ -131,9 +131,12 @@ public final class InfiniteModeState implements GameState {
                 continueButton.render(gc);
             } else {
                 gc.save();
-                gc.setGlobalAlpha(0.5);
-                continueButton.render(gc);
-                gc.restore();
+                try {
+                    gc.setGlobalAlpha(0.5);
+                    continueButton.render(gc);
+                } finally {
+                    gc.restore();
+                }
             }
         }
         if (backButton != null) {
