@@ -19,8 +19,6 @@ import org.example.gamelogic.strategy.transition.window.PopupTransitionStrategy;
 public final class PauseState implements GameState {
     private final GameState previousState;
     private final Window window;
-    private final Font titleFont = new Font("Arial", 48);
-    private final Font buttonFont = new Font("Arial", 28);
 
     private final Image normalImage;
     private final Image hoveredImage;
