@@ -266,7 +266,7 @@ public final class LevelState implements GameState {
             }
 
             TextRenderer.drawOutlinedText(gc, starText, infoX + infoWidth / 2,
-                    infoY + yOffset2, levelNameFont, Color.WHITE, Color.BLACK, 1.0, null);
+                    infoY + yOffset2, levelNameFont, Color.YELLOW, Color.BLACK, 1.0, null);
         }
     }
 
