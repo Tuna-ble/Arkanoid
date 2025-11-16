@@ -45,6 +45,8 @@ public class AssetManager {
             loadSound("music_2", "/sounds/music_2.wav");
             loadSound("music_3", "/sounds/music_3.wav");
             loadSound("siren", "/sounds/siren.wav");
+            loadSound("victory", "/sounds/victory.wav");
+            loadSound("star_accounted", "/sounds/star_accounted.wav");
         } catch (Exception e) {
             System.err.println("Không thể tải file âm thanh: " + e.getMessage());
             e.printStackTrace();
@@ -72,6 +74,7 @@ public class AssetManager {
             loadImage("bossEnragedHit", "/images/angryMoaiHit.png");
             loadImage("minion", "/images/minion.png");
             loadImage("minionShoot", "/images/minionShoot.png");
+            loadImage("enemyExplode",  "/images/enemyExplode.png");
 
             loadImage("frame", "/images/GameFrame.png");
             loadImage("pause", "/images/pause.png");
