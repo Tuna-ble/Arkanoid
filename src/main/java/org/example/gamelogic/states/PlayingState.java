@@ -312,7 +312,6 @@ public final class PlayingState implements GameState {
         gc.setTransform(new Affine());
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        // 1. [GIỮ NGUYÊN] Vẽ HUD và Khung viền
         gc.setFill(Color.BLACK);
         gc.fillRect(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH + GameConstants.FRAME_RIGHT_BORDER,
                 0,
@@ -325,43 +324,32 @@ public final class PlayingState implements GameState {
                     GameConstants.SCREEN_WIDTH - GameConstants.UI_BAR_WIDTH, GameConstants.SCREEN_HEIGHT);
         }
 
-        // 2. [GIỮ NGUYÊN] Cắt (Clip) khu vực chơi
         gc.save();
         gc.beginPath();
         gc.rect(GameConstants.PLAY_AREA_X, GameConstants.PLAY_AREA_Y,
                 GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
         gc.clip();
-
-        // 3. --- CODE SỬA LỖI ---
-        // Vẽ ảnh nền (background) BÊN TRONG khu vực clip
-        // (Đây là logic chuyển đổi sang ảnh nền Boss nếu ở BOSS_WARNING)
         if (currentSubState == SubState.BOSS_WARNING && this.bossBackground != null) {
-            // Tính toán độ trong suốt (alpha) cho ảnh nền Boss
             double alpha = this.backgroundTransitionTimer / BACKGROUND_TRANSITION_DURATION;
 
-            // 3a. Vẽ ảnh nền level (nền cũ)
             if (this.currentBackground != null) {
                 gc.drawImage(this.currentBackground,
                         GameConstants.PLAY_AREA_X, GameConstants.PLAY_AREA_Y,
                         GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
             }
 
-            // 3b. Vẽ ảnh nền Boss đè lên với độ trong suốt
             gc.setGlobalAlpha(alpha);
             gc.drawImage(this.bossBackground,
                     GameConstants.PLAY_AREA_X, GameConstants.PLAY_AREA_Y,
                     GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
-            gc.setGlobalAlpha(1.0); // Reset alpha
+            gc.setGlobalAlpha(1.0);
 
         } else if (this.currentBackground != null) {
-            // 3c. Trong các trạng thái khác, chỉ vẽ ảnh nền hiện tại
             gc.drawImage(this.currentBackground,
                     GameConstants.PLAY_AREA_X, GameConstants.PLAY_AREA_Y,
                     GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
         }
-        // --- KẾT THÚC SỬA LỖI ---
 
-        // 4. [GIỮ NGUYÊN] Vẽ Gạch, Bóng, Paddle (ĐÈ LÊN ẢNH NỀN)
         if (currentSubState == SubState.LEVEL_START) {
             brickManager.render(gc, levelStartTimer, LEVEL_START_DURATION);
             paddle.render(gc);
