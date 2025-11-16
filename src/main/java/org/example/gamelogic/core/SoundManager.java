@@ -75,7 +75,7 @@ public final class SoundManager {
         }
     }
 
-    private void playSound(String name) {
+    public void playSound(String name) {
         if (!SettingsManager.getInstance().isSfxEnabled()) return;
 
         Clip clip = assetManager.getSound(name);
@@ -156,8 +156,6 @@ public final class SoundManager {
 
 
     public void onGameOver(GameOverEvent event) {
-        // playSound("game_over");
-        // Dừng nhạc nền (neu co)
         stopMusic();
     }
 

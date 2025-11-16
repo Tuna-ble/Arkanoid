@@ -39,6 +39,7 @@ public final class PlayingState implements GameState {
     Font scoreFont;
     Image pauseIcon;
 
+    private Image currentBackground;
     private int currentLives;
     private boolean hasWon = false;
     private Image gameFrameImage;
@@ -122,7 +123,7 @@ public final class PlayingState implements GameState {
             this.currentLives = LifeManager.getInstance().getLives();
             this.levelNumber = levelNumber;
         }
-
+        this.currentBackground = gameManager.getBackgroundForLevel(this.levelNumber);
         org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
         this.scoreFont = am.getFont("Anxel", 24);
         this.labelFont = am.getFont("Anxel", 18);
@@ -224,6 +225,7 @@ public final class PlayingState implements GameState {
 
                     this.currentSubState = SubState.BOSS_WARNING;
                     this.warningFlashTimer = 0.0;
+                    SoundManager.getInstance().playSound("siren");
                 }
                 if (enemyManager.isBossDying()) {
                     this.currentSubState = SubState.BOSS_DYING;
@@ -303,11 +305,6 @@ public final class PlayingState implements GameState {
         gc.setTransform(new Affine());
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        gc.setFill(Color.DARKBLUE);
-        gc.fillRect(0, 0,
-                GameConstants.SCREEN_WIDTH - GameConstants.UI_BAR_WIDTH,
-                GameConstants.SCREEN_HEIGHT);
-
         gc.setFill(Color.BLACK);
         gc.fillRect(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH + GameConstants.FRAME_RIGHT_BORDER,
                 0,
@@ -326,6 +323,13 @@ public final class PlayingState implements GameState {
                 GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
         gc.clip();
 
+        if (this.currentBackground != null) {
+            gc.drawImage(this.currentBackground,
+                    GameConstants.PLAY_AREA_X,
+                    GameConstants.PLAY_AREA_Y,
+                    GameConstants.PLAY_AREA_WIDTH,
+                    GameConstants.PLAY_AREA_HEIGHT);
+        }
         if (currentSubState == SubState.LEVEL_START) {
             brickManager.render(gc, levelStartTimer, LEVEL_START_DURATION);
             paddle.render(gc);
