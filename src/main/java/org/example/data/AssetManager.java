@@ -63,6 +63,7 @@ public class AssetManager {
             loadImage("explosiveBrick", "/images/redBrick.png");
             loadImage("unbreakableBrick", "/images/unbreakableBrick.png");
             loadImage("unbreakableBrickHit", "/images/unbreakableBrickHit.png");
+            loadImage("powerups", "/images/PowerupSprites.png");
 
             loadImage("enemy1", "/images/UFO.png");
             loadImage("enemy2", "/images/asteroid.png");

@@ -75,12 +75,12 @@ public final class MainMenuState implements GameState {
                 new Stop(1, Color.web("#228BE6"))
         );
         DropShadow titleShadow = new DropShadow(12, Color.color(0, 0, 0, 0.6));
-        Font titleFont = Font.font("Verdana", FontWeight.BOLD, 72);
+        Font titleFont = Font.font("Anxel", FontWeight.BOLD, 80);
         TextRenderer.drawOutlinedText(
                 gc,
                 "ARKANOID",
                 GameConstants.SCREEN_WIDTH / 2.0,
-                230,
+                215,
                 titleFont,
                 titleFill,
                 Color.color(0, 0, 0, 0.8),

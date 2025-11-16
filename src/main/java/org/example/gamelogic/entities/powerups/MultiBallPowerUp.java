@@ -14,14 +14,13 @@ public class MultiBallPowerUp extends AbstractPowerUp {
 
     @Override
     public PowerUp clone() {
-        return new MultiBallPowerUp(0.0, 0.0, this.width, this.height, this.dx, this.dy, getStrategy().clone());
+        ExpandPaddlePowerUp newClone = new ExpandPaddlePowerUp(0.0, 0.0, this.width, this.height, this.dx, this.dy, getStrategy().clone());
+        newClone.animation = this.animation;
+        return newClone;
     }
 
     @Override
-    public void render(GraphicsContext gc) {
-        gc.setFill(Color.RED);
-        gc.fillRect(x, y, width, height);
-        gc.setStroke(Color.BLACK);
-        gc.strokeRect(x, y, width, height);
+    public int getSpriteRow() {
+        return 6;
     }
 }

@@ -9,18 +9,14 @@ import org.example.gamelogic.entities.GameObject;
 import org.example.gamelogic.entities.MovableObject;
 import org.example.gamelogic.events.PowerUpCollectedEvent;
 import org.example.gamelogic.strategy.powerup.PowerUpStrategy;
+import org.example.presentation.RowAnimation;
 
 public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
     protected PowerUpStrategy strategy;
     private boolean isTaken = false;
-
-    // Kiểm tra powerup đã rơi khỏi cửa sổ chưa
     protected boolean outOfBounds = false;
 
-    protected final Image powerUpSprites;
-    protected int currentFrame = 0;
-    protected double frameTimer = 0.0;
-    protected double spriteRow;
+    protected RowAnimation animation;
 
     public AbstractPowerUp(double x, double y, double width, double height,
                            double dx, double dy, PowerUpStrategy strategy) {
@@ -28,7 +24,17 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
         this.strategy = strategy;
         this.isActive = true;
 
-        powerUpSprites = AssetManager.getInstance().getImage("powerups");
+        Image powerUpSprites = AssetManager.getInstance().getImage("powerups");
+        int spriteRow = getSpriteRow();
+
+        if (powerUpSprites != null) {
+            this.animation = new RowAnimation(
+                    powerUpSprites,
+                    spriteRow,
+                    GameConstants.POWERUP_TOTAL_FRAMES,
+                    GameConstants.POWERUP_FRAME_DURATION
+            );
+        }
         subscribeToPowerUpCollectedEvent();
     }
 
@@ -53,15 +59,19 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
         if (!outOfBounds) y += dy;
         if (y > GameConstants.SCREEN_HEIGHT) outOfBounds = true;
 
-        frameTimer += deltaTime;
-        if (frameTimer >= GameConstants.POWERUP_FRAME_DURATION) {
-            frameTimer = 0;
-            currentFrame = (currentFrame + 1) % GameConstants.POWERUP_TOTAL_FRAMES;
+        if (animation != null) {
+            animation.update(deltaTime);
         }
     }
 
     @Override
-    public abstract void render(GraphicsContext gc);
+    public void render(GraphicsContext gc) {
+        if (animation != null) {
+            animation.render(gc, this.x, this.y, this.width, this.height);
+        }
+    }
+
+    public abstract int getSpriteRow();
 
     @Override
     public void setPosition(double x, double y) {
