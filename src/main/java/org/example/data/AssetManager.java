@@ -63,8 +63,13 @@ public class AssetManager {
             loadImage("unbreakableBrickHit", "/images/unbreakableBrickHit.png");
 
             loadImage("enemy1", "/images/UFO.png");
+            loadImage("enemy2", "/images/asteroid.png");
             loadImage("boss", "/images/moai.png");
             loadImage("bossShoot", "/images/moaiShooting.png");
+            loadImage("bossEnraged", "/images/angryMoai.png");
+            loadImage("bossEnragedShoot", "/images/angryMoaiShooting.png");
+            loadImage("bossHit", "/images/moaiHit.png");
+            loadImage("bossEnragedHit", "/images/angryMoaiHit.png");
             loadImage("minion", "/images/minion.png");
             loadImage("minionShoot", "/images/minionShoot.png");
 
@@ -87,6 +92,8 @@ public class AssetManager {
 
             loadImage("icon_expand", "/images/expandpaddle.png"); //
             loadImage("icon_extra_life", "/images/extra.png"); //
+            loadImage("bullet", "/images/bullet.png");
+            loadImage("bossBullet", "/images/bossBullet.png");
 
             loadImage("banner1", "/images/banner1.png");
             loadImage("banner2", "/images/banner2.png");
