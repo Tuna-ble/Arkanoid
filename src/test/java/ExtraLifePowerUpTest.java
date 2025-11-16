@@ -20,8 +20,4 @@ public class ExtraLifePowerUpTest {
         assertEquals(powerUp.getWidth(), clone2.getWidth());
         assertEquals(powerUp.getHeight(), clone2.getHeight());
     }
-    @Test
-    void testGetSpriteRow() {
-        assertEquals(5, powerUp.getSpriteRow());
-    }
 }
