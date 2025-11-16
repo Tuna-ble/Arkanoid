@@ -263,6 +263,9 @@ public final class PlayingState implements GameState {
                         EventManager.getInstance().publish(
                                 new ChangeStateEvent(GameStateEnum.VICTORY)
                         );
+                        EventManager.getInstance().publish(
+                                new LevelCompletedEvent()
+                        );
                     } else if (this.currentGameMode == GameModeEnum.INFINITE) {
                         clearManagers();
                         this.currentSubState = SubState.WAVE_CLEARED;
@@ -296,6 +299,9 @@ public final class PlayingState implements GameState {
                 this.hasWon = true;
                 EventManager.getInstance().publish(
                         new ChangeStateEvent(GameStateEnum.VICTORY)
+                );
+                EventManager.getInstance().publish(
+                        new LevelCompletedEvent()
                 );
             }
         } else if (currentGameMode == GameModeEnum.INFINITE && this.levelNumber % 5 != 0) {

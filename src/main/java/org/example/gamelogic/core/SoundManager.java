@@ -43,12 +43,12 @@ public final class SoundManager {
                 this::onPaddleHit
         );
         EventManager.getInstance().subscribe(
-                BallLostEvent.class,
-                this::onBallLost
-        );
-        EventManager.getInstance().subscribe(
                 GameOverEvent.class,
                 this::onGameOver
+        );
+        EventManager.getInstance().subscribe(
+                LevelCompletedEvent.class,
+                this::onLevelCompleted
         );
         EventManager.getInstance().subscribe(
                 BallHitBrickEvent.class,
@@ -150,13 +150,14 @@ public final class SoundManager {
         playSound("paddle_hit");
     }
 
-    public void onBallLost(BallLostEvent event) {
+    public void onGameOver(GameOverEvent event) {
+        stopMusic();
         playSound("ball_lost");
     }
 
-
-    public void onGameOver(GameOverEvent event) {
+    public void onLevelCompleted(LevelCompletedEvent event) {
         stopMusic();
+        playSound("victory");
     }
 
     private void onBallHitBrick(BallHitBrickEvent event) {
