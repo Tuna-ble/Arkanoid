@@ -70,13 +70,14 @@ public class AssetManager {
             loadImage("frame", "/images/GameFrame.png");
             loadImage("pause", "/images/pause.png");
 
-            loadImage("mainMenu", "/images/MainMenu.png"); //
+            loadImage("mainMenu", "/images/mainMenu.png"); //
             loadImage("ranking", "/images/ranking.png"); //
             loadImage("settings", "/images/settings.png");
-            loadImage("gameMode", "/images/gameMode.png");//
-            loadImage("gameOver", "/images/gameOverBackground.gif"); //
-            loadImage("victory", "/images/Victory.gif"); //
-            loadImage("level", "/images/Level.gif"); //
+            loadImage("gameMode", "/images/gameMode.png");
+            loadImage("modesFrame", "/images/modesFrame.png");//
+            loadImage("gameOver", "/images/gameOverBackground.png"); //
+            loadImage("victory", "/images/victory.png"); //
+            loadImage("level", "/images/level.png"); //
             loadImage("button", "/images/button.png");
             loadImage("hoveredButton", "/images/hoveredButton.png");
 
@@ -105,6 +106,9 @@ public class AssetManager {
             loadImage("barFrame", "/images/barFrame.png");
             loadImage("barFill", "/images/barFill.png");
             loadImage("barHandle", "/images/barHandle.png");
+
+            loadImage("infiniteStatic", "/images/infiniteStatic.png");
+            loadImage("infinite", "/images/infinite.png");
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());
             e.printStackTrace();
