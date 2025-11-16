@@ -45,6 +45,8 @@ public class AssetManager {
             loadSound("music_2", "/sounds/music_2.wav");
             loadSound("music_3", "/sounds/music_3.wav");
             loadSound("siren", "/sounds/siren.wav");
+            loadSound("victory", "/sounds/victory.wav");
+            loadSound("star_accounted", "/sounds/star_accounted.wav");
         } catch (Exception e) {
             System.err.println("Không thể tải file âm thanh: " + e.getMessage());
             e.printStackTrace();
@@ -61,12 +63,19 @@ public class AssetManager {
             loadImage("explosiveBrick", "/images/redBrick.png");
             loadImage("unbreakableBrick", "/images/unbreakableBrick.png");
             loadImage("unbreakableBrickHit", "/images/unbreakableBrickHit.png");
+            loadImage("powerups", "/images/PowerupSprites.png");
 
             loadImage("enemy1", "/images/UFO.png");
+            loadImage("enemy2", "/images/asteroid.png");
             loadImage("boss", "/images/moai.png");
             loadImage("bossShoot", "/images/moaiShooting.png");
+            loadImage("bossEnraged", "/images/angryMoai.png");
+            loadImage("bossEnragedShoot", "/images/angryMoaiShooting.png");
+            loadImage("bossHit", "/images/moaiHit.png");
+            loadImage("bossEnragedHit", "/images/angryMoaiHit.png");
             loadImage("minion", "/images/minion.png");
             loadImage("minionShoot", "/images/minionShoot.png");
+            loadImage("enemyExplode",  "/images/enemyExplode.png");
 
             loadImage("frame", "/images/GameFrame.png");
             loadImage("pause", "/images/pause.png");
@@ -87,6 +96,8 @@ public class AssetManager {
 
             loadImage("icon_expand", "/images/expandpaddle.png"); //
             loadImage("icon_extra_life", "/images/extra.png"); //
+            loadImage("bullet", "/images/bullet.png");
+            loadImage("bossBullet", "/images/bossBullet.png");
 
             loadImage("banner1", "/images/banner1.png");
             loadImage("banner2", "/images/banner2.png");

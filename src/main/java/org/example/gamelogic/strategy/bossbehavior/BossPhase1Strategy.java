@@ -16,11 +16,7 @@ public class BossPhase1Strategy implements BossBehaviorStrategy {
         laserTimer += deltaTime;
         if (laserTimer >= LASER_COOLDOWN) {
             laserTimer = 0.0;
-
-            double x = boss.getX() + boss.getWidth() / 2 - 2;
-            double y = boss.getY() + boss.getHeight();
-
-            LaserManager.getInstance().createBullet(x, y, 0, 400, BulletType.BOSS_LASER, BulletFrom.ENEMY);
+            boss.requestShoot(0, 400, BulletType.BOSS_LASER);
         }
     }
 }

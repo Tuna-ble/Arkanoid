@@ -19,11 +19,13 @@ public class ExpandPaddlePowerUp extends AbstractPowerUp {
 
     @Override
     public PowerUp clone() {
-        return new ExpandPaddlePowerUp(0.0, 0.0, this.width, this.height, this.dx, this.dy, getStrategy().clone());
+        ExpandPaddlePowerUp newClone = new ExpandPaddlePowerUp(0.0, 0.0, this.width, this.height, this.dx, this.dy, getStrategy().clone());
+        newClone.animation = this.animation;
+        return newClone;
     }
 
     @Override
-    public void render(GraphicsContext gc) {
-        gc.drawImage(expand, x, y, 30, 30);
+    public int getSpriteRow() {
+        return 3;
     }
 }

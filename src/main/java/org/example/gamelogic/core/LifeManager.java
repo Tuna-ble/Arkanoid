@@ -2,6 +2,7 @@ package org.example.gamelogic.core;
 
 import org.example.config.GameConstants;
 import org.example.gamelogic.events.ChangeStateEvent;
+import org.example.gamelogic.events.GameOverEvent;
 import org.example.gamelogic.events.LifeAddedEvent;
 import org.example.gamelogic.events.LifeLostEvent;
 import org.example.gamelogic.states.GameStateEnum;
@@ -32,6 +33,9 @@ public final class LifeManager {
         } else {
             EventManager.getInstance().publish(
                     new ChangeStateEvent(GameStateEnum.GAME_OVER)
+            );
+            EventManager.getInstance().publish(
+                    new GameOverEvent()
             );
         }
     }

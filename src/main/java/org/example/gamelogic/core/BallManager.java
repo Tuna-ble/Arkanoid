@@ -92,8 +92,6 @@ public final class BallManager {
     public List<SavedGameState.BallData> getDataToSave() {
         List<SavedGameState.BallData> ballDataList = new ArrayList<>();
         for (IBall ball : activeBalls) {
-
-
             ballDataList.add(new SavedGameState.BallData(
                     ball.getX(),
                     ball.getY(),

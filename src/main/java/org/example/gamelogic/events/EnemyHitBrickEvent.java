@@ -3,7 +3,7 @@ package org.example.gamelogic.events;
 import org.example.gamelogic.entities.bricks.Brick;
 import org.example.gamelogic.entities.enemy.Enemy;
 
-public class EnemyHitBrickEvent extends GameEvent {
+public final class EnemyHitBrickEvent extends GameEvent {
     private final Brick brick;
     private final Enemy enemy;
 
