@@ -1,5 +1,7 @@
 package org.example.gamelogic.core;
 
+import org.example.gamelogic.multithreading.AsyncExecutor;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -67,21 +69,23 @@ public final class SettingsManager {
     }
 
     public void saveSettings() {
-        try (FileWriter writer = new FileWriter(SETTINGS_FILE_PATH)) {
-            properties.setProperty("sfxEnabled", String.valueOf(this.sfxEnabled));
-            properties.setProperty("musicEnabled", String.valueOf(this.musicEnabled));
+        AsyncExecutor.runAsync(() -> {
+            try (FileWriter writer = new FileWriter(SETTINGS_FILE_PATH)) {
+                properties.setProperty("sfxEnabled", String.valueOf(this.sfxEnabled));
+                properties.setProperty("musicEnabled", String.valueOf(this.musicEnabled));
 
-            properties.setProperty("musicVolume", String.valueOf(this.musicVolume));
-            properties.setProperty("sfxVolume", String.valueOf(this.sfxVolume));
+                properties.setProperty("musicVolume", String.valueOf(this.musicVolume));
+                properties.setProperty("sfxVolume", String.valueOf(this.sfxVolume));
 
-            properties.setProperty("selectedMusic", this.selectedMusic);
+                properties.setProperty("selectedMusic", this.selectedMusic);
 
-            // Ghi ra file
-            properties.store(writer, "Arkanoid Game Settings");
+                // Ghi ra file
+                properties.store(writer, "Arkanoid Game Settings");
 
-        } catch (IOException e) {
-            System.err.println("Lỗi khi lưu file settings: " + e.getMessage());
-        }
+            } catch (IOException e) {
+                System.err.println("Lỗi khi lưu file settings: " + e.getMessage());
+            }
+        });
     }
 
     public boolean isSfxEnabled() {

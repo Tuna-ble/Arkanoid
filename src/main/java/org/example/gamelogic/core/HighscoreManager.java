@@ -1,5 +1,7 @@
 package org.example.gamelogic.core;
 
+import org.example.gamelogic.multithreading.AsyncExecutor;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -49,19 +51,21 @@ public final class HighscoreManager {
     }
 
     public static void saveNewScore(int newScore) {
-        List<Integer> scores = loadHighscores();
+        AsyncExecutor.runAsync(() -> {
+            List<Integer> scores = loadHighscores();
 
-        scores.add(newScore);
-        Collections.sort(scores, Collections.reverseOrder());
-        List<Integer> topScores = scores.subList(0, Math.min(scores.size(), MAX_SCORES_TO_KEEP));
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(HIGHSCORE_FILE_PATH, false))) {
-            for (Integer score : topScores) {
-                writer.write(score.toString());
-                writer.newLine();
+            scores.add(newScore);
+            Collections.sort(scores, Collections.reverseOrder());
+            List<Integer> topScores = scores.subList(0, Math.min(scores.size(), MAX_SCORES_TO_KEEP));
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(HIGHSCORE_FILE_PATH, false))) {
+                for (Integer score : topScores) {
+                    writer.write(score.toString());
+                    writer.newLine();
+                }
+            } catch (IOException e) {
+                System.err.println("Lỗi khi lưu file highscore: " + e.getMessage());
             }
-        } catch (IOException e) {
-            System.err.println("Lỗi khi lưu file highscore: " + e.getMessage());
-        }
+        });
     }
 
     public static void resetHighscores() {
