@@ -69,6 +69,7 @@ public class HealingBrick extends AbstractBrick {
 
         if (currentState == State.DAMAGED) {
             double pulseAlpha = (Math.sin(healingTimer * 10) + 1) / 2.0;
+            gc.save();
             try {
                 gc.setGlobalAlpha(pulseAlpha * 0.7);
                 gc.setFill(Color.WHITE);
