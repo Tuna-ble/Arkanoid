@@ -3,9 +3,12 @@ package org.example.gamelogic.entities;
 import java.lang.Math;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 
 public class Paddle extends MovableObject {
+    private Image paddleImage;
     private double speed;
     private double minX;
     private double maxX;
@@ -15,6 +18,8 @@ public class Paddle extends MovableObject {
         this.speed = GameConstants.PADDLE_SPEED;
         this.minX = GameConstants.PLAY_AREA_X;
         this.maxX = GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH - this.width;
+
+        this.paddleImage = AssetManager.getInstance().getImage("paddle");
     }
 
     public double getCenterX() {
@@ -61,15 +66,7 @@ public class Paddle extends MovableObject {
 
     @Override
     public void render(GraphicsContext gc) {
-        double drawX = x;
-        double drawY = y;
-
-        gc.setFill(GameConstants.PADDLE_COLOR);
-        gc.fillRoundRect(drawX, drawY, width, height, 10, 10);
-
-        gc.setStroke(GameConstants.PADDLE_BORDER_COLOR);
-        gc.setLineWidth(1.5);
-        gc.strokeRoundRect(drawX, drawY, width, height, 10, 10);
+        gc.drawImage(paddleImage, x, y, width, height);
     }
 
     public void setVelocity(double v, int i) {
