@@ -28,14 +28,23 @@ public final class TextRenderer {
                 gc.setEffect(shadow);
             }
 
-            if (strokePaint != null && strokeWidth > 0) {
-                gc.setStroke(strokePaint);
-                gc.setLineWidth(strokeWidth);
-                gc.strokeText(text, x, y);
-            }
+            String[] lines = text.split("\n");
 
-            gc.setFill(fillPaint);
-            gc.fillText(text, x, y);
+            double lineHeight = font.getSize();
+            double currentY = y;
+
+            for (String line : lines) {
+                if (strokePaint != null && strokeWidth > 0) {
+                    gc.setStroke(strokePaint);
+                    gc.setLineWidth(strokeWidth);
+                    gc.strokeText(line, x, currentY);
+                }
+
+                gc.setFill(fillPaint);
+                gc.fillText(line, x, currentY);
+
+                currentY += lineHeight + 10;
+            }
         } finally {
             gc.setFont(previousFont);
             gc.setEffect(null);
