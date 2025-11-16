@@ -369,4 +369,6 @@ public final class GameManager {
     public EnemyManager getEnemyManager() {
         return this.enemyManager;
     }
+
+    public GameModeEnum getCurrentGameMode() { return this.currentGameMode; }
 }
