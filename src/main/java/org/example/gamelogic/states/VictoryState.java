@@ -76,7 +76,7 @@ public final class VictoryState implements GameState {
         this.nextButton = new Button(nextX, buttonY, buttonWidth,
                 GameConstants.UI_BUTTON_HEIGHT, normalImage, hoveredImage, "Next Level");
 
-        victory = new Image("/images/victory.gif");
+        victory = AssetManager.getInstance().getImage("victory");
     }
 
     @Override

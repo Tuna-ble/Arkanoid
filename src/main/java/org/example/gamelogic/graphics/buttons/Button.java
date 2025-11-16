@@ -24,7 +24,7 @@ public class Button extends AbstractButton {
         double dynamicFontSize = height * FONT_SCALE_RATIO;
 
         this.font = new Font(DEFAULT_FONT_FAMILY, dynamicFontSize);
-        this.textColor = Color.WHITE;
+        this.textColor = Color.LIGHTBLUE;
     }
 
     public Button(double x, double y, Image normalImage, Image hoverImage, String text) {

@@ -71,7 +71,7 @@ public class GameApplication extends Application {
 
     @Override
     public void stop() throws Exception {
-        System.out.println("Đang tắt ứng dụng và thực hiện lưu game...");
+        System.out.println("Closing the app and saving...");
 
         GameManager gameManager = GameManager.getInstance();
 
@@ -88,9 +88,9 @@ public class GameApplication extends Application {
             SaveGameRepository repo = new SaveGameRepository();
             repo.saveGame(dataToSave, levelId);
 
-            System.out.println("Đã tự động lưu game cho level " + levelId);
+            System.out.println("Automatically saved for level " + levelId);
         } else {
-            System.out.println("Không ở trong PlayingState, không cần lưu.");
+            System.out.println("Not in PlayingState, no need to Le Duc Luu.");
         }
 
         gameManager.stopGameLoop();

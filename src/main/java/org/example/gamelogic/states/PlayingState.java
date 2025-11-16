@@ -561,12 +561,12 @@ public final class PlayingState implements GameState {
         state.balls = ballManager.getDataToSave();
         state.bricks = brickManager.getDataToSave();
         state.enemies = enemyManager.getDataToSave();
-        System.out.println("Đã thu thập trạng thái game (level " + this.levelNumber + ") để lưu.");
+        System.out.println("Collected game state (level " + this.levelNumber + ") to save.");
         return state;
     }
 
     public void loadGame(SavedGameState state) {
-        System.out.println("Đang áp dụng trạng thái đã lưu cho level " + state.levelId);
+        System.out.println("Applying saved state for level " + state.levelId);
 
         ScoreManager.getInstance().setScore(state.score);
         LifeManager.getInstance().setLives(state.lives);

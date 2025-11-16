@@ -52,7 +52,7 @@ public final class SettingsState implements GameState {
         currentMusic = settings.getSelectedMusic();
 
         ITransitionStrategy transition = new HologramTransitionStrategy();
-        this.window = new Window(previousState, 600, 500, transition);
+        this.window = new Window(previousState, 600, 400, transition);
 
         double bannerX = window.getX() + GameConstants.UI_BUTTON_PADDING;
         double bannerY = window.getY() + GameConstants.UI_BUTTON_PADDING;
@@ -63,7 +63,7 @@ public final class SettingsState implements GameState {
         this.banner.setTransition(new WipeElementTransitionStrategy(0.5));
 
         double btnX = bannerX;
-        double firstRowY = bannerY + bannerHeight + 40;
+        double firstRowY = bannerY + bannerHeight + 20;
         double secondRowY = firstRowY + 80 + GameConstants.UI_BUTTON_PADDING;
         double backButtonX = window.getX() + window.getWidth() - 90 - GameConstants.UI_BUTTON_PADDING;
         double backButtonY = window.getY() + window.getHeight() - 60 - GameConstants.UI_BUTTON_PADDING;
