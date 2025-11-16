@@ -25,7 +25,7 @@ public final class ConfirmContinueState implements GameState {
     private final AbstractButton continueButton;
     private final AbstractButton resetButton;
     private final int levelId;
-    private final Font titleFont = new Font("Arial", 48);
+    private final Font titleFont;
     private final double centerX;
 
     public ConfirmContinueState(int levelId) {
@@ -37,13 +37,17 @@ public final class ConfirmContinueState implements GameState {
 
         double buttonWidth = GameConstants.UI_BUTTON_WIDTH + 50;
         double buttonX = this.centerX - buttonWidth / 2;
+        double buttonY = window.getY() + 150;
 
         AssetManager am = AssetManager.getInstance();
+        titleFont = am.getFont("Anxel", 45);
+
         final Image normalImage = am.getImage("selectButton");
         final Image hoveredImage = am.getImage("selectButtonHovered");
+
         this.continueButton = new Button(
                 buttonX,
-                GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT - 10,
+                buttonY,
                 buttonWidth,
                 GameConstants.UI_BUTTON_HEIGHT,
                 normalImage,
@@ -53,7 +57,7 @@ public final class ConfirmContinueState implements GameState {
 
         this.resetButton = new Button(
                 buttonX,
-                GameConstants.SCREEN_HEIGHT / 2.0 + 10,
+                buttonY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_PADDING,
                 buttonWidth,
                 GameConstants.UI_BUTTON_HEIGHT,
                 normalImage,
@@ -72,7 +76,7 @@ public final class ConfirmContinueState implements GameState {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.color(0, 0, 0, 0.7)); // Màu đen mờ 70%
+        gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
         window.render(gc);
@@ -80,7 +84,7 @@ public final class ConfirmContinueState implements GameState {
         if (window.transitionFinished()) {
             gc.setTextAlign(TextAlignment.CENTER);
             TextRenderer.drawOutlinedText(
-                    gc, "Load Progress?", this.centerX, 200, titleFont,
+                    gc, "Load Progress?", this.centerX, 250, titleFont,
                     Color.WHITE, Color.BLACK, 2.0, null
             );
         }

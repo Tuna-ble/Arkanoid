@@ -32,7 +32,8 @@ public final class InfiniteModeState implements GameState {
     private final Button backButton;
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
 
-    private final Font titleFont = new Font("Arial", 70);
+    private final Font titleFont;
+    private final Font textFont;
     private final DropShadow titleShadow = new DropShadow(14, Color.color(0, 0, 0, 0.7));
     private final LinearGradient titleFill = new LinearGradient(
             0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
@@ -42,29 +43,32 @@ public final class InfiniteModeState implements GameState {
 
     public InfiniteModeState() {
         AssetManager am = AssetManager.getInstance();
+        titleFont = am.getFont("Anxel", 70);
+        textFont = am.getFont("Anxel", 45);
+
         final Image buttonImage = am.getImage("button");
         final Image hoveredImage = am.getImage("hoveredButton");
 
+        double buttonX = centerX - GameConstants.UI_BUTTON_WIDTH / 2;
+        double buttonY = GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT / 2.0;
+
         this.newGameButton = new Button(
-                centerX - GameConstants.UI_BUTTON_WIDTH / 2,
-                GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT / 2,
+                buttonX,
+                buttonY,
                 buttonImage,
                 hoveredImage,
                 "New Game"
         );
         this.continueButton = new Button(
-                centerX - GameConstants.UI_BUTTON_WIDTH / 2,
-                GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT / 2 + 100,
-                GameConstants.UI_BUTTON_WIDTH,
-                GameConstants.UI_BUTTON_HEIGHT * (currentWave > 1 ? 1.2 : 1),
+                buttonX,
+                buttonY + GameConstants.UI_BUTTON_HEIGHT + GameConstants.UI_BUTTON_PADDING,
                 buttonImage,
                 hoveredImage,
-                "Continue" + (currentWave > 1 ? "\nWave " + Integer.toString(currentWave) : "")
+                "Continue"
         );
         this.backButton = new Button(
-                centerX - GameConstants.UI_BUTTON_WIDTH / 2,
-                GameConstants.SCREEN_HEIGHT / 2.0 - GameConstants.UI_BUTTON_HEIGHT / 2 +
-                        GameConstants.UI_BUTTON_HEIGHT * (currentWave > 1 ? 1.2 : 1) + 140,
+                buttonX,
+                buttonY + GameConstants.UI_BUTTON_HEIGHT * 2 + GameConstants.UI_BUTTON_PADDING * 2,
                 buttonImage,
                 hoveredImage,
                 "Back"
@@ -98,13 +102,26 @@ public final class InfiniteModeState implements GameState {
                 gc,
                 "INFINITE MODE",
                 centerX,
-                110,
+                140,
                 titleFont,
                 titleFill,
                 Color.color(0,0,0,0.9),
                 3.0,
                 titleShadow
         );
+
+        TextRenderer.drawOutlinedText(
+                gc,
+                "Current wave: " + Integer.toString(currentWave),
+                centerX,
+                230,
+                textFont,
+                Color.LIGHTBLUE,
+                Color.color(0,0,0,0.9),
+                3.0,
+                titleShadow
+        );
+
 
         if (newGameButton != null) {
             newGameButton.render(gc);
