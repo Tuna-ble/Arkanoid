@@ -586,6 +586,7 @@ public final class PlayingState implements GameState {
         ballManager.loadData(state.balls);
         brickManager.loadData(state.bricks);
         enemyManager.loadData(state.enemies);
+        this.currentSubState = SubState.NORMAL_PLAY;
 
         // 5. Cập nhật lại các thứ khác nếu cần
         // vd: tgian choi
