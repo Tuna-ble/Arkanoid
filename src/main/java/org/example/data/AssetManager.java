@@ -44,6 +44,7 @@ public class AssetManager {
             loadSound("music_1", "/sounds/music_1.wav");
             loadSound("music_2", "/sounds/music_2.wav");
             loadSound("music_3", "/sounds/music_3.wav");
+            loadSound("siren", "/sounds/siren.wav");
         } catch (Exception e) {
             System.err.println("Không thể tải file âm thanh: " + e.getMessage());
             e.printStackTrace();
@@ -110,6 +111,11 @@ public class AssetManager {
 
             loadImage("infiniteStatic", "/images/infiniteStatic.png");
             loadImage("infinite", "/images/infinite.png");
+
+            loadImage("bg1", "/images/background1.png");
+            loadImage("bg2", "/images/background2.png");
+            loadImage("bg3", "/images/background3.png");
+
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());
             e.printStackTrace();

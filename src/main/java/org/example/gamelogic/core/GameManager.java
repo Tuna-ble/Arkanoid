@@ -10,6 +10,11 @@ import org.example.data.InfiniteLevelRepository;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.states.*;
+import javafx.scene.image.Image;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import java.util.Map;
 
@@ -37,6 +42,10 @@ public final class GameManager {
     private final double FIXED_TIMESTEP = GameConstants.FIXED_TIMESTEP;
     private ParticleManager particleManager;
 
+    private Map<Integer, String> levelBackgroundMap;
+    private List<String> backgroundKeys;
+    private Random random;
+
     private GameManager() {
         this.gameLoop = new AnimationTimer() {
             private long lastUpdate = 0;
@@ -52,11 +61,7 @@ public final class GameManager {
                 accumulator += deltaTime;
 
                 while (accumulator >= FIXED_TIMESTEP) {
-                    // 1. Cập nhật logic với BƯỚC THỜI GIAN CỐ ĐỊNH
-                    // Lưu ý: Không truyền "deltaTime" nữa, mà là "FIXED_TIMESTEP"
                     update(FIXED_TIMESTEP);
-
-                    // 2. Trừ đi thời gian đã xử lý
                     accumulator -= FIXED_TIMESTEP;
                 }
                 render();
@@ -97,6 +102,12 @@ public final class GameManager {
         this.stateManager.setState(currentState);
 
         AssetManager.getInstance();
+        
+        this.levelBackgroundMap = new HashMap<>();
+        this.backgroundKeys = List.of("bg1", "bg2", "bg3");
+        this.random = new Random();
+        initializeLevelBackgrounds(5);
+        
         this.enemyManager = EnemyManager.getInstance();
         this.soundManager = SoundManager.getInstance();
         this.scoreManager = ScoreManager.getInstance();
@@ -108,6 +119,26 @@ public final class GameManager {
         this.soundManager.playSelectedMusic();
 
         subscribeToEvents();
+    }
+
+    private void initializeLevelBackgrounds(int numLevels) {
+        for (int i = 1; i <= numLevels; i++) {
+            String randomBgKey = backgroundKeys.get(random.nextInt(backgroundKeys.size()));
+
+            levelBackgroundMap.put(i, randomBgKey);
+            System.out.println("Gán ảnh : Level " + i + " -> " + randomBgKey);
+        }
+    }
+
+    public Image getBackgroundForLevel(int levelId) {
+        String key = levelBackgroundMap.get(levelId);
+
+        if (key == null) {
+            int index = (levelId - 1) % backgroundKeys.size();
+            key = backgroundKeys.get(index);
+        }
+
+        return AssetManager.getInstance().getImage(key);
     }
 
     public void update(double deltaTime) {
@@ -252,6 +283,7 @@ public final class GameManager {
                     HighscoreManager.saveNewScore(finalScore);
 
                     playingState.cleanUp();
+                    soundManager.stopMusic();
                 }
                 newState = new GameOverState(currentLevel);
                 break;
