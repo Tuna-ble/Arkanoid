@@ -213,15 +213,20 @@ public final class LevelState implements GameState {
                     previewX + 10, previewY + 10,
                     previewWidth - 20, previewHeight - 20);
 
-            if (isLocked) {
-                gc.setFill(new Color(0, 0, 0, 0.7)); // Màu đen mờ 70%
-                gc.fillRect(previewX, previewY, previewWidth, previewHeight);
+            gc.save();
+            try {
+                if (isLocked) {
+                    gc.setFill(new Color(0, 0, 0, 0.7)); // Màu đen mờ 70%
+                    gc.fillRect(previewX, previewY, previewWidth, previewHeight);
 
-                gc.setTextAlign(TextAlignment.CENTER);
-                TextRenderer.drawOutlinedText(gc, "LOCKED",
-                        previewX + previewWidth / 2,
-                        previewY + previewHeight / 2 + (levelNameFont.getSize() / 2),
-                        levelNameFont, Color.RED, Color.BLACK, 2.0, null);
+                    gc.setTextAlign(TextAlignment.CENTER);
+                    TextRenderer.drawOutlinedText(gc, "LOCKED",
+                            previewX + previewWidth / 2,
+                            previewY + previewHeight / 2 + (levelNameFont.getSize() / 2),
+                            levelNameFont, Color.RED, Color.BLACK, 2.0, null);
+                }
+            } finally {
+                gc.restore();
             }
 
             gc.setTextAlign(TextAlignment.CENTER);
