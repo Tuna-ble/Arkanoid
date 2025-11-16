@@ -41,21 +41,10 @@ public class Enemy2 extends AbstractEnemy {
 
     @Override
     public void render(GraphicsContext gc) {
-
-        // Extract current phase frame from sprite sheet
-        Image currentFrame = new WritableImage(
-                enemySprites.getPixelReader(),
-                0,
-                180,
-                (int) ENEMY_SPRITE_WIDTH,
-                (int) ENEMY_SPRITE_HEIGHT
-        );
-
-        // Tint the current frame to desired color
-        Image tintedFrame = ImageModifier.tintImage(currentFrame, enemy2Color);
-
-        // Draw the tinted sprite at the desired position and size
-        gc.drawImage(tintedFrame, this.x, this.y, this.width, this.height);
+        gc.setFill(Color.PURPLE);
+        gc.fillRect(x, y, width, height);
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(x, y, width, height);
     }
 
     public void takeDamage(double damage) {
