@@ -40,7 +40,6 @@ public final class SettingsState implements GameState {
 
     private final String[] musicTracks = {"music_1", "music_2", "music_3"};
     private int currentMusicIndex = 0;
-    private String currentMusic;
 
     public SettingsState(GameState previousState) {
         this.previousState = previousState;
@@ -49,7 +48,7 @@ public final class SettingsState implements GameState {
         SettingsManager settings = SettingsManager.getInstance();
 
         titleFont = am.getFont("Anxel", 48);
-        currentMusic = settings.getSelectedMusic();
+        String initialMusicName = settings.getSelectedMusic();
 
         ITransitionStrategy transition = new HologramTransitionStrategy();
         this.window = new Window(previousState, 600, 400, transition);
@@ -121,12 +120,11 @@ public final class SettingsState implements GameState {
         this.nextMusicButton.setTransition(new WipeElementTransitionStrategy(0.5));
 
         this.musicDisplayLabel = new TextLabel(musicTextX, secondRowY + sliderPadding + 20,
-                sliderWidth - 60, 30, currentMusic);
+                sliderWidth - 60, 30, initialMusicName);
         this.musicDisplayLabel.setTransition(new WipeElementTransitionStrategy(0.5));
 
-        String currentMusic = SettingsManager.getInstance().getSelectedMusic();
         for (int i = 0; i < musicTracks.length; i++) {
-            if (musicTracks[i].equals(currentMusic)) {
+            if (musicTracks[i].equals(initialMusicName)) {
                 this.currentMusicIndex = i;
                 break;
             }
@@ -150,7 +148,6 @@ public final class SettingsState implements GameState {
     public void update(double deltaTime) {
         SoundManager.getInstance().updateAllVolumes();
         window.update(deltaTime);
-        currentMusic = SettingsManager.getInstance().getSelectedMusic();
     }
 
     @Override
@@ -215,8 +212,10 @@ public final class SettingsState implements GameState {
         }
 
         if (trackChanged) {
+            String newMusicName = musicTracks[currentMusicIndex];
             SoundManager.getInstance().playSelectedMusic();
-            musicDisplayLabel.setText(currentMusic);
+
+            musicDisplayLabel.setText(newMusicName);
         }
 
         if (volumeChanged || musicButton.isClicked()) {
