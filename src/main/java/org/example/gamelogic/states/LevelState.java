@@ -6,20 +6,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.example.config.GameConstants;
-import org.example.data.AssetManager;
-import org.example.data.FileLevelRepository;
-import org.example.data.ILevelRepository;
-import org.example.data.LevelData;
+import org.example.data.*;
 import org.example.gamelogic.I_InputProvider;
 import org.example.gamelogic.core.EventManager;
+import org.example.gamelogic.core.GameManager;
+import org.example.gamelogic.core.ProgressManager;
 import org.example.gamelogic.events.ChangeStateEvent;
 import org.example.gamelogic.graphics.TextRenderer;
 import org.example.gamelogic.graphics.buttons.AbstractButton;
-import org.example.gamelogic.graphics.buttons.Button; // (Import lớp Button chuẩn của bạn)
+import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.windows.Window;
 import org.example.gamelogic.strategy.transition.button.WipeElementTransitionStrategy;
 import org.example.gamelogic.strategy.transition.window.ITransitionStrategy;
-import org.example.gamelogic.strategy.transition.window.PopupTransitionStrategy;
 import org.example.gamelogic.strategy.transition.window.ScrollDownTransitionStrategy;
 
 import java.util.HashMap;
@@ -47,17 +45,26 @@ public final class LevelState implements GameState {
     private final Set<String> currentBrickTypes = new HashSet<>();
     private final Map<String, Image> brickIconMap = new HashMap<>();
 
-    private final Font titleFont = new Font("Arial", 70);
-    private final Font levelNameFont = new Font("Arial", 32);
-    private final Font infoFont = new Font("Arial", 18);
+    private final Font titleFont;
+    private final Font levelNameFont;
+    private final Font infoFont;
 
     private final Window window;
 
+    private final int maxLevelUnlocked;
+    private final Map<Integer, Integer> starsMap;
+
     public LevelState() {
+        this.maxLevelUnlocked = ProgressManager.getMaxLevelUnlocked();
+        this.starsMap = ProgressManager.loadStars();
+
         ITransitionStrategy transition = new ScrollDownTransitionStrategy();
         this.window = new Window(null, 850, 650, transition);
 
         AssetManager am = AssetManager.getInstance();
+        titleFont = am.getFont("Anxel", 70);
+        levelNameFont = am.getFont("Anxel", 32);
+        infoFont = am.getFont("Anxel", 18);
 
         this.levelBackground = am.getImage("level");
         Image bannerImage = am.getImage("banner2");
@@ -109,7 +116,7 @@ public final class LevelState implements GameState {
         this.playButton.setTransition(new WipeElementTransitionStrategy(0.5));
 
         this.backButton = new Button(infoX + (infoWidth - 200) / 2, infoY + infoHeight + 60,
-                200, 60, normalImage, hoverImage, "Back to Menu");
+                200, 60, normalImage, hoverImage, "Back");
         this.backButton.setTransition(new WipeElementTransitionStrategy(0.5));
 
         updateSelectedLevelInfo();
@@ -136,6 +143,13 @@ public final class LevelState implements GameState {
                     currentBrickTypes.add(type);
                 }
             }
+        }
+
+        int currentLevel = currentLevelIndex + 1;
+        if (currentLevel > maxLevelUnlocked) {
+            playButton.setDisabled(true);
+        } else {
+            playButton.setDisabled(false);
         }
     }
 
@@ -187,25 +201,37 @@ public final class LevelState implements GameState {
     public void render(GraphicsContext gc) {
         gc.drawImage(levelBackground, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        double centerX = GameConstants.SCREEN_WIDTH / 2.0;
-        gc.setTextAlign(TextAlignment.CENTER);
-        TextRenderer.drawOutlinedText(gc, "CHOOSE LEVEL", centerX, 110, titleFont, Color.WHITE, Color.BLACK, 3.0, null);
-
         window.render(gc);
 
         if (window.transitionFinished()) {
             double previewX = 100, previewY = 180, previewWidth = 450, previewHeight = 350;
 
+            int currentLevel = currentLevelIndex + 1;
+            boolean isLocked = (currentLevel > maxLevelUnlocked);
+
             renderMiniMap(gc, allLevelData[currentLevelIndex],
                     previewX + 10, previewY + 10,
                     previewWidth - 20, previewHeight - 20);
+
+            if (isLocked) {
+                gc.setFill(new Color(0, 0, 0, 0.7)); // Màu đen mờ 70%
+                gc.fillRect(previewX, previewY, previewWidth, previewHeight);
+
+                gc.setTextAlign(TextAlignment.CENTER);
+                TextRenderer.drawOutlinedText(gc, "LOCKED",
+                        previewX + previewWidth / 2,
+                        previewY + previewHeight / 2 + (levelNameFont.getSize() / 2),
+                        levelNameFont, Color.RED, Color.BLACK, 2.0, null);
+            }
+
+            gc.setTextAlign(TextAlignment.CENTER);
 
             String levelName = "Level " + (currentLevelIndex + 1);
             TextRenderer.drawOutlinedText(gc, levelName, previewX + previewWidth / 2, previewY + previewHeight + 40, levelNameFont, Color.WHITE, Color.BLACK, 2.0, null);
 
             double infoX = 600, infoY = 180, infoWidth = 250, infoHeight = 350;
 
-            TextRenderer.drawOutlinedText(gc, "INFO", infoX + infoWidth / 2, infoY + 40, levelNameFont, Color.WHITE, Color.BLACK, 2.0, null);
+            TextRenderer.drawOutlinedText(gc, "INFO", infoX + infoWidth / 2, infoY + 50, levelNameFont, Color.WHITE, Color.BLACK, 2.0, null);
 
             double yOffset = 80;
             double iconWidth = 30;
@@ -219,6 +245,23 @@ public final class LevelState implements GameState {
                 TextRenderer.drawOutlinedText(gc, ": " + name, infoX + 20 + iconWidth + 5, infoY + yOffset + 15, infoFont, Color.WHITE, Color.BLACK, 1.0, null);
                 yOffset += (iconHeight + 15);
             }
+
+            double yOffset2 = infoY + 100;
+            gc.setTextAlign(TextAlignment.CENTER);
+            TextRenderer.drawOutlinedText(gc, "STARS", infoX + infoWidth / 2, infoY + yOffset2, levelNameFont, Color.WHITE, Color.BLACK, 2.0, null);
+
+            yOffset2 += 40;
+
+            String starText;
+            if (isLocked) {
+                starText = "---";
+            } else {
+                int stars = starsMap.getOrDefault(currentLevel, 0);
+                starText = getStarString(stars);
+            }
+
+            TextRenderer.drawOutlinedText(gc, starText, infoX + infoWidth / 2,
+                    infoY + yOffset2, levelNameFont, Color.WHITE, Color.BLACK, 1.0, null);
         }
     }
 
@@ -239,9 +282,19 @@ public final class LevelState implements GameState {
 
         if (playButton.isClicked()) {
             int selectedLevel = currentLevelIndex + 1;
-            EventManager.getInstance().publish(
-                    new ChangeStateEvent(GameStateEnum.PLAYING, selectedLevel)
-            );
+
+            if (selectedLevel <= maxLevelUnlocked) {
+                SaveGameRepository repo = new SaveGameRepository();
+
+                if (repo.hasSave(selectedLevel)) {
+                    GameManager gm = GameManager.getInstance();
+                    gm.getStateManager().setState(new ConfirmContinueState(selectedLevel));
+                } else {
+                    EventManager.getInstance().publish(
+                            new ChangeStateEvent(GameStateEnum.PLAYING, selectedLevel)
+                    );
+                }
+            }
         }
 
         if (backButton.isClicked()) {
@@ -249,5 +302,17 @@ public final class LevelState implements GameState {
                     new ChangeStateEvent(GameStateEnum.GAME_MODE)
             );
         }
+    }
+
+    private String getStarString(int stars) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            if (i < stars) {
+                sb.append("★"); // Sao vàng (hoặc ký tự bạn muốn)
+            } else {
+                sb.append("☆"); // Sao rỗng
+            }
+        }
+        return sb.toString();
     }
 }
