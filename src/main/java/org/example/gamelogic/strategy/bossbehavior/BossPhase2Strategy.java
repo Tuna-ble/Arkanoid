@@ -31,11 +31,7 @@ public class BossPhase2Strategy implements BossBehaviorStrategy {
         laserTimer += deltaTime;
         if (laserTimer >= LASER_COOLDOWN) {
             laserTimer = 0.0;
-
-            double x = boss.getX() + boss.getWidth() / 2 - 2;
-            double y = boss.getY() + boss.getHeight();
-
-            LaserManager.getInstance().createBullet(x, y, 0, 400, BulletType.BOSS_LASER, BulletFrom.ENEMY);
+            boss.requestShoot(0, 400, BulletType.BOSS_LASER);
         }
 
         //
@@ -73,8 +69,7 @@ public class BossPhase2Strategy implements BossBehaviorStrategy {
                 double velX = Math.cos(centerAngle) * HOMING_BULLET_SPEED;
                 double velY = Math.sin(centerAngle) * HOMING_BULLET_SPEED;
 
-                LaserManager.getInstance().createBullet(startX, startY, velX, velY,
-                        BulletType.BOSS_HOMING_SQUARE, BulletFrom.ENEMY);
+                boss.requestShoot(velX, velY, BulletType.BOSS_HOMING_SQUARE);
 
                 bulletsLeft--;
                 timerPerShot = TIME_BETWEEN_SHOTS;

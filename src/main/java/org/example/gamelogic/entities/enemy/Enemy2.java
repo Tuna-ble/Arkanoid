@@ -5,19 +5,21 @@ import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
+import org.example.data.AssetManager;
 import org.example.gamelogic.graphics.ImageModifier;
 import org.example.gamelogic.strategy.movement.DownMovementStrategy;
 
 public class Enemy2 extends AbstractEnemy {
-    private Color enemy2Color;
-    private static final double ENEMY_SPRITE_WIDTH=180;
-    private static final double ENEMY_SPRITE_HEIGHT=140;
+    private Image enemyImage;
+    private static final double ENEMY_SPRITE_WIDTH = 180;
+    private static final double ENEMY_SPRITE_HEIGHT = 140;
 
     public Enemy2(double x, double y, double width, double height,
                   double dx, double dy) {
         super(x, y, width, height, dx, dy, new DownMovementStrategy());
 
-        this.enemy2Color=Color.PURPLE;
+        AssetManager am = AssetManager.getInstance();
+        this.enemyImage = am.getImage("enemy2");
     }
 
     @Override
@@ -41,10 +43,7 @@ public class Enemy2 extends AbstractEnemy {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.PURPLE);
-        gc.fillRect(x, y, width, height);
-        gc.setStroke(Color.BLACK);
-        gc.strokeRect(x, y, width, height);
+        gc.drawImage(enemyImage, x, y, width, height);
     }
 
     public void takeDamage(double damage) {
@@ -52,8 +51,6 @@ public class Enemy2 extends AbstractEnemy {
             return;
         }
         this.isActive = false;
-        /*EventManager.getInstance().publish(new BrickDestroyedEvent(this));
-        EventManager.getInstance().publish(new ExplosiveBrickEvent(this));*/
     }
     @Override
     public String getType() {
