@@ -51,7 +51,7 @@ public class AssetManager {
 
         try {
             // loadImage("ball", "/images/ball.png");
-            // loadImage("paddle", "/images/paddle.png");
+            loadImage("paddle", "/images/paddle.png");
             loadImage("normalBrick", "/images/cyanBrick.png");
             loadImage("hardBrick1", "/images/hardBrick1.png");
             loadImage("hardBrick2", "/images/hardBrick2.png");
@@ -75,7 +75,7 @@ public class AssetManager {
             loadImage("settings", "/images/settings.png");
             loadImage("gameMode", "/images/gameMode.png");
             loadImage("modesFrame", "/images/modesFrame.png");//
-            loadImage("gameOver", "/images/gameOverBackground.png"); //
+            loadImage("gameOver", "/images/gameOver.png"); //
             loadImage("victory", "/images/victory.png"); //
             loadImage("level", "/images/level.png"); //
             loadImage("button", "/images/button.png");
