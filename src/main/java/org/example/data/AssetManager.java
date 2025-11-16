@@ -115,6 +115,7 @@ public class AssetManager {
             loadImage("bg1", "/images/background1.png");
             loadImage("bg2", "/images/background2.png");
             loadImage("bg3", "/images/background3.png");
+            loadImage("bossBackground", "/images/bossBackground.png");
 
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());
