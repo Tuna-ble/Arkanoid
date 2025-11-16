@@ -303,10 +303,9 @@ public final class PlayingState implements GameState {
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
         gc.setFill(Color.DARKBLUE);
-        gc.fillRect(GameConstants.PLAY_AREA_X,
-                GameConstants.PLAY_AREA_Y,
-                GameConstants.PLAY_AREA_WIDTH,
-                GameConstants.PLAY_AREA_HEIGHT);
+        gc.fillRect(0, 0,
+                GameConstants.SCREEN_WIDTH - GameConstants.UI_BAR_WIDTH,
+                GameConstants.SCREEN_HEIGHT);
 
         gc.setFill(Color.BLACK);
         gc.fillRect(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH + GameConstants.FRAME_RIGHT_BORDER,
@@ -365,8 +364,13 @@ public final class PlayingState implements GameState {
         if (currentSubState == SubState.BOSS_DYING && currentGameMode == GameModeEnum.LEVEL) {
             double fadeAlpha = Math.min(1.0, bossDyingTimer / BOSS_DEATH_DURATION);
 
-            gc.setFill(Color.color(1.0, 1.0, 1.0, fadeAlpha));
-            gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+            gc.save();
+            try {
+                gc.setFill(Color.color(1.0, 1.0, 1.0, fadeAlpha));
+                gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+            } finally {
+                gc.restore();
+            }
         }
 
         if (currentSubState == SubState.WAVE_CLEARED) {

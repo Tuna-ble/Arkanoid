@@ -68,8 +68,14 @@ public class Window {
     public void render(GraphicsContext gc) {
         if (previousState != null) {
             previousState.render(gc);
-            gc.setFill(new Color(0, 0, 0, 0.6));
-            gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+            gc.save();
+            try {
+                gc.setFill(new Color(0, 0, 0, 0.6));
+                gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+            } finally {
+                gc.restore();
+            }
+
         }
 
         if (windowTransition != null) {
