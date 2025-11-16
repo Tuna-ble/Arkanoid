@@ -59,6 +59,12 @@ public class BossMinion extends AbstractEnemy {
 
     @Override
     public void render(GraphicsContext gc) {
+        if (lifeState == LifeState.DYING) {
+            if (explosionAnim != null) {
+                explosionAnim.render(gc, x, y, width, height);
+            }
+            return;
+        }
         gc.drawImage(idleImage, this.x, this.y, this.width, this.height);
     }
 
@@ -66,9 +72,12 @@ public class BossMinion extends AbstractEnemy {
         if (isDestroyed()) {
             return;
         }
-        this.isActive = false;
-        /*EventManager.getInstance().publish(new BrickDestroyedEvent(this));
-        EventManager.getInstance().publish(new ExplosiveBrickEvent(this));*/
+        this.lifeState = LifeState.DYING;
+        if (explosionAnim != null) {
+            explosionAnim.reset();
+        }
+        this.setDx(0);
+        this.setDy(0);
     }
 
     @Override

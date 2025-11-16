@@ -43,6 +43,12 @@ public class Enemy2 extends AbstractEnemy {
 
     @Override
     public void render(GraphicsContext gc) {
+        if (lifeState == LifeState.DYING) {
+            if (explosionAnim != null) {
+                explosionAnim.render(gc, x, y, width, height);
+            }
+            return;
+        }
         gc.drawImage(enemyImage, x, y, width, height);
     }
 
@@ -50,7 +56,12 @@ public class Enemy2 extends AbstractEnemy {
         if (isDestroyed()) {
             return;
         }
-        this.isActive = false;
+        this.lifeState = LifeState.DYING;
+        if (explosionAnim != null) {
+            explosionAnim.reset();
+        }
+        this.setDx(0);
+        this.setDy(0);
     }
     @Override
     public String getType() {

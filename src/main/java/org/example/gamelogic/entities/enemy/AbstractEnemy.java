@@ -14,6 +14,7 @@ import org.example.gamelogic.entities.LaserBullet;
 import org.example.gamelogic.entities.MovableObject;
 import org.example.gamelogic.events.*;
 import org.example.gamelogic.strategy.movement.EnemyMovementStrategy;
+import org.example.presentation.SpriteAnimation;
 
 public abstract class AbstractEnemy extends MovableObject implements Enemy {
     private boolean isHit = false;
@@ -22,6 +23,13 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
     protected double scoreValue;
     protected boolean hasEnteredScreen;
     protected final Image enemySprites;
+
+    protected SpriteAnimation explosionAnim;
+    protected enum LifeState {
+        ALIVE,
+        DYING
+    }
+    protected LifeState lifeState = LifeState.ALIVE;
 
     protected EnemyMovementStrategy movementStrategy;
 
@@ -33,6 +41,10 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
         this.movementStrategy = initialMovementStrategy;
         this.enemySprites = AssetManager.getInstance().getImage("enemies");
 
+        Image sheet = AssetManager.getInstance().getImage("enemyExplode");
+        if (sheet != null) {
+            this.explosionAnim = new SpriteAnimation(sheet, 7, 7, 0.5, false);
+        }
         subscribeToEvents();
     }
 
@@ -67,6 +79,18 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
 
     @Override
     public void update(double deltaTime) {
+        if (lifeState == LifeState.DYING) {
+            if (explosionAnim != null) {
+                explosionAnim.update(deltaTime);
+                if (explosionAnim.isFinished()) {
+                    this.isActive = false;
+                }
+            } else {
+                this.isActive = false;
+            }
+            return;
+        }
+
         if (!this.hasEnteredScreen) {
             handleEntry(deltaTime);
         } else {
@@ -74,7 +98,6 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
                 this.movementStrategy.move(this, deltaTime);
             }
         }
-
         if (this.y > GameConstants.SCREEN_HEIGHT) {
             this.setActive(false);
         }

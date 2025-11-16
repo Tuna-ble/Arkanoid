@@ -20,6 +20,7 @@ public abstract class AbstractPowerUp extends MovableObject implements PowerUp {
     protected final Image powerUpSprites;
     protected int currentFrame = 0;
     protected double frameTimer = 0.0;
+    protected double spriteRow;
 
     public AbstractPowerUp(double x, double y, double width, double height,
                            double dx, double dy, PowerUpStrategy strategy) {
