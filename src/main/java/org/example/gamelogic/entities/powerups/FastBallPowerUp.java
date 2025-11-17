@@ -14,7 +14,7 @@ public class FastBallPowerUp extends AbstractPowerUp {
 
     @Override
     public PowerUp clone() {
-        ExpandPaddlePowerUp newClone = new ExpandPaddlePowerUp(0.0, 0.0, this.width, this.height, this.dx, this.dy, getStrategy().clone());
+        FastBallPowerUp newClone = new FastBallPowerUp(0.0, 0.0, this.width, this.height, this.dx, this.dy, getStrategy().clone());
         newClone.animation = this.animation;
         return newClone;
     }

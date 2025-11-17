@@ -20,4 +20,9 @@ public class PiercingBallPowerUpTest {
         assertEquals(powerUp.getWidth(), clone2.getWidth());
         assertEquals(powerUp.getHeight(), clone2.getHeight());
     }
+
+    @Test
+    void testGetSpriteRow() {
+        assertEquals(7, powerUp.getSpriteRow());
+    }
 }
