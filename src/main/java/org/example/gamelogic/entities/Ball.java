@@ -14,6 +14,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Quản lý đối tượng Bóng (Ball) chính trong game.
+ * <p>
+ * Lớp này kế thừa từ {@link MovableObject} và implement {@link IBall}.
+ * Nó xử lý logic di chuyển, va chạm, trạng thái (dính, xuyên thấu),
+ * và render (vẽ bóng và vệt mờ - trail).
+ */
 public class Ball extends MovableObject implements IBall {
     private double radius;
     private double speed;
@@ -23,6 +30,11 @@ public class Ball extends MovableObject implements IBall {
     private int pierceLeft;
     private List<GameObject> piercingObjects;
 
+    /**
+     * Lớp nội (inner class)
+     * lưu trữ "ảnh chụp" (snapshot) vị trí của bóng
+     * để vẽ vệt mờ (trail).
+     */
     private static class GhostSnapshot {
         double x, y, width, height;
 
@@ -38,6 +50,22 @@ public class Ball extends MovableObject implements IBall {
     private final int MAX_GHOSTS = 8;
     private double lastGhostX, lastGhostY;
 
+    /**
+     * Khởi tạo một đối tượng Ball mới.
+     * <p>
+     * <b>Định nghĩa:</b> Thiết lập vị trí,
+     * bán kính ({@code radius}),
+     * và trạng thái ban đầu (dính vào paddle,
+     * màu sắc mặc định, không xuyên thấu).
+     * <p>
+     * <b>Expected:</b> Một đối tượng Ball được tạo,
+     * {@code attachedToPaddle} là {@code true},
+     * và sẵn sàng để được {@code release()}.
+     *
+     * @param x      Tọa độ X ban đầu.
+     * @param y      Tọa độ Y ban đầu.
+     * @param radius Bán kính của bóng.
+     */
     public Ball(double x, double y, double radius) {
         super(x, y, radius * 2, radius * 2, 0, 0);
         this.radius = radius;
@@ -52,33 +80,87 @@ public class Ball extends MovableObject implements IBall {
         this.lastGhostY = y;
     }
 
+    /**
+     * Đặt số lần bóng có thể xuyên (pierce) gạch.
+     * <p>
+     * <b>Định nghĩa:</b> Cập nhật {@code pierceLeft}.
+     * <p>
+     * <b>Expected:</b> {@code pierceLeft} được cập nhật.
+     *
+     * @param pierceLeft Số lần xuyên thấu còn lại.
+     */
     public void setPierceLeft(int pierceLeft) {
         this.pierceLeft = pierceLeft;
     }
 
+    /**
+     * Lấy số lần bóng có thể xuyên (pierce) gạch còn lại.
+     * <p>
+     * <b>Định nghĩa:</b> Trả về {@code pierceLeft}.
+     * <p>
+     * <b>Expected:</b> Số lần xuyên thấu (int).
+     *
+     * @return Số lần xuyên thấu.
+     */
     public int getPierceLeft() {
         return pierceLeft;
     }
 
+    /**
+     * Lấy danh sách các đối tượng mà bóng đang xuyên qua.
+     * <p>
+     * <b>Định nghĩa:</b> Trả về {@code piercingObjects}
+     * (dùng để tránh va chạm lặp lại
+     * với cùng 1 đối tượng trong 1 frame).
+     * <p>
+     * <b>Expected:</b> Danh sách (List)
+     * các {@link GameObject} đang bị xuyên.
+     *
+     * @return Danh sách đối tượng đang bị xuyên.
+     */
     public List<GameObject> getPiercingObjects() {
         return piercingObjects;
     }
 
+    /**
+     * Lấy tọa độ X tại tâm của Bóng.
+     * <p>
+     * <b>Định nghĩa:</b> Tính toán {@code x + width / 2}.
+     * <p>
+     * <b>Expected:</b> Tọa độ X (double)
+     * của điểm giữa bóng.
+     *
+     * @return Tọa độ X ở tâm.
+     */
     public double getCenterX() {
         return x + width / 2;
     }
 
-    // update bóng theo delta
+    /**
+     * Cập nhật logic của bóng (di chuyển, vệt mờ - trail).
+     * <p>
+     * <b>Định nghĩa:</b> Cập nhật màu sắc (dựa trên trạng thái pierce).
+     * Nếu không dính (not attached),
+     * di chuyển bóng (x, y) dựa trên vận tốc (dx, dy),
+     * đảm bảo vận tốc tối thiểu/tối đa,
+     * và cập nhật danh sách {@code trail}
+     * (vị trí cũ) để tạo vệt mờ.
+     * <p>
+     * <b>Expected:</b> Vị trí bóng được cập nhật.
+     * Danh sách {@code trail} được cập nhật
+     * nếu bóng di chuyển đủ xa.
+     *
+     * @param deltaTime Thời gian (giây) kể từ frame trước.
+     */
     @Override
     public void update(double deltaTime) {
-        if (isActive) { // bóng rời paddle
+        if (isActive) {
 
             currentColor = (pierceLeft > 0 ?
                     GameConstants.PIERCING_BALL_COLOR :
                     GameConstants.NORMAL_BALL_COLOR);
 
             if (!attachedToPaddle) {
-                // Logic di chuyển tự do
                 ensureMinimumVelocity();
                 limitMaximumSpeed();
                 this.x += dx * deltaTime;
@@ -105,6 +187,22 @@ public class Ball extends MovableObject implements IBall {
         }
     }
 
+    /**
+     * Vẽ (render) bóng và vệt mờ (trail) lên canvas.
+     * <p>
+     * <b>Định nghĩa:</b> Lặp qua danh sách {@code trail}
+     * để vẽ các "bóng ma" (ghosts)
+     * với độ mờ (alpha) và kích thước (scale) giảm dần.
+     * Vẽ quả bóng chính (hình tròn)
+     * bằng {@link RadialGradient} để tạo hiệu ứng 3D
+     * và vẽ viền (stroke) cho rõ nét.
+     * <p>
+     * <b>Expected:</b> Bóng và vệt mờ
+     * (nếu có) được vẽ lên {@code gc}.
+     * Không vẽ gì nếu {@code isActive} là {@code false}.
+     *
+     * @param gc Context (bút vẽ) của canvas.
+     */
     @Override
     public void render(GraphicsContext gc) {
         if (isActive) {
@@ -135,45 +233,69 @@ public class Ball extends MovableObject implements IBall {
                 gc.restore();
             }
 
-            // Tạo gradient nhẹ để bóng có cảm giác 3D
             RadialGradient gradient = new RadialGradient(
-                    0, 0,                // focus angle, focus distance
-                    x + radius, y + radius, // tâm gradient
-                    radius,               // bán kính gradient
-                    false,                // proportional = false -> dùng pixel
+                    0, 0,
+                    x + radius, y + radius,
+                    radius,
+                    false,
                     CycleMethod.NO_CYCLE,
-                    new Stop(0, Color.WHITE),          // vùng sáng
-                    new Stop(1, currentColor) // vùng tối
+                    new Stop(0, Color.WHITE),
+                    new Stop(1, currentColor)
             );
 
-            // tô hình tròn bằng gradient
             gc.setFill(gradient);
             gc.fillOval(x, y, radius * 2, radius * 2);
 
-            // vẽ viền bóng (cho rõ nét)
             gc.setStroke(Color.gray(0.2));
             gc.setLineWidth(1);
             gc.strokeOval(x, y, radius * 2, radius * 2);
         }
     }
 
-    // bắn bóng ra khỏi paddle
+    /**
+     * Thả bóng ra khỏi paddle.
+     * <p>
+     * <b>Định nghĩa:</b> Nếu bóng đang dính (attached)
+     * và hoạt động (active),
+     * đặt {@code attachedToPaddle = false}
+     * và gán vận tốc (dx, dy) ban đầu
+     * dựa trên góc (angle)
+     * và tốc độ ({@code speed}) mặc định.
+     * <p>
+     * <b>Expected:</b> Bóng bắt đầu di chuyển
+     * độc lập khỏi paddle.
+     */
     public void release() {
         if (attachedToPaddle && isActive) {
             attachedToPaddle = false;
-            // tạo độ lệch nhỏ so với baseAngle (75 độ)
             double angleVariation = Math.toRadians(
                     (Math.random() - 0.5) * 2 * GameConstants.BALL_INITIAL_ANGLE_RANDOM_RANGE
             );
             double baseAngle = Math.toRadians(-75);
             double angle = baseAngle + angleVariation;
 
-            // tính toán vận tốc ban đầu
             this.dx = speed * Math.cos(angle);
             this.dy = speed * Math.sin(angle);
         }
     }
 
+    /**
+     * Đặt lại (reset) trạng thái bóng
+     * (thường khi mất mạng).
+     * <p>
+     * <b>Định nghĩa:</b> Đặt lại vị trí bóng
+     * (dính vào paddle mới),
+     * đặt lại vận tốc (dx, dy = 0),
+     * đặt lại tốc độ (speed),
+     * và xóa vệt mờ ({@code trail}).
+     * <p>
+     * <b>Expected:</b> Bóng quay trở lại
+     * trạng thái ban đầu, dính vào paddle.
+     *
+     * @param paddleX     Tọa độ X của paddle.
+     * @param paddleY     Tọa độ Y của paddle.
+     * @param paddleWidth Chiều rộng của paddle.
+     */
     public void reset(double paddleX, double paddleY, double paddleWidth) {
         this.attachedToPaddle = true;
         this.isActive = true;
@@ -188,48 +310,62 @@ public class Ball extends MovableObject implements IBall {
         this.lastGhostY = this.y;
     }
 
+    /**
+     * Xử lý va chạm với Paddle.
+     * <p>
+     * <b>Định nghĩa:</b> Đảo ngược vận tốc Y ({@code dy}).
+     * Điều chỉnh vận tốc X ({@code dx})
+     * dựa trên vận tốc của paddle ({@code paddle.getDx()})
+     * và vị trí va chạm ({@code hitPositionRatio}).
+     * Tăng tốc độ ({@code speed}) của bóng
+     * và cập nhật lại vector vận tốc.
+     * <p>
+     * <b>Expected:</b> Bóng nảy lên (dy bị đảo ngược),
+     * góc nảy (dx) bị ảnh hưởng
+     * bởi vị trí va chạm và chuyển động của paddle.
+     *
+     * @param paddle           Đối tượng Paddle đã va chạm.
+     * @param hitPositionRatio Tỷ lệ vị trí va chạm
+     * (-1.0 ở mép trái, 1.0 ở mép phải).
+     */
     @Override
     public void handlePaddleCollision(Paddle paddle, double hitPositionRatio) {
         if (!isActive() || attachedToPaddle) return;
 
-        // 1. Đẩy bóng lên trên paddle (vẫn cần thiết để tránh kẹt)
-        //    Bạn có thể làm nhẹ nhàng hơn: chỉ đẩy lên nếu bóng đã lún vào
         double overlapY = (this.y + this.height) - paddle.getY();
         if (overlapY > 0) {
-            this.y -= overlapY; // Chỉ đẩy lên đúng bằng độ lún
+            this.y -= overlapY;
         }
-        // Hoặc giữ cách cũ nếu đơn giản:
-        // this.y = paddle.getY() - this.height;
 
-        // 2. Phản xạ: Đảo ngược thành phần Y
-        if (dy > 0) { // Chỉ đảo ngược nếu đang đi xuống
+        if (dy > 0) {
             dy = -dy;
-        } else if (dy == 0) { // Xử lý trường hợp bóng đi ngang
-            dy = -GameConstants.BALL_MIN_VY; // Đẩy nhẹ lên
+        } else if (dy == 0) {
+            dy = -GameConstants.BALL_MIN_VY;
         }
-        dy = -Math.abs(dy); // Đảm bảo dy luôn âm (đi lên)
+        dy = -Math.abs(dy);
 
-        // 3. (TÙY CHỌN) Ảnh hưởng của chuyển động Paddle lên dx:
-        //    Thêm một phần nhỏ vận tốc của paddle vào dx của bóng
-        //    để tạo hiệu ứng "đẩy" bóng sang trái/phải khi paddle di chuyển.
-        dx += paddle.getDx() * GameConstants.PADDLE_MOVE_INFLUENCE; // PADDLE_MOVE_INFLUENCE là hệ số nhỏ, ví dụ 0.2
+        dx += paddle.getDx() * GameConstants.PADDLE_MOVE_INFLUENCE;
 
-        // 4. (TÙY CHỌN) Điều chỉnh dx nhẹ dựa trên vị trí va chạm:
-        //    Làm bóng hơi lệch sang trái/phải nếu chạm vào rìa paddle.
-        //    Dùng hitPositionRatio nhưng với ảnh hưởng nhỏ hơn nhiều so với cách cũ.
-        double angleInfluence = speed * hitPositionRatio * 0.1; // Hệ số nhỏ, ví dụ 0.1
+        double angleInfluence = speed * hitPositionRatio * 0.1;
         dx += angleInfluence;
 
-        // 5. Cập nhật tốc độ (nếu muốn tăng tốc sau va chạm) và giới hạn
         double speedAfterCollision = Math.min(speed + GameConstants.BALL_SPEED_INCREMENT_PER_BRICK, GameConstants.BALL_MAX_SPEED);
         this.speed = speedAfterCollision;
-        updateVelocityWithSpeed(); // Điều chỉnh dx, dy để khớp với speed mới
-        ensureMinimumVelocity(); // Đảm bảo không quá chậm
-        limitMaximumSpeed(); // Đảm bảo không quá nhanh
+        updateVelocityWithSpeed();
+        ensureMinimumVelocity();
+        limitMaximumSpeed();
     }
 
     /**
-     * demo va chạm với paddle
+     * (Deprecated/Demo) Điều chỉnh góc va chạm với paddle.
+     * <p>
+     * <b>Định nghĩa:</b> Một logic xử lý
+     * va chạm paddle cũ (hoặc demo).
+     * <p>
+     * <b>Expected:</b> (Tương tự {@code handlePaddleCollision}).
+     *
+     * @param hitPosition Vị trí va chạm.
+     * @param paddledx    Vận tốc X của paddle.
      */
     public void adjustAngle(double hitPosition, double paddledx) {
         dx += paddledx * GameConstants.PADDLE_MOVE_INFLUENCE;
@@ -251,30 +387,82 @@ public class Ball extends MovableObject implements IBall {
                 GameConstants.BALL_MAX_SPEED);
     }
 
-    // getter
+    /**
+     * Lấy bán kính (radius) của bóng.
+     * <p>
+     * <b>Định nghĩa:</b> Trả về {@code radius}.
+     * <p>
+     * <b>Expected:</b> Bán kính (double).
+     *
+     * @return Bán kính.
+     */
     public double getRadius() {
         return radius;
     }
 
+    /**
+     * Lấy tốc độ (speed) cơ sở của bóng.
+     * <p>
+     * <b>Định nghĩa:</b> Trả về {@code speed}.
+     * <p>
+     * <b>Expected:</b> Tốc độ (double).
+     *
+     * @return Tốc độ.
+     */
     public double getSpeed() {
         return speed;
     }
 
+    /**
+     * Tăng tốc độ (speed) của bóng
+     * (thường khi phá gạch).
+     * <p>
+     * <b>Định nghĩa:</b> Tăng {@code speed}
+     * một lượng ({@code BALL_SPEED_INCREMENT_PER_BRICK})
+     * và gọi {@code updateVelocityWithSpeed()}.
+     * <p>
+     * <b>Expected:</b> Tốc độ của bóng tăng lên,
+     * giới hạn bởi {@code BALL_MAX_SPEED}.
+     */
     public void incrementSpeed() {
         speed = Math.min(speed + GameConstants.BALL_SPEED_INCREMENT_PER_BRICK, GameConstants.BALL_MAX_SPEED);
-        // Cập nhật lại dx, dy để phản ánh tốc độ mới
         updateVelocityWithSpeed();
     }
 
+    /**
+     * Nhân tốc độ (speed) của bóng
+     * với một hệ số (factor).
+     * <p>
+     * <b>Định nghĩa:</b> Nhân {@code speed}
+     * với {@code factor}
+     * (dùng cho power-up Tăng/Giảm tốc).
+     * <p>
+     * <b>Expected:</b> Tốc độ của bóng thay đổi,
+     * giới hạn trong khoảng
+     * ({@code BALL_MIN_SPEED}, {@code BALL_MAX_SPEED}).
+     *
+     * @param factor Hệ số nhân.
+     */
     @Override
     public void multiplySpeed(double factor) {
-        // Giữ tốc độ trong giới hạn min/max
         double targetSpeed = Math.max(GameConstants.BALL_MIN_SPEED, Math.min(this.speed * factor, GameConstants.BALL_MAX_SPEED));
         this.speed = targetSpeed;
-        // Cập nhật lại dx, dy
         updateVelocityWithSpeed();
     }
 
+    /**
+     * Tạo một bản sao (clone) của bóng.
+     * <p>
+     * <b>Định nghĩa:</b> Implement (ghi đè)
+     * phương thức {@code clone()} (từ {@code IBall}).
+     * Tạo một bóng mới ở trạng thái mặc định,
+     * không dính (not attached).
+     * <p>
+     * <b>Expected:</b> Một đối tượng {@link IBall} mới
+     * (dùng cho Prototype Pattern).
+     *
+     * @return Một {@code IBall} mới (clone).
+     */
     public IBall clone() {
         Ball newBall = new Ball(0, 0, this.width / 2.0);
         newBall.attachedToPaddle = false;
@@ -282,6 +470,21 @@ public class Ball extends MovableObject implements IBall {
         return newBall;
     }
 
+    /**
+     * Tạo một bản sao (duplicate)
+     * của bóng với trạng thái hiện tại.
+     * <p>
+     * <b>Định nghĩa:</b> Tạo một bóng mới
+     * và sao chép các trạng thái
+     * ({@code pierceLeft}, {@code speed})
+     * từ bóng hiện tại.
+     * <p>
+     * <b>Expected:</b> Một {@link IBall} mới
+     * có cùng thuộc tính với bóng gốc
+     * (dùng cho power-up MultiBall).
+     *
+     * @return Một {@code IBall} mới (duplicate).
+     */
     public IBall duplicate() {
         Ball newBall = new Ball(0, 0, this.width / 2.0);
         newBall.pierceLeft=pierceLeft;
@@ -294,56 +497,126 @@ public class Ball extends MovableObject implements IBall {
         return newBall;
     }
 
+    /**
+     * Kiểm tra xem bóng đã bị "hủy" (inactive) hay chưa.
+     * <p>
+     * <b>Định nghĩa:</b> Trả về trạng thái
+     * ngược của {@code isActive}.
+     * <p>
+     * <b>Expected:</b> {@code true} nếu bóng
+     * không hoạt động, ngược lại {@code false}.
+     *
+     * @return boolean Trạng thái đã bị hủy.
+     */
     public boolean isDestroyed() {
         return !isActive;
     }
 
+    /**
+     * Đặt vị trí (x, y) của bóng một cách trực tiếp.
+     * <p>
+     * <b>Định nghĩa:</b> Cập nhật {@code x} và {@code y}.
+     * <p>
+     * <b>Expected:</b> Vị trí của bóng được thay đổi.
+     *
+     * @param x Tọa độ X mới.
+     * @param y Tọa độ Y mới.
+     */
     public void setPosition(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
+    /**
+     * Lấy chính đối tượng GameObject này.
+     * <p>
+     * <b>Định nghĩa:</b> Trả về tham chiếu {@code this}.
+     * <p>
+     * <b>Expected:</b> Trả về instance của chính đối tượng này.
+     *
+     * @return {@code this}.
+     */
     public GameObject getGameObject() {
         return this;
     }
 
+    /**
+     * Đảo ngược vận tốc theo trục X.
+     * <p>
+     * <b>Định nghĩa:</b> {@code dx = -dx}.
+     * <p>
+     * <b>Expected:</b> Bóng đổi hướng di chuyển ngang.
+     */
     public void reverseDirX() {
         this.dx = -this.dx;
     }
 
+    /**
+     * Đảo ngược vận tốc theo trục Y.
+     * <p>
+     * <b>Định nghĩa:</b> {@code dy = -dy}.
+     * <p>
+     * <b>Expected:</b> Bóng đổi hướng di chuyển dọc.
+     */
     public void reverseDirY() {
         this.dy = -this.dy;
     }
 
+    /**
+     * Hủy (deactivate) bóng.
+     * <p>
+     * <b>Định nghĩa:</b> Đặt {@code isActive = false}.
+     * <p>
+     * <b>Expected:</b> Bóng ngừng hoạt động
+     * (sẽ bị xóa bởi BallManager).
+     */
     public void destroy() {
         this.isActive = false;
     }
 
+    /**
+     * Kiểm tra xem bóng có đang dính vào paddle không.
+     * <p>
+     * <b>Định nghĩa:</b> Trả về {@code attachedToPaddle}.
+     * <p>
+     * <b>Expected:</b> {@code true} nếu đang dính,
+     * {@code false} nếu đang di chuyển tự do.
+     *
+     * @return boolean Trạng thái dính.
+     */
     public boolean isAttachedToPaddle() {
         return attachedToPaddle;
     }
 
+    /**
+     * (Helper) Đảm bảo bóng không di chuyển quá chậm.
+     * <p>
+     * <b>Định nghĩa:</b> Kiểm tra và đảm bảo
+     * vận tốc Y ({@code dy})
+     * và tổng tốc độ (speed)
+     * luôn lớn hơn hoặc bằng
+     * giá trị tối thiểu (MIN_VY, MIN_SPEED).
+     * <p>
+     * <b>Expected:</b> Vận tốc (dx, dy)
+     * được điều chỉnh nếu cần thiết
+     * để duy trì tốc độ tối thiểu.
+     */
     private void ensureMinimumVelocity() {
-        // Đảm bảo dy không quá gần 0
         if (Math.abs(dy) < GameConstants.BALL_MIN_VY) {
-            // Giữ nguyên dấu của dy, nhưng đặt giá trị tuyệt đối bằng mức tối thiểu
             dy = Math.copySign(GameConstants.BALL_MIN_VY, dy);
         }
 
-        // Đảm bảo tốc độ tổng thể không dưới mức tối thiểu
-        double currentSpeedSq = dx * dx + dy * dy; // Tính bình phương tốc độ để tránh căn bậc hai
+        double currentSpeedSq = dx * dx + dy * dy;
         double minSpeedSq = GameConstants.BALL_MIN_SPEED * GameConstants.BALL_MIN_SPEED;
 
         if (currentSpeedSq < minSpeedSq) {
             double currentSpeed = Math.sqrt(currentSpeedSq);
-            if (currentSpeed > 0) { // Tránh chia cho 0
-                // Tăng tỷ lệ dx và dy để đạt tốc độ tối thiểu
+            if (currentSpeed > 0) {
                 double factor = GameConstants.BALL_MIN_SPEED / currentSpeed;
                 dx *= factor;
                 dy *= factor;
-            } else if (speed > 0) { // Nếu đang đứng yên nhưng speed > 0 (ví dụ sau reset)
-                // Có thể đặt lại một vận tốc ngẫu nhiên nhỏ hoặc theo hướng mặc định
-                // Ví dụ: Đặt lại theo góc -75 độ
+            } else if (speed > 0) {
+
                 double baseAngle = Math.toRadians(-75);
                 dx = speed * Math.cos(baseAngle);
                 dy = speed * Math.sin(baseAngle);
@@ -351,21 +624,42 @@ public class Ball extends MovableObject implements IBall {
         }
     }
 
+    /**
+     * (Helper) Giới hạn tốc độ tối đa của bóng.
+     * <p>
+     * <b>Định nghĩa:</b> Kiểm tra nếu tổng tốc độ
+     * (currentSpeed) vượt quá {@code BALL_MAX_SPEED}.
+     * <p>
+     * <b>Expected:</b> Vận tốc (dx, dy)
+     * được điều chỉnh (giảm)
+     * nếu bóng vượt quá tốc độ tối đa,
+     * và {@code speed} được cập nhật.
+     */
     private void limitMaximumSpeed() {
         double currentSpeedSq = dx * dx + dy * dy;
         double maxSpeedSq = GameConstants.BALL_MAX_SPEED * GameConstants.BALL_MAX_SPEED;
 
         if (currentSpeedSq > maxSpeedSq) {
             double currentSpeed = Math.sqrt(currentSpeedSq);
-            // Giảm tỷ lệ dx và dy để đưa về tốc độ tối đa
             double factor = GameConstants.BALL_MAX_SPEED / currentSpeed;
             dx *= factor;
             dy *= factor;
-            // Cập nhật lại biến speed nội bộ cho nhất quán
             speed = GameConstants.BALL_MAX_SPEED;
         }
     }
 
+    /**
+     * (Helper) Cập nhật vector vận tốc (dx, dy)
+     * để khớp với tốc độ ({@code speed}) cơ sở.
+     * <p>
+     * <b>Định nghĩa:</b> Tính toán lại (normalize và scale)
+     * {@code dx} và {@code dy}
+     * dựa trên giá trị {@code speed} hiện tại.
+     * <p>
+     * <b>Expected:</b> Hướng di chuyển (vector) được giữ nguyên,
+     * nhưng độ lớn (magnitude) của vector
+     * bằng với {@code speed}.
+     */
     private void updateVelocityWithSpeed() {
         if (!attachedToPaddle) {
             double currentSpeed = Math.sqrt(dx * dx + dy * dy);
@@ -374,8 +668,7 @@ public class Ball extends MovableObject implements IBall {
                 dx *= factor;
                 dy *= factor;
             } else if (speed > 0) {
-                // Nếu đang đứng yên (ví dụ sau reset) và speed > 0, tính lại dx/dy
-                // Có thể cần logic khác ở đây tùy thuộc vào cách bạn muốn xử lý
+
             }
         }
     }

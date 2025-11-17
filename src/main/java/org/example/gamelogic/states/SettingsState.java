@@ -18,6 +18,13 @@ import org.example.gamelogic.strategy.transition.button.WipeElementTransitionStr
 import org.example.gamelogic.strategy.transition.window.HologramTransitionStrategy;
 import org.example.gamelogic.strategy.transition.window.ITransitionStrategy;
 
+/**
+ * Quản lý trạng thái "Cài đặt" (Settings) của game.
+ * <p>
+ * Lớp này chịu trách nhiệm hiển thị cửa sổ cài đặt,
+ * cho phép người dùng điều chỉnh âm lượng (nhạc, SFX),
+ * bật/tắt âm thanh, chọn nhạc nền và quay lại trạng thái trước đó.
+ */
 public final class SettingsState implements GameState {
     private GameState previousState;
     private Window window;
@@ -41,6 +48,21 @@ public final class SettingsState implements GameState {
     private final String[] musicTracks = {"music_1", "music_2", "music_3"};
     private int currentMusicIndex = 0;
 
+    /**
+     * Khởi tạo trạng thái Settings.
+     * <p>
+     * <b>Định nghĩa:</b> Lưu trạng thái game trước đó (để quay lại).
+     * Tải tài nguyên (font, ảnh) và khởi tạo {@link Window}
+     * cùng tất cả các nút bấm, thanh trượt (Slider),
+     * và nhãn (Label) cho giao diện cài đặt.
+     * <p>
+     * <b>Expected:</b> Một cửa sổ cài đặt được khởi tạo
+     * với các giá trị hiện tại từ {@link SettingsManager}
+     * và sẵn sàng cho hiệu ứng chuyển cảnh (transition).
+     *
+     * @param previousState Trạng thái game ngay trước khi mở Cài đặt
+     * (thường là PlayingState hoặc MainMenuState).
+     */
     public SettingsState(GameState previousState) {
         this.previousState = previousState;
 
@@ -144,12 +166,34 @@ public final class SettingsState implements GameState {
         this.window.addButton(musicDisplayLabel);
     }
 
+    /**
+     * Cập nhật trạng thái Cài đặt.
+     * <p>
+     * <b>Định nghĩa:</b> Cập nhật âm lượng (để áp dụng thay đổi từ thanh trượt).
+     * Cập nhật logic của {@link Window} (chủ yếu là hiệu ứng transition).
+     * <p>
+     * <b>Expected:</b> Trạng thái của cửa sổ và âm lượng được cập nhật
+     * theo thời gian ({@code deltaTime}).
+     *
+     * @param deltaTime Thời gian (giây) kể từ frame trước.
+     */
     @Override
     public void update(double deltaTime) {
         SoundManager.getInstance().updateAllVolumes();
         window.update(deltaTime);
     }
 
+    /**
+     * Vẽ (render) trạng thái Cài đặt lên canvas.
+     * <p>
+     * <b>Định nghĩa:</b> Vẽ ảnh nền Cài đặt (nếu có).
+     * Sau đó, gọi {@code window.render(gc)} để vẽ cửa sổ
+     * và tất cả các thành phần con (nút, thanh trượt) của nó.
+     * <p>
+     * <b>Expected:</b> Giao diện cài đặt được vẽ lên màn hình.
+     *
+     * @param gc Context (bút vẽ) của canvas.
+     */
     @Override
     public void render(GraphicsContext gc) {
         SettingsManager settings = SettingsManager.getInstance();
@@ -161,6 +205,20 @@ public final class SettingsState implements GameState {
         window.render(gc);
     }
 
+    /**
+     * Xử lý input (click chuột, kéo thanh trượt) của người dùng.
+     * <p>
+     * <b>Định nghĩa:</b> Ủy quyền xử lý input cho {@code window}.
+     * Kiểm tra trạng thái (isClicked, getValue) của các nút và thanh trượt
+     * để cập nhật cài đặt trong {@link SettingsManager}
+     * và phát âm thanh qua {@link SoundManager}.
+     * <p>
+     * <b>Expected:</b> Các cài đặt (âm lượng, bật/tắt, nhạc nền)
+     * được cập nhật theo tương tác của người dùng.
+     * Phát sự kiện {@link ChangeStateEvent} khi nhấn nút "Back".
+     *
+     * @param input Nguồn cung cấp input (phím, chuột).
+     */
     @Override
     public void handleInput(I_InputProvider input) {
         if (input == null) return;
@@ -230,6 +288,17 @@ public final class SettingsState implements GameState {
         }
     }
 
+    /**
+     * Lấy về trạng thái game trước đó.
+     * <p>
+     * <b>Định nghĩa:</b> Trả về đối tượng GameState đã được lưu khi
+     * khởi tạo SettingsState.
+     * <p>
+     * <b>Expected:</b> Trạng thái game (VD: PlayingState)
+     * mà từ đó Settings được mở.
+     *
+     * @return GameState Trạng thái game trước đó.
+     */
     public GameState getPreviousState() {
         return this.previousState;
     }

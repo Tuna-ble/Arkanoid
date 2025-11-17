@@ -5,8 +5,10 @@ import javafx.scene.image.Image;
 import org.example.config.GameConstants;
 
 /**
- * Điều khiển hoạt ảnh theo hàng (row) trong sprite sheet.
- * Dùng cho animation power-up hoặc hiệu ứng có nhiều frame nằm trên cùng một hàng.
+ * Quản lý và render một hoạt ảnh dựa trên một hàng (row) của spritesheet.
+ * <p>
+ * Lớp này xử lý việc chọn đúng frame từ một hàng cụ thể trên ảnh spritesheet
+ * và vẽ nó lên canvas.
  */
 public class RowAnimation {
     private final Image spriteSheet;
@@ -23,12 +25,17 @@ public class RowAnimation {
     private final double SPRITE_PADDING = GameConstants.POWERUP_SPRITE_PADDING;
 
     /**
-     * Tạo hoạt ảnh sử dụng một hàng trong sprite sheet.
+     * Khởi tạo đối tượng hoạt ảnh hàng.
+     * <p>
+     * <b>Định nghĩa:</b> Lưu trữ spritesheet và các thông số (hàng,
+     * số frame, thời lượng) của hoạt ảnh.
+     * <p>
+     * <b>Expected:</b> Đối tượng được tạo, sẵn sàng chạy hoạt ảnh từ frame 0.
      *
-     * @param spriteSheet   ảnh sprite sheet chứa các frame
-     * @param spriteRow     hàng (row) chứa animation
-     * @param totalFrames   tổng số frame trong animation
-     * @param frameDuration thời gian hiển thị mỗi frame (giây)
+     * @param spriteSheet   Ảnh spritesheet chứa tất cả frame.
+     * @param spriteRow     Chỉ số của hàng (Y) cần lấy frame.
+     * @param totalFrames   Tổng số frame trong hàng đó.
+     * @param frameDuration Thời gian (giây) mà mỗi frame được hiển thị.
      */
     public RowAnimation(Image spriteSheet, int spriteRow, int totalFrames, double frameDuration) {
         this.spriteSheet = spriteSheet;
@@ -38,9 +45,15 @@ public class RowAnimation {
     }
 
     /**
-     * Cập nhật frame theo thời gian.
+     * Cập nhật logic hoạt ảnh.
+     * <p>
+     * <b>Định nghĩa:</b> Tính toán thời gian trôi qua (`deltaTime`) để
+     * quyết định khi nào cần chuyển sang frame tiếp theo.
+     * <p>
+     * <b>Expected:</b> `currentFrame` được cập nhật (tăng lên 1 hoặc quay về 0)
+     * nếu `frameTimer` vượt quá `frameDuration`.
      *
-     * @param deltaTime thời gian trôi qua giữa hai cập nhật (giây)
+     * @param deltaTime Thời gian (giây) kể từ lần update cuối cùng.
      */
     public void update(double deltaTime) {
         frameTimer += deltaTime;
@@ -51,13 +64,19 @@ public class RowAnimation {
     }
 
     /**
-     * Vẽ frame hiện tại của animation lên canvas.
+     * Vẽ frame hiện tại của hoạt ảnh lên canvas.
+     * <p>
+     * <b>Định nghĩa:</b> "Cắt" (lấy) hình ảnh của frame hiện tại
+     * (`currentFrame`) từ `spriteSheet` và vẽ nó lên `gc`.
+     * <p>
+     * <b>Expected:</b> Frame hoạt ảnh hiện tại được vẽ tại vị trí (x, y)
+     * với kích thước (w, h) trên canvas.
      *
-     * @param gc context để vẽ lên
-     * @param x  vị trí X để vẽ
-     * @param y  vị trí Y để vẽ
-     * @param w  chiều rộng hiển thị
-     * @param h  chiều cao hiển thị
+     * @param gc Context để vẽ.
+     * @param x  Tọa độ X đích (trên canvas).
+     * @param y  Tọa độ Y đích (trên canvas).
+     * @param w  Chiều rộng đích (trên canvas).
+     * @param h  Chiều cao đích (trên canvas).
      */
     public void render(GraphicsContext gc, double x, double y, double w, double h) {
         if (spriteSheet == null) return;

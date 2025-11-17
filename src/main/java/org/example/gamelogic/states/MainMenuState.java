@@ -21,6 +21,13 @@ import org.example.gamelogic.graphics.buttons.AbstractButton;
 import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
+/**
+ * Quản lý trạng thái "Menu Chính" (Main Menu) của game.
+ * <p>
+ * Lớp này chịu trách nhiệm hiển thị các tùy chọn menu chính
+ * (Start, Ranking, Settings, Reset) và xử lý input để
+ * chuyển sang các trạng thái khác.
+ */
 public final class MainMenuState implements GameState {
     private Image mainMenuImage;
     private Image normalImage;
@@ -33,6 +40,16 @@ public final class MainMenuState implements GameState {
     private final double centerX = GameConstants.SCREEN_WIDTH / 2.0;
     private final double baseY = GameConstants.SCREEN_HEIGHT / 2.0 - 100;
 
+    /**
+     * Khởi tạo trạng thái Main Menu.
+     * <p>
+     * <b>Định nghĩa:</b> Tải tài nguyên (ảnh nền, ảnh nút)
+     * từ {@link AssetManager} và khởi tạo các đối tượng {@link Button}
+     * cho các tùy chọn menu.
+     * <p>
+     * <b>Expected:</b> Trạng thái sẵn sàng để update và render,
+     * các nút bấm được tạo và định vị.
+     */
     public MainMenuState() {
         AssetManager am = AssetManager.getInstance();
         this.mainMenuImage = am.getImage("mainMenu");
@@ -50,11 +67,31 @@ public final class MainMenuState implements GameState {
                 baseY + (buttonGap * 3), normalImage, hoveredImage, "Reset Game");
     }
 
+    /**
+     * Cập nhật trạng thái Main Menu.
+     * <p>
+     * <b>Định nghĩa:</b> Tăng {@code elapsedTime} (thời gian trôi qua)
+     * dựa trên {@code deltaTime} để dùng cho hoạt ảnh.
+     * <p>
+     * <b>Expected:</b> {@code elapsedTime} được cập nhật.
+     *
+     * @param deltaTime Thời gian (giây) kể từ frame trước.
+     */
     @Override
     public void update(double deltaTime) {
         elapsedTime += deltaTime;
     }
 
+    /**
+     * Vẽ (render) trạng thái Main Menu lên canvas.
+     * <p>
+     * <b>Định nghĩa:</b> Vẽ ảnh nền, tiêu đề game "ARKANOID"
+     * (với hiệu ứng), tất cả các nút bấm, và gợi ý "Press ESC to Exit".
+     * <p>
+     * <b>Expected:</b> Giao diện menu chính được hiển thị đầy đủ.
+     *
+     * @param gc Context (bút vẽ) của canvas.
+     */
     @Override
     public void render(GraphicsContext gc) {
         gc.setTransform(new Affine());
@@ -103,10 +140,23 @@ public final class MainMenuState implements GameState {
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
+    /**
+     * Xử lý input (click chuột, phím) của người dùng.
+     * <p>
+     * <b>Định nghĩa:</b> Gọi {@code updateButtons} để cập nhật trạng thái nút.
+     * Kiểm tra click chuột hoặc nhấn phím (SPACE, ESC)
+     * để xử lý lựa chọn của người dùng.
+     * <p>
+     * <b>Expected:</b> Phát sự kiện {@link ChangeStateEvent}
+     * (để chuyển sang GAME_MODE, RANKING, SETTINGS, CONFIRM_RESET)
+     * hoặc thoát game (System.exit) khi có input tương ứng.
+     *
+     * @param inputProvider Nguồn cung cấp input (phím, chuột).
+     */
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
-        
+
         updateButtons(inputProvider);
 
         if ((startButton != null && startButton.isClicked())
@@ -131,6 +181,16 @@ public final class MainMenuState implements GameState {
         }
     }
 
+    /**
+     * (Helper) Cập nhật trạng thái (hover, click) cho tất cả các nút bấm.
+     * <p>
+     * <b>Định nghĩa:</b> Gọi {@code handleInput} trên từng đối tượng nút.
+     * <p>
+     * <b>Expected:</b> Trạng thái của các nút
+     * được cập nhật theo input của người dùng.
+     *
+     * @param inputProvider Nguồn cung cấp input (phím, chuột).
+     */
     private void updateButtons(I_InputProvider inputProvider) {
         if (startButton != null) startButton.handleInput(inputProvider);
         if (rankingButton != null) rankingButton.handleInput(inputProvider);
@@ -138,5 +198,3 @@ public final class MainMenuState implements GameState {
         if (newGameButton != null) newGameButton.handleInput(inputProvider);
     }
 }
-
-

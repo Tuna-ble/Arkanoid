@@ -23,6 +23,14 @@ import org.example.gamelogic.strategy.transition.window.ITransitionStrategy;
 import org.example.gamelogic.strategy.transition.window.ScrollDownTransitionStrategy;
 import java.util.Map;
 
+/**
+ * Quản lý trạng thái "Chế độ Vô Tận" (Infinite Mode).
+ * <p>
+ * Lớp này hiển thị một cửa sổ (Window) cho phép người chơi
+ * bắt đầu Chế độ Vô Tận. Nó kiểm tra xem có "session"
+ * (wave đang chơi) hoặc "save" (lưu trong level) hay không
+ * để hiển thị các tùy chọn "Continue", "New Game" hoặc "Back".
+ */
 public final class InfiniteModeState implements GameState {
 
     private final Image background;
@@ -41,6 +49,20 @@ public final class InfiniteModeState implements GameState {
     private int savedWave = 1;
     private boolean hasSession = false;
 
+    /**
+     * Khởi tạo trạng thái Chế độ Vô Tận.
+     * <p>
+     * <b>Định nghĩa:</b> Tải tài nguyên (ảnh, font).
+     * Tải (load) dữ liệu {@link ProgressManager} và
+     * {@link SaveGameRepository} để kiểm tra trạng thái lưu.
+     * Khởi tạo {@link Window} và các nút bấm
+     * (Continue/New Game/Back)
+     * dựa trên việc có tồn tại save hay không.
+     * <p>
+     * <b>Expected:</b> Trạng thái sẵn sàng update/render,
+     * các nút bấm được hiển thị chính xác
+     * theo dữ liệu save của người chơi.
+     */
     public InfiniteModeState() {
         AssetManager am = AssetManager.getInstance();
 
@@ -122,11 +144,33 @@ public final class InfiniteModeState implements GameState {
         }
     }
 
+    /**
+     * Cập nhật trạng thái.
+     * <p>
+     * <b>Định nghĩa:</b> Ủy quyền (delegate) logic update
+     * cho {@link Window} (để chạy transition).
+     * <p>
+     * <b>Expected:</b> Hiệu ứng transition của cửa sổ được cập nhật.
+     *
+     * @param deltaTime Thời gian (giây) kể từ frame trước.
+     */
     @Override
     public void update(double deltaTime) {
         window.update(deltaTime);
     }
 
+    /**
+     * Vẽ (render) trạng thái Chế độ Vô Tận.
+     * <p>
+     * <b>Định nghĩa:</b> Vẽ ảnh nền, sau đó gọi {@code window.render()}.
+     * Nếu transition hoàn tất, vẽ văn bản thông tin
+     * (ví dụ: "Continue your progress...")
+     * lên trên panel thông tin.
+     * <p>
+     * <b>Expected:</b> Giao diện Chế độ Vô Tận được hiển thị đầy đủ.
+     *
+     * @param gc Context (bút vẽ) của canvas.
+     */
     @Override
     public void render(GraphicsContext gc) {
         gc.drawImage(background, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
@@ -160,6 +204,20 @@ public final class InfiniteModeState implements GameState {
         }
     }
 
+    /**
+     * Xử lý input (click chuột) của người dùng.
+     * <p>
+     * <b>Định nghĩa:</b> Ủy quyền (delegate) xử lý input cho {@link Window}.
+     * Kiểm tra click cho các nút ("Start", "New Game", "Back").
+     * <p>
+     * <b>Expected:</b> Phát sự kiện {@link ChangeStateEvent} (GAME_MODE)
+     * khi click "Back".
+     * Tải game (nếu có save) hoặc
+     * bắt đầu game mới (gọi {@link #startSession(boolean)})
+     * khi click "Start" hoặc "New Game".
+     *
+     * @param inputProvider Nguồn cung cấp input (phím, chuột).
+     */
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
@@ -201,6 +259,19 @@ public final class InfiniteModeState implements GameState {
         }
     }
 
+    /**
+     * (Helper) Bắt đầu một phiên (session) chơi mới.
+     * <p>
+     * <b>Định nghĩa:</b> Xóa session và save cũ
+     * nếu {@code reset} là true.
+     * Phát sự kiện để chuyển sang trạng thái {@code PLAYING}.
+     * <p>
+     * <b>Expected:</b> Phát sự kiện {@link ChangeStateEvent}
+     * (PLAYING). Dữ liệu cũ bị xóa nếu {@code reset} là true.
+     *
+     * @param reset True nếu muốn xóa toàn bộ tiến trình
+     * (session và save) trước khi bắt đầu.
+     */
     private void startSession(boolean reset) {
         if (reset) {
             ProgressManager.clearSession("INFINITE");

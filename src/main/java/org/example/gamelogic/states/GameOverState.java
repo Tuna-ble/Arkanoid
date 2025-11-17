@@ -19,6 +19,12 @@ import org.example.gamelogic.graphics.buttons.AbstractButton;
 import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
+/**
+ * Quản lý trạng thái "Thua Cuộc" (Game Over) của game.
+ * <p>
+ * Lớp này chịu trách nhiệm hiển thị màn hình Game Over,
+ * điểm số cuối cùng, và các tùy chọn (Restart, Menu, Exit).
+ */
 public final class GameOverState implements GameState {
     private Image gameOverGif;
     private final int levelToRestart;
@@ -33,6 +39,20 @@ public final class GameOverState implements GameState {
 
     private final double FADE_IN_DURATION = 1.5;
 
+    /**
+     * Khởi tạo trạng thái Game Over.
+     * <p>
+     * <b>Định nghĩa:</b> Lưu lại level ({@code levelToRestart})
+     * để người chơi có thể bắt đầu lại.
+     * Tải tài nguyên (ảnh, font) và khởi tạo các nút bấm
+     * (Restart, Menu, Exit).
+     * <p>
+     * <b>Expected:</b> Trạng thái sẵn sàng để update và render,
+     * các nút bấm được tạo và định vị.
+     *
+     * @param levelToRestart Level mà người chơi sẽ bắt đầu lại
+     * nếu chọn "Restart".
+     */
     public GameOverState(int levelToRestart) {
         this.levelToRestart = levelToRestart;
 
@@ -57,11 +77,33 @@ public final class GameOverState implements GameState {
                 "Exit");
     }
 
+    /**
+     * Cập nhật trạng thái Game Over.
+     * <p>
+     * <b>Định nghĩa:</b> Tăng {@code elapsedTime} (thời gian trôi qua)
+     * dựa trên {@code deltaTime} để dùng cho hoạt ảnh (fade-in, hiệu ứng).
+     * <p>
+     * <b>Expected:</b> {@code elapsedTime} được cập nhật.
+     *
+     * @param deltaTime Thời gian (giây) kể từ frame trước.
+     */
     @Override
     public void update(double deltaTime) {
         elapsedTime += deltaTime;
     }
 
+    /**
+     * Vẽ (render) trạng thái Game Over lên canvas.
+     * <p>
+     * <b>Định nghĩa:</b> Vẽ ảnh nền, hiệu ứng scanline (đường kẻ).
+     * Vẽ tiêu đề "GAME OVER" và điểm số (với hiệu ứng glitch, fade-in).
+     * Vẽ các nút bấm (Restart, Menu, Exit) sau khi hiệu ứng fade-in hoàn tất.
+     * <p>
+     * <b>Expected:</b> Giao diện Game Over được hiển thị đầy đủ
+     * với các hiệu ứng.
+     *
+     * @param gc Context (bút vẽ) của canvas.
+     */
     @Override
     public void render(GraphicsContext gc) {
         gc.drawImage(gameOverGif, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
@@ -138,6 +180,19 @@ public final class GameOverState implements GameState {
     }
 
 
+    /**
+     * Xử lý input (click chuột) của người dùng.
+     * <p>
+     * <b>Định nghĩa:</b> Chặn input nếu hiệu ứng fade-in chưa hoàn tất.
+     * Gọi {@code updateButtons} để cập nhật trạng thái nút.
+     * Kiểm tra click cho từng nút (Restart, Menu, Exit).
+     * <p>
+     * <b>Expected:</b> Phát sự kiện {@link ChangeStateEvent}
+     * (PLAYING, MAIN_MENU) hoặc thoát game (System.exit)
+     * khi nút tương ứng được click.
+     *
+     * @param inputProvider Nguồn cung cấp input (phím, chuột).
+     */
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
@@ -148,7 +203,7 @@ public final class GameOverState implements GameState {
 
         // Update buttons to check hover and click states
         updateButtons(inputProvider);
-        
+
         // Handle button clicks
         if (restartButton != null && restartButton.isClicked()) {
             EventManager.getInstance().publish(
@@ -163,6 +218,16 @@ public final class GameOverState implements GameState {
         }
     }
 
+    /**
+     * (Helper) Cập nhật trạng thái (hover, click) cho tất cả các nút bấm.
+     * <p>
+     * <b>Định nghĩa:</b> Gọi {@code handleInput} trên từng đối tượng nút.
+     * <p>
+     * <b>Expected:</b> Trạng thái của các nút
+     * được cập nhật theo input của người dùng.
+     *
+     * @param inputProvider Nguồn cung cấp input (phím, chuột).
+     */
     private void updateButtons(I_InputProvider inputProvider) {
         if (restartButton != null) restartButton.handleInput(inputProvider);
         if (menuButton != null) menuButton.handleInput(inputProvider);
