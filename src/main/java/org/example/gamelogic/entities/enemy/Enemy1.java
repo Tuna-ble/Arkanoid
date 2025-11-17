@@ -5,6 +5,8 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
 import org.example.data.AssetManager;
+import org.example.gamelogic.core.EventManager;
+import org.example.gamelogic.events.EnemyDestroyedEvent;
 import org.example.gamelogic.strategy.movement.DownMovementStrategy;
 import org.example.presentation.SpriteAnimation;
 
@@ -67,6 +69,7 @@ public class Enemy1 extends AbstractEnemy {
             return;
         }
         this.lifeState = LifeState.DYING;
+        EventManager.getInstance().publish(new EnemyDestroyedEvent(this));
         if (explosionAnim != null) {
             explosionAnim.reset();
         }

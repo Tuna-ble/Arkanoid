@@ -1,8 +1,10 @@
 package org.example.gamelogic.strategy.bossbehavior;
 
 import javafx.scene.paint.Color;
+import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.ParticleManager;
 import org.example.gamelogic.entities.enemy.Boss;
+import org.example.gamelogic.events.EnemyDestroyedEvent;
 
 import java.util.Random;
 
@@ -19,6 +21,7 @@ public class BossDyingStrategy implements BossBehaviorStrategy {
 
     @Override
     public void update(Boss boss, double deltaTime) {
+        EventManager.getInstance().publish(new EnemyDestroyedEvent(boss));
         boss.setDx(0);
         boss.setDy(0);
 

@@ -93,6 +93,7 @@ public class AssetManager {
 
             loadImage("frame", "/images/GameFrame.png");
             loadImage("pause", "/images/pause.png");
+            loadImage("hud", "/images/hud.png");
 
             loadImage("mainMenu", "/images/mainMenu.png"); //
             loadImage("ranking", "/images/ranking.png"); //

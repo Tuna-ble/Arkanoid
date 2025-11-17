@@ -5,9 +5,11 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import org.example.config.GameConstants;
 import org.example.data.AssetManager;
+import org.example.gamelogic.core.EventManager;
 import org.example.gamelogic.core.LaserManager;
 import org.example.gamelogic.entities.BulletFrom;
 import org.example.gamelogic.entities.BulletType;
+import org.example.gamelogic.events.EnemyDestroyedEvent;
 import org.example.gamelogic.strategy.movement.DashMovementStrategy;
 import org.example.gamelogic.strategy.movement.DownMovementStrategy;
 import org.example.gamelogic.strategy.movement.LRMovementStrategy;
@@ -73,6 +75,7 @@ public class BossMinion extends AbstractEnemy {
             return;
         }
         this.lifeState = LifeState.DYING;
+        EventManager.getInstance().publish(new EnemyDestroyedEvent(this));
         if (explosionAnim != null) {
             explosionAnim.reset();
         }
