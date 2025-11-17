@@ -12,11 +12,22 @@ import org.example.data.SavedGameState;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Quản lý kẻ địch: tạo, spawn, cập nhật, render và lưu/khôi phục trạng thái kẻ địch.
+ *
+ * <p>Cung cấp API để spawn kẻ địch theo loại, cập nhật luồng spawn cho từng chế độ chơi
+ * và truy xuất danh sách kẻ địch đang hoạt động.
+ */
 public final class EnemyManager {
     private static class SingletonHolder {
         private static final EnemyManager INSTANCE = new EnemyManager();
     }
 
+    /**
+     * Lấy instance đơn của EnemyManager.
+     *
+     * @return singleton EnemyManager
+     */
     public static EnemyManager getInstance() {
         return SingletonHolder.INSTANCE;
     }
@@ -37,6 +48,9 @@ public final class EnemyManager {
     private int currentLevelNumber;
     private boolean bossSpawned;
 
+    /**
+     * Khởi tạo EnemyManager: đăng ký prototype và khởi tạo factory.
+     */
     public EnemyManager() {
         EnemyRegistry registry = EnemyRegistry.getInstance();
         registerEnemyPrototypes(registry);
@@ -44,16 +58,28 @@ public final class EnemyManager {
         this.bossSpawned = false;
     }
 
+    /**
+     * Đăng ký prototype cho các loại enemy vào registry (dùng bởi EnemyFactory sau này).
+     *
+     * @param enemyRegistry registry để đăng ký prototype
+     */
     private void registerEnemyPrototypes(EnemyRegistry enemyRegistry) {
-        enemyRegistry.register("E1", new Enemy1(0.0, 0.0, GameConstants.ENEMY_WIDTH,
-                GameConstants.ENEMY_HEIGHT, 25.0, 50.0));
-        enemyRegistry.register("E2", new Enemy2(0.0, 0.0, GameConstants.ENEMY_WIDTH,
-                GameConstants.ENEMY_HEIGHT, 25.0, 50.0));
-        enemyRegistry.register("MINION", new BossMinion(0.0, 0.0, GameConstants.MINION_WIDTH,
-                GameConstants.MINION_HEIGHT, 25.0, 50.0));
-        enemyRegistry.register("BOSS", new Boss(0, 0, 0, 100));
+    enemyRegistry.register("E1", new Enemy1(0.0, 0.0, GameConstants.ENEMY_WIDTH,
+        GameConstants.ENEMY_HEIGHT, 25.0, 50.0));
+    enemyRegistry.register("E2", new Enemy2(0.0, 0.0, GameConstants.ENEMY_WIDTH,
+        GameConstants.ENEMY_HEIGHT, 25.0, 50.0));
+    enemyRegistry.register("MINION", new BossMinion(0.0, 0.0, GameConstants.MINION_WIDTH,
+        GameConstants.MINION_HEIGHT, 25.0, 50.0));
+    enemyRegistry.register("BOSS", new Boss(0, 0, 0, 100));
     }
 
+    /**
+     * Spawn một kẻ địch cụ thể tại toạ độ center.
+     *
+     * @param type mã loại kẻ địch (ví dụ "E1", "BOSS")
+     * @param centerX toạ độ x trung tâm spawn
+     * @param centerY toạ độ y trung tâm spawn
+     */
     public void spawnEnemy(String type, double centerX, double centerY) {
         Enemy newEnemy = enemyFactory.createEnemy(type, 0, 0);
 
@@ -76,6 +102,11 @@ public final class EnemyManager {
         }
     }
 
+    /**
+     * Spawn một kẻ địch ở vị trí bắt đầu ngẫu nhiên phía trên màn hình.
+     *
+     * @param type mã loại kẻ địch
+     */
     public void spawnEnemy(String type) {
         Enemy newEnemy = enemyFactory.createEnemy(type, 0, 0);
 
@@ -95,6 +126,12 @@ public final class EnemyManager {
         }
     }
 
+    /**
+     * Chuẩn bị script level (thiết lập chế độ chơi và số level để spawn enemy).
+     *
+     * @param currentGameMode chế độ chơi hiện tại
+     * @param levelNumber số level hiện tại
+     */
     public void loadLevelScript(GameModeEnum currentGameMode, int levelNumber) {
         this.currentGameMode = currentGameMode;
         this.currentLevelNumber = levelNumber;
@@ -105,10 +142,20 @@ public final class EnemyManager {
         this.activeEnemies.clear();
     }
 
+    /**
+     * Đặt tham chiếu đến BrickManager (nếu cần kiểm tra trạng thái gạch khi spawn boss).
+     *
+     * @param brickManager instance của BrickManager
+     */
     public void setBrickManager(BrickManager brickManager) {
         this.brickManager = brickManager;
     }
 
+    /**
+     * Cập nhật trạng thái kẻ địch, xử lý spawn theo script/điều kiện.
+     *
+     * @param deltaTime thời gian (giây) kể từ lần cập nhật trước
+     */
     public void update(double deltaTime) {
         levelTimer += deltaTime;
 
@@ -126,6 +173,9 @@ public final class EnemyManager {
         processSpawnQueue();
     }
 
+    /**
+     * Cập nhật logic spawn dành cho chế độ LEVEL (theo số level cụ thể).
+     */
     private void updateLevelMode() {
         switch (currentLevelNumber) {
             case 2:
@@ -152,6 +202,9 @@ public final class EnemyManager {
         }
     }
 
+    /**
+     * Cập nhật logic spawn dành cho chế độ INFINITE.
+     */
     private void updateInfiniteMode() {
         if (currentLevelNumber % 2 == 0 && currentLevelNumber % 10 != 0) {
             if (levelTimer > 5.0 && enemiesSpawned < 10) {
@@ -166,6 +219,9 @@ public final class EnemyManager {
         }
     }
 
+    /**
+     * Xử lý hàng chờ spawn: chuyển các enemy đã sinh vào danh sách active.
+     */
     private void processSpawnQueue() {
         if (!enemiesToSpawn.isEmpty()) {
             activeEnemies.addAll(enemiesToSpawn);
@@ -173,20 +229,38 @@ public final class EnemyManager {
         }
     }
 
+    /**
+     * Vẽ tất cả kẻ địch hiện hoạt lên canvas.
+     *
+     * @param gc GraphicsContext của canvas (kỳ vọng không null)
+     */
     public void render(GraphicsContext gc) {
         for (Enemy enemy : activeEnemies) {
             enemy.render(gc);
         }
     }
 
+    /**
+     * Xóa danh sách kẻ địch đang hoạt động.
+     */
     public void clear() {
         activeEnemies.clear();
     }
 
+    /**
+     * Lấy danh sách kẻ địch đang hoạt động.
+     *
+     * @return danh sách Enemy (mutable)
+     */
     public List<Enemy> getActiveEnemies() {
         return activeEnemies;
     }
 
+    /**
+     * Kiểm tra xem boss còn tồn tại trong danh sách kẻ địch hay không.
+     *
+     * @return true nếu không còn boss; false nếu vẫn còn
+     */
     public boolean isBossDefeated() {
         for (Enemy enemy : activeEnemies) {
             if (enemy instanceof Boss) {
@@ -196,10 +270,20 @@ public final class EnemyManager {
         return true;
     }
 
+    /**
+     * Kiểm tra đã từng spawn boss trong level hiện tại chưa.
+     *
+     * @return true nếu boss đã spawn; false nếu chưa
+     */
     public boolean hasBossSpawned() {
         return this.bossSpawned;
     }
 
+    /**
+     * Cập nhật chỉ cho boss (dùng khi chỉ boss cần được xử lý).
+     *
+     * @param deltaTime thời gian (giây) kể từ lần cập nhật trước
+     */
     public void updateBossOnly(double deltaTime) {
         processSpawnQueue();
         activeEnemies.removeIf(Enemy::isDestroyed);
@@ -211,6 +295,11 @@ public final class EnemyManager {
         }
     }
 
+    /**
+     * Kiểm tra boss đã vào màn hình (ready) chưa.
+     *
+     * @return true nếu boss đã vào màn hình; false ngược lại
+     */
     public boolean isBossReady() {
         for (Enemy enemy : activeEnemies) {
             if (enemy instanceof Boss) {
@@ -220,6 +309,11 @@ public final class EnemyManager {
         return false;
     }
 
+    /**
+     * Kiểm tra boss đang ở trạng thái dying (theo strategy).
+     *
+     * @return true nếu boss đang chết; false nếu không
+     */
     public boolean isBossDying() {
         for (Enemy enemy : activeEnemies) {
             if (enemy instanceof Boss) {
@@ -232,6 +326,11 @@ public final class EnemyManager {
         return false;
     }
 
+    /**
+     * Chuẩn bị dữ liệu kẻ địch để lưu trạng thái trò chơi.
+     *
+     * @return danh sách EnemyData chứa type, vị trí và máu của từng kẻ địch
+     */
     public List<SavedGameState.EnemyData> getDataToSave() {
         List<SavedGameState.EnemyData> enemyDataList = new ArrayList<>();
         for (Enemy enemy : activeEnemies) {
@@ -246,6 +345,11 @@ public final class EnemyManager {
         return enemyDataList;
     }
 
+    /**
+     * Khôi phục kẻ địch từ dữ liệu đã lưu.
+     *
+     * @param enemyDataList danh sách dữ liệu kẻ địch đã lưu
+     */
     public void loadData(List<SavedGameState.EnemyData> enemyDataList) {
         activeEnemies.clear();
         enemiesToSpawn.clear();

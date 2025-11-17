@@ -24,6 +24,13 @@ public class SaveGameRepository {
         return new File(SAVE_DIRECTORY, fileName);
     }
 
+    /**
+     * Lưu trạng thái game xuống file theo level.
+     *
+     * @param state   dữ liệu SaveGameState cần ghi
+     * @param levelId level tương ứng với file save
+     * @return true nếu lưu thành công, false nếu lỗi I/O
+     */
     public boolean saveGame(SavedGameState state, int levelId) {
         ensureSaveDirectoryExists();
         File saveFile = getSaveFile(levelId);
@@ -42,6 +49,12 @@ public class SaveGameRepository {
         }
     }
 
+    /**
+     * Tải dữ liệu save game từ file của level.
+     *
+     * @param levelId level cần load
+     * @return SaveGameState đã đọc; null nếu file không tồn tại hoặc bị lỗi
+     */
     public SavedGameState loadGame(int levelId) {
         File saveFile = getSaveFile(levelId);
 
@@ -65,6 +78,12 @@ public class SaveGameRepository {
         }
     }
 
+    /**
+     * Xóa file save của level.
+     *
+     * @param levelId level cần xóa save
+     * @return true nếu xóa thành công (hoặc file không tồn tại), false nếu xóa thất bại
+     */
     public boolean deleteSave(int levelId) {
         File saveFile = getSaveFile(levelId);
         if (saveFile.exists()) {

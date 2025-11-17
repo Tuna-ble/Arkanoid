@@ -8,12 +8,23 @@ import java.util.Map;
 import java.util.Properties;
 
 public final class ProgressManager {
+    /**
+     * Quản lý tiến độ và session của người chơi (lưu cục bộ vào file properties trong home directory).
+     *
+     * <p>Các phương thức tĩnh để đọc/ghi stars, session và reset progress.
+     */
+
     private static final String SESSION_FILE_PATH =
             System.getProperty("user.home") + File.separator + ".arkanoid_session.properties";
     private static final String PROGRESS_FILE_PATH =
             System.getProperty("user.home") + File.separator + ".arkanoid_progress.properties";
     private static final int TOTAL_LEVELS = 5;
 
+    /**
+     * Đọc số sao đã đạt cho từng level từ file progress.
+     *
+     * @return map level->stars (chỉ chứa các level có stars > 0)
+     */
     public static Map<Integer, Integer> loadStars() {
         Map<Integer, Integer> starsMap = new HashMap<>();
         Properties props = new Properties();
@@ -38,6 +49,11 @@ public final class ProgressManager {
         return starsMap;
     }
 
+    /**
+     * Lấy mức level tối đa đã mở từ file progress.
+     *
+     * @return level tối đa đã mở (ít nhất 1)
+     */
     public static int getMaxLevelUnlocked() {
         Properties props = new Properties();
         File progressFile = new File(PROGRESS_FILE_PATH);
@@ -54,6 +70,12 @@ public final class ProgressManager {
         return Math.min(maxLevel, TOTAL_LEVELS);
     }
 
+    /**
+     * Lưu tiến độ bất đồng bộ: cập nhật số sao và mở level tiếp theo nếu cần.
+     *
+     * @param levelCompleted level vừa hoàn thành
+     * @param starsAwarded số sao được trao (nên >= 1)
+     */
     public static void saveProgress(int levelCompleted, int starsAwarded) {
         AsyncExecutor.runAsync(() -> {
             if (starsAwarded < 1) return;
@@ -89,6 +111,9 @@ public final class ProgressManager {
         });
     }
 
+    /**
+     * Xóa file progress và session (reset tiến độ chơi).
+     */
     public static void resetProgress() {
         try {
             File progressFile = new File(PROGRESS_FILE_PATH);
@@ -116,6 +141,15 @@ public final class ProgressManager {
         }
     }
 
+    /**
+     * Lưu session hiện tại (bất đồng bộ) cho một chế độ chơi cụ thể.
+     *
+     * @param gameMode tên chế độ chơi (ví dụ "LEVEL" hoặc "INFINITE")
+     * @param currentScore điểm hiện tại
+     * @param elapsedTime thời gian đã chơi (giây)
+     * @param levelNumber số level hiện tại
+     * @param currentLives số mạng hiện tại
+     */
     public static void saveSession(String gameMode, int currentScore, double elapsedTime, int levelNumber, int currentLives) {
         AsyncExecutor.runAsync(() -> {
             File sessionFile = new File(SESSION_FILE_PATH);
@@ -144,6 +178,12 @@ public final class ProgressManager {
         });
     }
 
+    /**
+     * Đọc session đã lưu cho chế độ chơi cụ thể.
+     *
+     * @param gameMode tên chế độ chơi
+     * @return map chứa các giá trị session (score, time, level, lives) dưới dạng string; rỗng nếu không có
+     */
     public static Map<String, String> loadSession(String gameMode) {
         Map<String, String> data = new HashMap<>();
         File sessionFile = new File(SESSION_FILE_PATH);
@@ -168,6 +208,11 @@ public final class ProgressManager {
         return data;
     }
 
+    /**
+     * Xóa session đã lưu cho chế độ chơi chỉ định (bất đồng bộ).
+     *
+     * @param gameMode tên chế độ chơi
+     */
     public static void clearSession(String gameMode) {
         AsyncExecutor.runAsync(() -> {
             File sessionFile = new File(SESSION_FILE_PATH);

@@ -26,6 +26,14 @@ public class SavedGameState implements Serializable {
 
         public BallData() {}
 
+        /**
+         * Tạo dữ liệu bóng với vị trí và vận tốc.
+         *
+         * @param x  vị trí X
+         * @param y  vị trí Y
+         * @param vx vận tốc X
+         * @param vy vận tốc Y
+         */
         public BallData(double x, double y, double vx, double vy) {
             this.x = x;
             this.y = y;
@@ -43,6 +51,13 @@ public class SavedGameState implements Serializable {
 
         public BrickData() {}
 
+        /**
+         * Tạo dữ liệu gạch với thông tin trạng thái.
+         *
+         * @param id         mã loại gạch
+         * @param health     máu còn lại
+         * @param isDestroyed trạng thái gạch đã bị phá hay chưa
+         */
         public BrickData(int id, int health, boolean isDestroyed) {
             this.id = id;
             this.health = health;
@@ -59,6 +74,14 @@ public class SavedGameState implements Serializable {
 
         public EnemyData() {}
 
+        /**
+         * Tạo dữ liệu kẻ địch với vị trí, loại và máu.
+         *
+         * @param type   loại enemy (string key)
+         * @param x      vị trí X
+         * @param y      vị trí Y
+         * @param health lượng máu còn lại
+         */
         public EnemyData(String type, double x, double y, int health) {
             this.type = type;
             this.x = x;

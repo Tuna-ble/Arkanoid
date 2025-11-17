@@ -12,12 +12,33 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+/**
+ * Xử lý va chạm giữa các game object: bóng, paddle, gạch, kẻ địch và tia laser.
+ *
+ * <p>Phương thức công khai chủ yếu là {@link #checkCollisions(...)}; lớp cũng cung cấp
+ * các helper để giải quyết va chạm cụ thể.
+ */
 public final class CollisionManager {
 
+    /**
+     * Tạo mới CollisionManager.
+     *
+     * <p>Hiện tại không cần tham số; constructor để public vì lớp được sử dụng trực tiếp.
+     */
     public CollisionManager() {
 
     }
 
+    /**
+     * Tìm và xử lý va chạm tốt nhất giữa một quả bóng và một danh sách đối tượng Collidable.
+     * Chọn đối tượng có độ "overlap" lớn nhất và đẩy bóng ra ngoài, sau đó gọi callback onHit.
+     *
+     * @param ball quả bóng cần kiểm tra
+     * @param objects danh sách đối tượng có thể va chạm
+     * @param onHit callback được gọi khi xác nhận va chạm (thường để phát sự kiện)
+     * @param <T> kiểu đối tượng Collidable
+     * @return true nếu có va chạm và đã xử lý; false nếu không có va chạm
+     */
     private <T extends Collidable> boolean resolveBallCollision(IBall ball, List<T> objects, BiConsumer<IBall, T> onHit) {
         T bestCollisionObject = null;
         double maxOverlap = -1.0;
@@ -91,6 +112,16 @@ public final class CollisionManager {
         return false;
     }
 
+    /**
+     * Kiểm tra và xử lý tất cả va chạm giữa các đối tượng trò chơi.
+     *
+     * @param balls danh sách bóng hiện tại (kỳ vọng không null)
+     * @param paddle paddle hiện tại (có thể null)
+     * @param bricks danh sách gạch (kỳ vọng không null)
+     * @param fallingPowerUps danh sách power-up rơi (kỳ vọng không null)
+     * @param lasers danh sách tia laser hiện tại (kỳ vọng không null)
+     * @param enemies danh sách kẻ địch (kỳ vọng không null)
+     */
     public void checkCollisions(List<IBall> balls, Paddle paddle, List<Brick> bricks,
                                 List<PowerUp> fallingPowerUps, List<LaserBullet> lasers,
                                 List<Enemy> enemies) {
@@ -122,6 +153,12 @@ public final class CollisionManager {
         checkLaserCollisions(lasers, bricks, enemies, paddle);
     }
 
+    /**
+     * Kiểm tra và xử lý va chạm của quả bóng với biên play area (trái/phải/trên/dưới).
+     * Phát sự kiện tương ứng khi bóng chạm tường hoặc bị mất.
+     *
+     * @param ball quả bóng cần kiểm tra
+     */
     private void checkBallBoundsCollisions(IBall ball) {
         boolean collisionOccurred = false;
 
@@ -154,6 +191,13 @@ public final class CollisionManager {
         }
     }
 
+    /**
+     * Kiểm tra va chạm giữa bóng và paddle; nếu va chạm đúng mặt trên paddle thì
+     * tính toán vị trí va chạm tương đối và ủy quyền cho bóng xử lý.
+     *
+     * @param ball quả bóng
+     * @param paddle paddle (có thể null)
+     */
     private void checkBallPaddleCollision(IBall ball, Paddle paddle) {
         if (paddle != null && ball.getGameObject().intersects(paddle.getGameObject())) {
             boolean hitTopSurface = (ball.getY() + ball.getHeight()) < (paddle.getY() + paddle.getHeight() * 0.5);
@@ -175,6 +219,12 @@ public final class CollisionManager {
         }
     }
 
+    /**
+     * Chọn chế độ xử lý va chạm với gạch tuỳ theo trạng thái piercing của bóng.
+     *
+     * @param ball quả bóng
+     * @param bricks danh sách gạch
+     */
     private void checkBallBrickCollisions(IBall ball, List<Brick> bricks) {
         if (ball.getPierceLeft() > 0) {
             handlePiercingBrickCollision(ball, bricks);
@@ -183,6 +233,13 @@ public final class CollisionManager {
         }
     }
 
+    /**
+     * Xử lý va chạm khi bóng đang ở trạng thái piercing: cho phép xuyên nhiều gạch
+     * và đảm bảo không gây trùng lặp damage trên cùng một gạch.
+     *
+     * @param ball quả bóng
+     * @param bricks danh sách gạch
+     */
     private void handlePiercingBrickCollision(IBall ball, List<Brick> bricks) {
         // ConcurrentModificationException is the worst
         for (Brick brick : bricks) {
@@ -220,12 +277,25 @@ public final class CollisionManager {
         }
     }
 
+    /**
+     * Xử lý va chạm bình thường giữa bóng và gạch (không xuyên), dùng resolveBallCollision.
+     *
+     * @param ball quả bóng
+     * @param bricks danh sách gạch
+     */
     private void handleNormalBrickCollision(IBall ball, List<Brick> bricks) {
         resolveBallCollision(ball, bricks, (theBall, theBrick) -> {
             EventManager.getInstance().publish(new BallHitBrickEvent(theBrick, theBall));
         });
     }
 
+    /**
+     * Kiểm tra va chạm giữa paddle và các power-up rơi; nếu trúng thì publish sự kiện
+     * và đánh dấu power-up đã được thu.
+     *
+     * @param paddle paddle hiện tại (có thể null)
+     * @param fallingPowerUps danh sách power-up rơi
+     */
     private void checkPaddlePowerUpCollisions(Paddle paddle, List<PowerUp> fallingPowerUps) {
         if (paddle == null || fallingPowerUps == null) return;
 
@@ -242,6 +312,15 @@ public final class CollisionManager {
         }
     }
 
+    /**
+     * Kiểm tra va chạm cho các tia laser với gạch, kẻ địch và paddle; xử lý thiệt hại và
+     * vô hiệu hoá tia khi cần.
+     *
+     * @param lasers danh sách tia laser
+     * @param bricks danh sách gạch
+     * @param enemies danh sách kẻ địch
+     * @param paddle paddle (dùng khi tia bắn của kẻ địch có thể chạm paddle)
+     */
     private void checkLaserCollisions(List<LaserBullet> lasers, List<Brick> bricks, List<Enemy> enemies, Paddle paddle) {
         Iterator<LaserBullet> iterator = lasers.iterator();
         while (iterator.hasNext()) {
@@ -278,6 +357,12 @@ public final class CollisionManager {
         }
     }
 
+    /**
+     * Chọn chế độ xử lý va chạm giữa bóng và kẻ địch tuỳ trạng thái piercing.
+     *
+     * @param ball quả bóng
+     * @param enemies danh sách kẻ địch
+     */
     private void checkBallEnemyCollisions(IBall ball, List<Enemy> enemies) {
         if (ball.getPierceLeft() > 0) {
             handlePiercingEnemyCollision(ball, enemies);
@@ -286,6 +371,12 @@ public final class CollisionManager {
         }
     }
 
+    /**
+     * Xử lý va chạm khi bóng có khả năng xuyên kẻ địch (piercing), tương tự như piercing brick.
+     *
+     * @param ball quả bóng
+     * @param enemies danh sách kẻ địch
+     */
     private void handlePiercingEnemyCollision(IBall ball, List<Enemy> enemies) {
         // ConcurrentModificationException is the worst
         for (Enemy enemy : enemies) {
@@ -322,12 +413,26 @@ public final class CollisionManager {
         }
     }
 
+    /**
+     * Xử lý va chạm bình thường giữa bóng và kẻ địch bằng resolveBallCollision.
+     *
+     * @param ball quả bóng
+     * @param enemies danh sách kẻ địch
+     */
     private void handleNormalEnemyCollision(IBall ball, List<Enemy> enemies) {
         resolveBallCollision(ball, enemies, (theBall, theEnemy) -> {
             EventManager.getInstance().publish(new BallHitEnemyEvent(theEnemy, theBall));
         });
     }
 
+    /**
+     * Kiểm tra va chạm giữa một enemy và danh sách gạch; trả về true nếu có va chạm
+     * và đã xử lý vị trí/đảo chiều di chuyển.
+     *
+     * @param enemy kẻ địch cần kiểm tra
+     * @param bricks danh sách gạch
+     * @return true nếu có va chạm và đã được xử lý
+     */
     private boolean checkEnemyBrickCollisions(Enemy enemy, List<Brick> bricks) {
         if ((enemy.getY() + enemy.getHeight()) < GameConstants.TOP_MARGIN) {
             return false;
@@ -396,6 +501,11 @@ public final class CollisionManager {
         return false;
     }
 
+    /**
+     * Kiểm tra và xử lý va chạm của enemy với biên play area (trái/phải/trên).
+     *
+     * @param enemy kẻ địch cần kiểm tra
+     */
     private void checkEnemyBoundsCollisions(Enemy enemy) {
         if (enemy.getX() <= GameConstants.PLAY_AREA_X) {
             enemy.setPosition(GameConstants.PLAY_AREA_X, enemy.getY());
