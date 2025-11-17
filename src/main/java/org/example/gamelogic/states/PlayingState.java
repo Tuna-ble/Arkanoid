@@ -41,13 +41,13 @@ public final class PlayingState implements GameState {
 
     private Image currentBackground;
     private Image bossBackground;
+    private Image hudBackground;
     private double backgroundTransitionTimer = 0.0;
     private final double BACKGROUND_TRANSITION_DURATION = 3.0;
 
     private int currentLives;
     private boolean hasWon = false;
     private Image gameFrameImage;
-    private Image hudFrameImage;
     private double elapsedTime = 0.0;
     private String formattedTime = "00:00";
     private int lastSecond = -1;
@@ -77,7 +77,7 @@ public final class PlayingState implements GameState {
     private final double LEVEL_START_DURATION = 1.5;
 
     private double warningFlashTimer = 0.0;
-    private double warningFlashDuration = 7.0;
+    private double warningFlashDuration = 5.0;
 
     private double bossDyingTimer = 0.0;
     private final double BOSS_DEATH_DURATION = 5.0;
@@ -130,6 +130,7 @@ public final class PlayingState implements GameState {
         this.currentBackground = gameManager.getBackgroundForLevel(this.levelNumber);
         org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
         this.bossBackground = am.getImage("bossBackground");
+        this.hudBackground = am.getImage("hud");
         this.scoreFont = am.getFont("Anxel", 24);
         this.labelFont = am.getFont("Anxel", 18);
         this.valueFont = am.getFont("Anxel", 28);
@@ -142,7 +143,6 @@ public final class PlayingState implements GameState {
         this.levelStartTimer = 0.0;
 
         this.gameFrameImage = am.getImage("frame");
-        this.hudFrameImage = am.getImage("hudFrame");
     }
 
     private void subscribeToEvents() {
@@ -314,46 +314,40 @@ public final class PlayingState implements GameState {
         }
     }
 
-    public void render(javafx.scene.canvas.GraphicsContext gc) {
+    public void render(GraphicsContext gc) {
         gc.setTransform(new Affine());
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
-        gc.setFill(Color.BLACK);
-        gc.fillRect(GameConstants.PLAY_AREA_X + GameConstants.PLAY_AREA_WIDTH + GameConstants.FRAME_RIGHT_BORDER,
-                0,
-                GameConstants.UI_BAR_WIDTH + GameConstants.FRAME_RIGHT_BORDER,
-                GameConstants.SCREEN_HEIGHT);
-
         renderHUD(gc);
-        if (gameFrameImage != null) {
-            gc.drawImage(gameFrameImage, 0, 0,
-                    GameConstants.SCREEN_WIDTH - GameConstants.UI_BAR_WIDTH, GameConstants.SCREEN_HEIGHT);
-        }
 
         gc.save();
         gc.beginPath();
-        gc.rect(GameConstants.PLAY_AREA_X, GameConstants.PLAY_AREA_Y,
-                GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
+        gc.rect(0, 0,
+                GameConstants.SCREEN_WIDTH - GameConstants.UI_BAR_WIDTH,
+                GameConstants.SCREEN_HEIGHT);
         gc.clip();
         if (currentSubState == SubState.BOSS_WARNING && this.bossBackground != null) {
             double alpha = this.backgroundTransitionTimer / BACKGROUND_TRANSITION_DURATION;
 
             if (this.currentBackground != null) {
                 gc.drawImage(this.currentBackground,
-                        GameConstants.PLAY_AREA_X, GameConstants.PLAY_AREA_Y,
-                        GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
+                        0, 0,
+                        GameConstants.SCREEN_WIDTH - GameConstants.UI_BAR_WIDTH,
+                        GameConstants.SCREEN_HEIGHT);
             }
 
             gc.setGlobalAlpha(alpha);
             gc.drawImage(this.bossBackground,
-                    GameConstants.PLAY_AREA_X, GameConstants.PLAY_AREA_Y,
-                    GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
+                    0, 0,
+                    GameConstants.SCREEN_WIDTH - GameConstants.UI_BAR_WIDTH,
+                    GameConstants.SCREEN_HEIGHT);
             gc.setGlobalAlpha(1.0);
 
         } else if (this.currentBackground != null) {
             gc.drawImage(this.currentBackground,
-                    GameConstants.PLAY_AREA_X, GameConstants.PLAY_AREA_Y,
-                    GameConstants.PLAY_AREA_WIDTH, GameConstants.PLAY_AREA_HEIGHT);
+                    0, 0,
+                    GameConstants.SCREEN_WIDTH - GameConstants.UI_BAR_WIDTH,
+                    GameConstants.SCREEN_HEIGHT);
         }
 
         if (currentSubState == SubState.LEVEL_START) {
@@ -372,6 +366,12 @@ public final class PlayingState implements GameState {
         }
 
         gc.restore();
+
+        if (gameFrameImage != null) {
+            gc.drawImage(gameFrameImage, 0, 0,
+                    GameConstants.SCREEN_WIDTH - GameConstants.UI_BAR_WIDTH, GameConstants.SCREEN_HEIGHT);
+        }
+
         renderPauseButton(gc);
 
         if (currentSubState == SubState.BOSS_WARNING) {
@@ -430,8 +430,18 @@ public final class PlayingState implements GameState {
         double hudAreaWidth = GameConstants.UI_BAR_WIDTH;
         double hudCenterX = hudAreaStartX + (hudAreaWidth / 2.0);
 
-        double startY = 150.0;
-        double spacingY = 120.0;
+        if (hudBackground != null) {
+            gc.drawImage(hudBackground,
+                    hudAreaStartX, 0,
+                    hudAreaWidth, GameConstants.SCREEN_HEIGHT
+            );
+        } else {
+            gc.setFill(Color.BLACK);
+            gc.fillRect(hudAreaStartX, 0, hudAreaWidth, GameConstants.SCREEN_HEIGHT);
+        }
+
+        double startY = GameConstants.SCREEN_HEIGHT / 4.0 / 2.0 - 15;
+        double spacingY = GameConstants.SCREEN_HEIGHT / 4.0;
 
         int currentScore = ScoreManager.getInstance().getScore();
 

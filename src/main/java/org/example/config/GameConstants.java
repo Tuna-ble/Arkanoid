@@ -73,15 +73,13 @@ public final class GameConstants {
     public static final double PADDING = 5;
     public static final double TOP_MARGIN = 50;
     public static final double HARD_BRICK_DURABILITY = 3;
-    public static final int POINTS_PER_HARD_BRICK = 50;
-    public static final int POINTS_PER_EXPLOSIVE_BRICK = 30;
 
     // Enemies
     public static final double ENEMY_WIDTH = 40;
     public static final double ENEMY_HEIGHT = 40;
     public static final double BOSS_WIDTH = 190;
     public static final double BOSS_HEIGHT = 350;
-    public static final double BOSS_HEALTH = 10;
+    public static final double BOSS_HEALTH = 30;
     public static final double MINION_WIDTH = 25;
     public static final double MINION_HEIGHT = 40;
 
@@ -105,6 +103,12 @@ public final class GameConstants {
 
     // Score
     public static final int POINTS_PER_BRICK = 10;
+    public static final int POINTS_PER_HARD_BRICK = 50;
+    public static final int POINTS_PER_EXPLOSIVE_BRICK = 30;
+    public static final int POINTS_PER_HEALING_BRICK = 15;
+    public static final int POINTS_PER_NORMAL_ENEMY = 30;
+    public static final int POINTS_PER_MINION = 60;
+    public static final int POINTS_PER_BOSS = 1000;
 
     // UI - Buttons
     public static final double UI_BUTTON_WIDTH = 200;
