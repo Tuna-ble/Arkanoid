@@ -25,6 +25,13 @@ import org.example.gamelogic.strategy.transition.window.HologramTransitionStrate
 import org.example.gamelogic.strategy.transition.window.ITransitionStrategy;
 import org.example.gamelogic.strategy.transition.window.PopupTransitionStrategy;
 
+/**
+ * Quản lý trạng thái "Xác nhận Reset" (Confirm Reset).
+ * <p>
+ * Lớp này hiển thị một cửa sổ (Window) hỏi người chơi
+ * có chắc chắn muốn xóa toàn bộ tiến trình (progress)
+ * và điểm cao (highscores) hay không.
+ */
 public final class ConfirmResetState implements GameState {
     private final Window window;
     private final AbstractButton yesButton;
@@ -40,6 +47,15 @@ public final class ConfirmResetState implements GameState {
             new Stop(1, Color.web("#ff4444"))
     );
 
+    /**
+     * Khởi tạo trạng thái Xác nhận Reset.
+     * <p>
+     * <b>Định nghĩa:</b> Khởi tạo {@link Window} với hiệu ứng transition.
+     * Tải tài nguyên (font, ảnh nút) và tạo hai nút "YES" và "NO".
+     * <p>
+     * <b>Expected:</b> Cửa sổ xác nhận được tạo,
+     * chứa các nút, và sẵn sàng cho việc update/render.
+     */
     public ConfirmResetState() {
         double buttonY = 350;
         double buttonSpacing = 40;
@@ -74,11 +90,33 @@ public final class ConfirmResetState implements GameState {
         window.addButton(noButton);
     }
 
+    /**
+     * Cập nhật trạng thái Xác nhận Reset.
+     * <p>
+     * <b>Định nghĩa:</b> Ủy quyền (delegate) logic update
+     * cho {@link Window} (để chạy transition).
+     * <p>
+     * <b>Expected:</b> Hiệu ứng transition của cửa sổ được cập nhật.
+     *
+     * @param deltaTime Thời gian (giây) kể từ frame trước.
+     */
     @Override
     public void update(double deltaTime) {
         window.update(deltaTime);
     }
 
+    /**
+     * Vẽ (render) trạng thái Xác nhận Reset.
+     * <p>
+     * <b>Định nghĩa:</b> Xóa màn hình và gọi {@code window.render()}.
+     * Nếu transition hoàn tất, vẽ văn bản cảnh báo ("ARE YOU SURE?").
+     * Vẽ các nút "YES" và "NO".
+     * <p>
+     * <b>Expected:</b> Cửa sổ xác nhận
+     * (bao gồm nền mờ, văn bản, và các nút) được vẽ lên canvas.
+     *
+     * @param gc Context (bút vẽ) của canvas.
+     */
     @Override
     public void render(GraphicsContext gc) {
         gc.setFill(Color.BLACK);
@@ -112,6 +150,19 @@ public final class ConfirmResetState implements GameState {
         noButton.render(gc);
     }
 
+    /**
+     * Xử lý input (click chuột) của người dùng.
+     * <p>
+     * <b>Định nghĩa:</b> Ủy quyền (delegate) xử lý input cho {@link Window}
+     * (để cập nhật trạng thái nút). Kiểm tra click cho nút "YES" và "NO".
+     * <p>
+     * <b>Expected:</b> Nếu click "YES", gọi {@link HighscoreManager#resetHighscores()}
+     * và {@link ProgressManager#resetProgress()}.
+     * Cả hai nút "YES" và "NO" đều phát sự kiện
+     * {@link ChangeStateEvent} (MAIN_MENU).
+     *
+     * @param inputProvider Nguồn cung cấp input (phím, chuột).
+     */
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;

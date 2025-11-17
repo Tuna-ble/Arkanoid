@@ -21,6 +21,12 @@ import org.example.gamelogic.graphics.TextRenderer;
 
 import java.util.List;
 
+/**
+ * Quản lý trạng thái "Bảng xếp hạng" (Ranking) của game.
+ * <p>
+ * Lớp này chịu trách nhiệm tải và hiển thị danh sách điểm cao (high scores)
+ * và xử lý việc quay lại Main Menu.
+ */
 public final class RankingState implements GameState {
 
     private final List<Integer> highscores;
@@ -48,9 +54,26 @@ public final class RankingState implements GameState {
     private final DropShadow normalScoreShadow = new DropShadow(8, Color.web("#ffdd44", 0.6));
     private final DropShadow titleBaseShadow = new DropShadow(20, Color.web("#ffdd44", 0.4));
 
+    /**
+     * (Helper) Vẽ một mục (entry) điểm cao lên canvas.
+     * <p>
+     * <b>Định nghĩa:</b> Vẽ ảnh nền (score card) và hiển thị
+     * thứ hạng (rank) cùng điểm số (score) tại vị trí đã cho.
+     * <p>
+     * <b>Expected:</b> Một hàng điểm cao được vẽ lên `gc`,
+     * nổi bật nếu là hạng 1.
+     *
+     * @param gc     Context (bút vẽ) của canvas.
+     * @param x      Tọa độ X.
+     * @param y      Tọa độ Y.
+     * @param width  Chiều rộng.
+     * @param height Chiều cao.
+     * @param rank   Thứ hạng (1, 2, 3...).
+     * @param score  Điểm số.
+     */
     private void drawScoreEntry(GraphicsContext gc, double x, double y,
-                                        double width, double height, 
-                                    int rank, int score) {
+                                double width, double height,
+                                int rank, int score) {
         if (scoreCardImage != null) {
             gc.drawImage(scoreCardImage, x, y, width, height);
         } else {
@@ -60,7 +83,7 @@ public final class RankingState implements GameState {
 
         // Draw rank number and score with pre-created fonts
         gc.setTextAlign(TextAlignment.CENTER);
-        
+
         Color textColor = (rank == 1) ? scoreHighlightColor : scoreNormalColor;
         TextRenderer.drawOutlinedText(
                 gc,
@@ -89,6 +112,15 @@ public final class RankingState implements GameState {
         );
     }
 
+    /**
+     * Khởi tạo trạng thái Bảng xếp hạng.
+     * <p>
+     * <b>Định nghĩa:</b> Tải danh sách highscores từ {@link HighscoreManager}.
+     * Tải tài nguyên (ảnh, font) và khởi tạo nút "Back to Menu".
+     * <p>
+     * <b>Expected:</b> Trạng thái sẵn sàng để update và render,
+     * highscores đã được tải.
+     */
     public RankingState() {
         this.highscores = HighscoreManager.loadHighscores();
         org.example.data.AssetManager am = org.example.data.AssetManager.getInstance();
@@ -106,11 +138,32 @@ public final class RankingState implements GameState {
         this.scoreCardImage = am.getImage("rankBanner");
     }
 
+    /**
+     * Cập nhật trạng thái Bảng xếp hạng.
+     * <p>
+     * <b>Định nghĩa:</b> Tăng {@code elapsed} (thời gian trôi qua)
+     * dựa trên {@code deltaTime} để dùng cho hoạt ảnh.
+     * <p>
+     * <b>Expected:</b> {@code elapsed} được cập nhật.
+     *
+     * @param deltaTime Thời gian (giây) kể từ frame trước.
+     */
     @Override
     public void update(double deltaTime) {
         elapsed += deltaTime;
     }
 
+    /**
+     * Vẽ (render) trạng thái Bảng xếp hạng lên canvas.
+     * <p>
+     * <b>Định nghĩa:</b> Vẽ nền, tiêu đề "RANKING".
+     * Lặp qua danh sách highscores (tối đa 5) và
+     * gọi {@code drawScoreEntry} cho mỗi mục. Vẽ nút "Back".
+     * <p>
+     * <b>Expected:</b> Giao diện bảng xếp hạng được hiển thị đầy đủ.
+     *
+     * @param gc Context (bút vẽ) của canvas.
+     */
     @Override
     public void render(GraphicsContext gc) {
         gc.fillRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
@@ -147,10 +200,10 @@ public final class RankingState implements GameState {
                     "NO SCORES YET",
                     centerX,
                     scoreY,
-                    scoreFont, 
-                    scoreNormalColor, 
-                    Color.web("#4A0404", 0.8), 
-                    2.0, 
+                    scoreFont,
+                    scoreNormalColor,
+                    Color.web("#4A0404", 0.8),
+                    2.0,
                     null
             );
         } else {
@@ -171,6 +224,18 @@ public final class RankingState implements GameState {
         backButton.render(gc);
     }
 
+    /**
+     * Xử lý input (click chuột) của người dùng.
+     * <p>
+     * <b>Định nghĩa:</b> Cập nhật trạng thái nút "Back"
+     * ({@code backButton.handleInput}).
+     * <p>
+     * <b>Expected:</b> Nếu nút "Back" được click,
+     * phát sự kiện {@link ChangeStateEvent}
+     * để chuyển về {@code GameStateEnum.MAIN_MENU}.
+     *
+     * @param inputProvider Nguồn cung cấp input (phím, chuột).
+     */
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;

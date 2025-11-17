@@ -16,16 +16,23 @@ import org.example.gamelogic.states.GameState;
 import org.example.gamelogic.states.PlayingState;
 
 /**
- * Entry point JavaFX cho game Arkanoid.
- * <br>Khởi tạo window, input handler và game loop.
+ * Lớp chính của ứng dụng game (JavaFX Application).
+ * Chịu trách nhiệm khởi tạo cửa sổ, xử lý input, và quản lý vòng đời ứng dụng.
  */
 public class GameApplication extends Application {
 
     /**
-     * Khởi tạo và hiển thị cửa sổ game, setup input và start game loop.
+     * Khởi tạo và bắt đầu ứng dụng game.
+     * <p>
+     * <b>Định nghĩa:</b> Cấu hình GameManager, InputHandler, Scene,
+     * gắn các trình lắng nghe sự kiện (input) và hiển thị cửa sổ game (Stage).
+     * Bắt đầu vòng lặp game.
+     * <p>
+     * <b>Expected:</b> Cửa sổ game "Arkanoid" hiển thị và game bắt đầu chạy,
+     * sẵn sàng nhận input.
      *
-     * @param primaryStage stage chính do JavaFX cung cấp
-     * @throws Exception nếu có lỗi trong quá trình khởi tạo
+     * @param primaryStage Stage chính (cửa sổ) của ứng dụng.
+     * @throws Exception Lỗi nếu quá trình khởi tạo thất bại.
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -42,6 +49,7 @@ public class GameApplication extends Application {
         StackPane root = new StackPane(canvas);
         Scene scene = new Scene(root, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
 
+        // Đăng ký sự kiện bàn phím
         scene.setOnKeyPressed(event -> {
             inputHandler.addKey(event.getCode());
         });
@@ -50,6 +58,7 @@ public class GameApplication extends Application {
             inputHandler.removeKey(event.getCode());
         });
 
+        // Đăng ký sự kiện chuột
         scene.setOnMouseMoved(event -> {
             inputHandler.setMousePos(event.getX(), event.getY());
         });
@@ -80,10 +89,14 @@ public class GameApplication extends Application {
     }
 
     /**
-     * Được gọi khi ứng dụng đóng lại.
-     * <br>Nếu đang ở PlayingState thì tự động lưu game hiện tại và dừng game loop.
+     * Được gọi khi ứng dụng đóng.
+     * <p>
+     * <b>Định nghĩa:</b> Tự động lưu trạng thái game nếu đang chơi (PlayingState)
+     * và dừng vòng lặp game một cách an toàn.
+     * <p>
+     * <b>Expected:</b> Game được lưu (nếu cần) và ứng dụng tắt an toàn.
      *
-     * @throws Exception nếu có lỗi khi shutdown
+     * @throws Exception Lỗi nếu lưu game hoặc dừng ứng dụng thất bại.
      */
     @Override
     public void stop() throws Exception {
@@ -96,6 +109,7 @@ public class GameApplication extends Application {
             currentState = gameManager.getStateManager().getState();
         }
 
+        // Chỉ lưu game nếu đang ở trạng thái chơi
         if (currentState instanceof PlayingState) {
             PlayingState playingState = (PlayingState) currentState;
 
@@ -106,17 +120,22 @@ public class GameApplication extends Application {
 
             System.out.println("Automatically saved for level " + levelId);
         } else {
-            System.out.println("Not in PlayingState, no need to Le Duc Luu.");
+            System.out.println("Not in PlayingState, no need to save.");
         }
 
+        // Dừng vòng lặp game trước khi thoát
         gameManager.stopGameLoop();
         super.stop();
     }
 
     /**
-     * Hàm main khởi chạy ứng dụng JavaFX.
+     * Phương thức main, khởi chạy ứng dụng JavaFX.
+     * <p>
+     * <b>Định nghĩa:</b> Gọi {@code launch(args)} để bắt đầu JavaFX runtime.
+     * <p>
+     * <b>Expected:</b> JavaFX được khởi tạo và gọi phương thức {@code start()}.
      *
-     * @param args tham số dòng lệnh (nếu có)
+     * @param args Đối số dòng lệnh (không dùng trong ứng dụng này).
      */
     public static void main(String[] args) {
         launch(args);

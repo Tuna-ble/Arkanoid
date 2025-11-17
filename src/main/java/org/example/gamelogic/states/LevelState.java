@@ -26,6 +26,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Quản lý trạng thái "Chọn Màn Chơi" (Level Selection).
+ * <p>
+ * Lớp này hiển thị một cửa sổ (Window) cho phép người chơi
+ * duyệt qua các màn chơi, xem thông tin (sao, loại gạch),
+ * và chọn màn chơi để bắt đầu (hoặc tiếp tục).
+ */
 public final class LevelState implements GameState {
 
     private static final int NUM_LEVELS = 5;
@@ -54,6 +61,18 @@ public final class LevelState implements GameState {
     private final int maxLevelUnlocked;
     private final Map<Integer, Integer> starsMap;
 
+    /**
+     * Khởi tạo trạng thái Chọn Màn Chơi.
+     * <p>
+     * <b>Định nghĩa:</b> Tải tiến trình (progress) của người chơi
+     * (màn đã mở, sao) từ {@link ProgressManager}.
+     * Tải tất cả dữ liệu level (để hiển thị minimap, info).
+     * Khởi tạo {@link Window}, các nút bấm, và các tài nguyên (font, ảnh).
+     * <p>
+     * <b>Expected:</b> Trạng thái sẵn sàng update/render.
+     * Màn chơi đầu tiên (index 0) được chọn và
+     * thông tin của nó được hiển thị.
+     */
     public LevelState() {
         this.maxLevelUnlocked = ProgressManager.getMaxLevelUnlocked();
         this.starsMap = ProgressManager.loadStars();
@@ -129,6 +148,18 @@ public final class LevelState implements GameState {
         window.addButton(backButton);
     }
 
+    /**
+     * (Helper) Cập nhật thông tin (loại gạch, trạng thái khóa)
+     * dựa trên {@code currentLevelIndex}.
+     * <p>
+     * <b>Định nghĩa:</b> Phân tích layout của level được chọn
+     * để thu thập các loại gạch.
+     * Vô hiệu hóa nút "PLAY" nếu level chưa được mở khóa.
+     * <p>
+     * <b>Expected:</b> {@code currentBrickTypes} được cập nhật.
+     * Nút "PLAY" bị vô hiệu hóa (disabled)
+     * nếu level > {@code maxLevelUnlocked}.
+     */
     private void updateSelectedLevelInfo() {
         currentBrickTypes.clear();
         if (currentLevelIndex < 0 || currentLevelIndex >= allLevelData.length) return;
@@ -153,6 +184,17 @@ public final class LevelState implements GameState {
         }
     }
 
+    /**
+     * (Helper) Chuyển đổi mã loại gạch (vd: "N") thành tên đầy đủ (vd: "Normal").
+     * <p>
+     * <b>Định nghĩa:</b> Sử dụng switch-case để
+     * trả về tên (String) của loại gạch.
+     * <p>
+     * <b>Expected:</b> Trả về tên (String) tương ứng với loại gạch.
+     *
+     * @param type Mã loại gạch (viết tắt).
+     * @return Tên đầy đủ của loại gạch.
+     */
     private String getBrickName(String type) {
         switch (type.toUpperCase()) {
             case "N": return "Normal";
@@ -164,6 +206,23 @@ public final class LevelState implements GameState {
         }
     }
 
+    /**
+     * (Helper) Vẽ một bản đồ thu nhỏ (minimap) của layout level.
+     * <p>
+     * <b>Định nghĩa:</b> Lặp qua layout của {@code LevelData}
+     * và vẽ các hình ảnh gạch thu nhỏ
+     * vào vùng (x, y, w, h) được chỉ định.
+     * <p>
+     * <b>Expected:</b> Một bản đồ thu nhỏ
+     * được vẽ lên {@code gc}.
+     *
+     * @param gc   Context (bút vẽ) của canvas.
+     * @param data Dữ liệu level chứa layout.
+     * @param x    Tọa độ X (đích).
+     * @param y    Tọa độ Y (đích).
+     * @param w    Chiều rộng (đích).
+     * @param h    Chiều cao (đích).
+     */
     private void renderMiniMap(GraphicsContext gc, LevelData data, double x, double y, double w, double h) {
         if (data == null) return;
         List<String> layout = data.getLayout();
@@ -191,12 +250,35 @@ public final class LevelState implements GameState {
         }
     }
 
+    /**
+     * Cập nhật trạng thái Chọn Màn Chơi.
+     * <p>
+     * <b>Định nghĩa:</b> Tăng {@code elapsedTime} (thời gian trôi qua)
+     * và ủy quyền (delegate) logic update cho {@link Window}.
+     * <p>
+     * <b>Expected:</b> Hiệu ứng transition của {@code window} được cập nhật.
+     *
+     * @param deltaTime Thời gian (giây) kể từ frame trước.
+     */
     @Override
     public void update(double deltaTime) {
         elapsedTime += deltaTime;
         window.update(deltaTime);
     }
 
+    /**
+     * Vẽ (render) trạng thái Chọn Màn Chơi.
+     * <p>
+     * <b>Định nghĩa:</b> Vẽ nền, sau đó gọi {@code window.render()}.
+     * Nếu transition của window hoàn tất, vẽ các thông tin chi tiết:
+     * minimap ({@code renderMiniMap}), thông tin gạch, thông tin sao,
+     * và lớp phủ "LOCKED" nếu level chưa được mở.
+     * <p>
+     * <b>Expected:</b> Giao diện chọn màn chơi được hiển thị đầy đủ,
+     * bao gồm thông tin chi tiết của level đang chọn.
+     *
+     * @param gc Context (bút vẽ) của canvas.
+     */
     @Override
     public void render(GraphicsContext gc) {
         gc.drawImage(levelBackground, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
@@ -270,6 +352,19 @@ public final class LevelState implements GameState {
         }
     }
 
+    /**
+     * Xử lý input (click chuột) của người dùng.
+     * <p>
+     * <b>Định nghĩa:</b> Ủy quyền (delegate) xử lý input cho {@link Window}.
+     * Kiểm tra click cho các nút (Prev, Next, Play, Back).
+     * <p>
+     * <b>Expected:</b> {@code currentLevelIndex} thay đổi (nếu click Next/Prev).
+     * Phát sự kiện {@link ChangeStateEvent} (PLAYING, GAME_MODE)
+     * hoặc chuyển sang {@link ConfirmContinueState}
+     * khi click Play hoặc Back.
+     *
+     * @param inputProvider Nguồn cung cấp input (phím, chuột).
+     */
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
@@ -309,6 +404,18 @@ public final class LevelState implements GameState {
         }
     }
 
+    /**
+     * (Helper) Chuyển đổi số lượng sao (int) thành một chuỗi (String) biểu thị.
+     * <p>
+     * <b>Định nghĩa:</b> Tạo một chuỗi 3 ký tự
+     * (ví dụ: 1 -> "★☆☆", 3 -> "★★★").
+     * <p>
+     * <b>Expected:</b> Trả về một chuỗi (String)
+     * biểu thị số sao đã đạt được.
+     *
+     * @param stars Số sao (0-3).
+     * @return Chuỗi 3 ký tự biểu thị sao.
+     */
     private String getStarString(int stars) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 3; i++) {

@@ -21,6 +21,12 @@ import org.example.gamelogic.graphics.buttons.AbstractButton;
 import org.example.gamelogic.graphics.buttons.Button;
 import org.example.gamelogic.graphics.TextRenderer;
 
+/**
+ * Quản lý trạng thái "Chiến thắng" (Victory) khi người chơi hoàn thành một màn.
+ * <p>
+ * Lớp này chịu trách nhiệm tính toán sao, hiển thị điểm,
+ * render hoạt ảnh và xử lý input cho các nút (Menu, Restart, Next).
+ */
 public final class VictoryState implements GameState {
     private final int livesLeft;
     private final int levelCompleted;
@@ -54,6 +60,19 @@ public final class VictoryState implements GameState {
     private boolean star2SoundPlayed = false;
     private boolean star3SoundPlayed = false;
 
+    /**
+     * Khởi tạo trạng thái Victory.
+     * <p>
+     * <b>Định nghĩa:</b> Tính toán số sao đạt được dựa trên số mạng còn lại.
+     * Lưu tiến trình (progress) vào {@link ProgressManager}.
+     * Khởi tạo các nút bấm và tải tài nguyên (font, ảnh).
+     * <p>
+     * <b>Expected:</b> Trạng thái sẵn sàng để update và render,
+     * tiến trình của người chơi đã được lưu.
+     *
+     * @param livesLeft      Số mạng còn lại của người chơi.
+     * @param levelCompleted Cấp độ (level) vừa hoàn thành.
+     */
     public VictoryState(int livesLeft, int levelCompleted) {
         this.livesLeft = livesLeft;
         this.levelCompleted = levelCompleted;
@@ -98,11 +117,31 @@ public final class VictoryState implements GameState {
         victory = AssetManager.getInstance().getImage("victory");
     }
 
+    /**
+     * Cập nhật trạng thái Victory (chủ yếu là thời gian cho hoạt ảnh).
+     * <p>
+     * <b>Định nghĩa:</b> Tăng {@code elapsedTime} dựa trên {@code deltaTime}.
+     * <p>
+     * <b>Expected:</b> {@code elapsedTime} được cập nhật,
+     * dùng cho render hoạt ảnh sao và nút bấm.
+     *
+     * @param deltaTime Thời gian (giây) kể từ frame trước.
+     */
     @Override
     public void update(double deltaTime) {
         elapsedTime += deltaTime;
     }
 
+    /**
+     * (Helper) Cập nhật trạng thái (hover, click) cho tất cả các nút bấm.
+     * <p>
+     * <b>Định nghĩa:</b> Gọi {@code handleInput} trên từng đối tượng nút.
+     * <p>
+     * <b>Expected:</b> Trạng thái của các nút (quit, menu, next, restart)
+     * được cập nhật theo input của người dùng.
+     *
+     * @param inputProvider Nguồn cung cấp input (phím, chuột).
+     */
     private void updateButtons(I_InputProvider inputProvider) {
         quitButton.handleInput(inputProvider);
         menuButton.handleInput(inputProvider);
@@ -110,6 +149,18 @@ public final class VictoryState implements GameState {
         restartButton.handleInput(inputProvider);
     }
 
+    /**
+     * Vẽ (render) trạng thái Victory lên canvas.
+     * <p>
+     * <b>Định nghĩa:</b> Vẽ nền, tiêu đề "VICTORY", điểm số cuối cùng.
+     * Render hoạt ảnh 3 ngôi sao dựa trên {@code elapsedTime}.
+     * Render hoạt ảnh mờ dần (fade-in) cho các nút bấm.
+     * <p>
+     * <b>Expected:</b> Toàn bộ giao diện "Chiến thắng" được hiển thị
+     * với các hiệu ứng hoạt ảnh.
+     *
+     * @param gc Context (bút vẽ) của canvas.
+     */
     @Override
     public void render(GraphicsContext gc) {
         double scale = GameConstants.SCREEN_HEIGHT / victory.getHeight();
@@ -119,10 +170,10 @@ public final class VictoryState implements GameState {
 
         gc.drawImage(
                 victory,
-                cropStartX / scale, 0, // sx, sy
-                GameConstants.SCREEN_WIDTH / scale, victory.getHeight(), // sw, sh (crop gốc)
-                0, 0, // dx, dy
-                GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT // dw, dh (vẽ full screen)
+                cropStartX / scale, 0,
+                GameConstants.SCREEN_WIDTH / scale, victory.getHeight(),
+                0, 0,
+                GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT
         );
 
         gc.setTextAlign(TextAlignment.CENTER);
@@ -146,19 +197,17 @@ public final class VictoryState implements GameState {
                 370,
                 scoreFont,
                 Color.web("#ffffcc"),
-                Color.color(0,0,0,0.85),
+                Color.color(0, 0, 0, 0.85),
                 2.0,
-                new DropShadow(8, Color.color(0,0,0,0.6))
+                new DropShadow(8, Color.color(0, 0, 0, 0.6))
         );
 
         double starAnimProgress = elapsedTime - STAR_ANIM_START_TIME;
 
-        // Tính thời điểm cho mỗi sao
         double star1Time = TIME_PER_STAR;
         double star2Time = TIME_PER_STAR * 2;
         double star3Time = TIME_PER_STAR * 3;
 
-        // Vẽ các ngôi sao (★ là tô đầy, ☆ là rỗng)
         String star1 = "☆ ";
         String star2 = "☆ ";
         String star3 = "☆";
@@ -199,6 +248,19 @@ public final class VictoryState implements GameState {
         }
     }
 
+    /**
+     * Xử lý input (click chuột) của người dùng.
+     * <p>
+     * <b>Định nghĩa:</b> Chặn input nếu hoạt ảnh sao chưa hoàn thành.
+     * Gọi {@code updateButtons} và kiểm tra {@code isClicked()}
+     * cho từng nút.
+     * <p>
+     * <b>Expected:</b> Phát sự kiện {@link ChangeStateEvent}
+     * (để chuyển sang Menu, Restart, Next) hoặc thoát game (Quit)
+     * khi nút tương ứng được click.
+     *
+     * @param inputProvider Nguồn cung cấp input (phím, chuột).
+     */
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;

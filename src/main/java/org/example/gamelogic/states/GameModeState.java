@@ -16,6 +16,13 @@ import org.example.gamelogic.graphics.buttons.AbstractButton;
 import org.example.gamelogic.graphics.buttons.Button;
 import org.example.presentation.SpriteAnimation;
 
+/**
+ * Quản lý trạng thái "Chọn Chế Độ Chơi" (Game Mode Selection).
+ * <p>
+ * Lớp này hiển thị hai lựa chọn (INFINITE và CASUAL) trên hai nửa
+ * màn hình. Nó xử lý hiệu ứng hover (phóng to, chạy animation)
+ * và click chuột để chuyển sang trạng thái tương ứng.
+ */
 public final class GameModeState implements GameState {
     private boolean isHoveringLeft = false;
     private boolean isHoveringRight = false;
@@ -37,6 +44,16 @@ public final class GameModeState implements GameState {
     private final double SCALE_NORMAL = 1.0;
     private final double SCALE_HOVER = 1.2;
 
+    /**
+     * Khởi tạo trạng thái Chọn Chế Độ Chơi.
+     * <p>
+     * <b>Định nghĩa:</b> Tải tất cả tài nguyên (ảnh, font,
+     * ảnh tĩnh và ảnh động) cần thiết cho việc hiển thị hai chế độ chơi
+     * và nút "Back".
+     * <p>
+     * <b>Expected:</b> Trạng thái sẵn sàng để update và render,
+     * các hình ảnh và animation được tải (nếu có).
+     */
     public GameModeState() {
         AssetManager am = AssetManager.getInstance();
         this.titleFont = am.getFont("Anxel", 50);
@@ -69,6 +86,17 @@ public final class GameModeState implements GameState {
         );
     }
 
+    /**
+     * Cập nhật trạng thái.
+     * <p>
+     * <b>Định nghĩa:</b> Cập nhật logic cho các
+     * {@link SpriteAnimation} (nếu chúng đang được hover).
+     * <p>
+     * <b>Expected:</b> Animation của bên đang được hover
+     * (trái hoặc phải) được cập nhật frame.
+     *
+     * @param deltaTime Thời gian (giây) kể từ frame trước.
+     */
     @Override
     public void update(double deltaTime) {
         if (isHoveringLeft && infiniteAnim != null) {
@@ -79,6 +107,30 @@ public final class GameModeState implements GameState {
         }
     }
 
+    /**
+     * (Helper) Vẽ một nửa (trái hoặc phải) của màn hình chọn chế độ.
+     * <p>
+     * <b>Định nghĩa:</b> Vẽ nền, ảnh tĩnh hoặc ảnh động (tùy thuộc
+     * vào trạng thái {@code isHovered}), khung viền, tiêu đề
+     * và mô tả (nếu đang hover).
+     * <p>
+     * <b>Expected:</b> Một nửa màn hình được vẽ với hiệu ứng phóng to
+     * (scale) và hoạt ảnh (nếu có) khi được hover.
+     *
+     * @param gc                 Context (bút vẽ) của canvas.
+     * @param isHovered          Trạng thái hover của nửa màn hình này.
+     * @param x                  Tọa độ X bắt đầu.
+     * @param y                  Tọa độ Y bắt đầu.
+     * @param w                  Chiều rộng.
+     * @param h                  Chiều cao.
+     * @param background         Ảnh nền.
+     * @param staticEntity       Ảnh tĩnh (hiển thị khi không hover).
+     * @param animSpriteEntity   Hoạt ảnh (hiển thị khi hover).
+     * @param entityW            Chiều rộng gốc của entity.
+     * @param entityH            Chiều cao gốc của entity.
+     * @param title              Tiêu đề (INFINITE / CASUAL).
+     * @param description        Mô tả (hiển thị khi hover).
+     */
     private void renderHalf(GraphicsContext gc, boolean isHovered,
                             double x, double y, double w, double h,
                             Image background,
@@ -131,6 +183,17 @@ public final class GameModeState implements GameState {
         }
     }
 
+    /**
+     * Vẽ (render) trạng thái Chọn Chế Độ Chơi.
+     * <p>
+     * <b>Định nghĩa:</b> Xóa màn hình và gọi {@link #renderHalf(GraphicsContext, boolean, double, double, double, double, Image, Image, SpriteAnimation, double, double, String, String)}
+     * cho cả hai bên (trái và phải). Vẽ nút "Back".
+     * <p>
+     * <b>Expected:</b> Toàn bộ giao diện chọn chế độ
+     * (2 bên) được hiển thị.
+     *
+     * @param gc Context (bút vẽ) của canvas.
+     */
     @Override
     public void render(GraphicsContext gc) {
         gc.clearRect(0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
@@ -159,6 +222,20 @@ public final class GameModeState implements GameState {
         backButton.render(gc);
     }
 
+    /**
+     * Xử lý input (chuột, phím) của người dùng.
+     * <p>
+     * <b>Định nghĩa:</b> Kiểm tra vị trí chuột để cập nhật trạng thái
+     * {@code isHoveringLeft}/{@code isHoveringRight} và reset animation
+     * nếu cần. Xử lý click chuột (chọn chế độ hoặc "Back")
+     * và phím ESC (quay lại menu).
+     * <p>
+     * <b>Expected:</b> Phát sự kiện {@link ChangeStateEvent}
+     * (MAIN_MENU, INFINITE_MODE, LEVEL_STATE)
+     * dựa trên tương tác của người dùng.
+     *
+     * @param inputProvider Nguồn cung cấp input (phím, chuột).
+     */
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;

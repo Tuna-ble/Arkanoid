@@ -20,6 +20,14 @@ import org.example.gamelogic.graphics.windows.Window;
 import org.example.gamelogic.strategy.transition.window.ITransitionStrategy;
 import org.example.gamelogic.strategy.transition.window.PopupTransitionStrategy;
 
+/**
+ * Quản lý trạng thái "Xác nhận Tiếp tục" (Confirm Continue).
+ * <p>
+ * Lớp này hiển thị một cửa sổ (Window) khi người chơi
+ * chọn một level (trong LevelState) mà có file save tồn tại.
+ * Nó hỏi người chơi muốn "Continue" (tải save)
+ * hay "Reset Level" (xóa save và chơi mới).
+ */
 public final class ConfirmContinueState implements GameState {
     private final Window window;
     private final AbstractButton continueButton;
@@ -28,6 +36,19 @@ public final class ConfirmContinueState implements GameState {
     private final Font titleFont;
     private final double centerX;
 
+    /**
+     * Khởi tạo trạng thái Xác nhận Tiếp tục.
+     * <p>
+     * <b>Định nghĩa:</b> Lưu {@code levelId} (level có file save).
+     * Khởi tạo {@link Window} với hiệu ứng transition.
+     * Tải tài nguyên (font, ảnh nút) và
+     * tạo hai nút "Continue" và "Reset Level".
+     * <p>
+     * <b>Expected:</b> Cửa sổ xác nhận được tạo,
+     * chứa các nút, và sẵn sàng cho việc update/render.
+     *
+     * @param levelId Level (int) có file save cần xác nhận.
+     */
     public ConfirmContinueState(int levelId) {
         ITransitionStrategy transition = new PopupTransitionStrategy();
         this.window = new Window(null, 500, 400, transition);
@@ -69,11 +90,32 @@ public final class ConfirmContinueState implements GameState {
         window.addButton(resetButton);
     }
 
+    /**
+     * Cập nhật trạng thái Xác nhận Tiếp tục.
+     * <p>
+     * <b>Định nghĩa:</b> Ủy quyền (delegate) logic update
+     * cho {@link Window} (để chạy transition).
+     * <p>
+     * <b>Expected:</b> Hiệu ứng transition của cửa sổ được cập nhật.
+     *
+     * @param deltaTime Thời gian (giây) kể từ frame trước.
+     */
     @Override
     public void update(double deltaTime) {
         window.update(deltaTime);
     }
 
+    /**
+     * Vẽ (render) trạng thái Xác nhận Tiếp tục.
+     * <p>
+     * <b>Định nghĩa:</b> Xóa màn hình và gọi {@code window.render()}.
+     * Nếu transition hoàn tất, vẽ văn bản tiêu đề ("Load Progress?").
+     * <p>
+     * <b>Expected:</b> Cửa sổ xác nhận
+     * (bao gồm nền mờ, văn bản, và các nút) được vẽ lên canvas.
+     *
+     * @param gc Context (bút vẽ) của canvas.
+     */
     @Override
     public void render(GraphicsContext gc) {
         gc.setFill(Color.BLACK);
@@ -90,6 +132,25 @@ public final class ConfirmContinueState implements GameState {
         }
     }
 
+    /**
+     * Xử lý input (click chuột) của người dùng.
+     * <p>
+     * <b>Định nghĩa:</b> Ủy quyền (delegate) xử lý input cho {@link Window}
+     * (để cập nhật trạng thái nút).
+     * Kiểm tra click cho nút "Continue" và "Reset Level".
+     * <p>
+     * <b>Expected:</b>
+     * <ul>
+     * <li>Click "Continue": Tải {@code SavedGameState},
+     * xóa file save, tạo {@link PlayingState} mới,
+     * gọi {@code playingState.loadGame(savedData)},
+     * và chuyển sang PlayingState.</li>
+     * <li>Click "Reset Level": Xóa file save và
+     * gọi {@link #startNewGame()}.</li>
+     * </ul>
+     *
+     * @param inputProvider Nguồn cung cấp input (phím, chuột).
+     */
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;
@@ -122,6 +183,14 @@ public final class ConfirmContinueState implements GameState {
         }
     }
 
+    /**
+     * (Helper) Bắt đầu một game mới cho level đã chọn.
+     * <p>
+     * <b>Định nghĩa:</b> Phát sự kiện {@link ChangeStateEvent}
+     * để chuyển sang trạng thái {@code PLAYING} với {@code levelId} hiện tại.
+     * <p>
+     * <b>Expected:</b> Trạng thái game chuyển sang {@code PLAYING}.
+     */
     private void startNewGame() {
 
         EventManager.getInstance().publish(

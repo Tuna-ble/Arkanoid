@@ -7,6 +7,13 @@ import javafx.scene.shape.Rectangle;
 import org.example.data.AssetManager;
 import org.example.gamelogic.I_InputProvider;
 
+/**
+ * Quản lý một thanh trượt (Slider) UI cho phép người dùng chọn một giá trị (0.0 - 1.0).
+ * <p>
+ * Lớp này kế thừa {@link AbstractUIElement}
+ * và xử lý logic kéo (dragging)
+ * của con trỏ (handle) để thay đổi giá trị {@code value}.
+ */
 public class Slider extends AbstractUIElement {
     private double value;
     private boolean isDragging = false;
@@ -25,6 +32,23 @@ public class Slider extends AbstractUIElement {
 
     private Rectangle bounds;
 
+    /**
+     * Khởi tạo một thanh trượt (Slider).
+     * <p>
+     * <b>Định nghĩa:</b> Tải tài nguyên (ảnh khung, fill, handle).
+     * Tính toán kích thước của "track" (phần bên trong)
+     * và đặt giá trị ban đầu ({@code initialValue}).
+     * <p>
+     * <b>Expected:</b> Thanh trượt được tạo
+     * và con trỏ (handle) được đặt đúng vị trí
+     * tương ứng với {@code initialValue}.
+     *
+     * @param x            Tọa độ X.
+     * @param y            Tọa độ Y.
+     * @param width        Chiều rộng.
+     * @param height       Chiều cao.
+     * @param initialValue Giá trị ban đầu (từ 0.0 đến 1.0).
+     */
     public Slider(double x, double y, double width, double height, double initialValue) {
         super(x, y, width, height);
 
@@ -43,16 +67,54 @@ public class Slider extends AbstractUIElement {
         setValue(initialValue);
     }
 
+    /**
+     * Đặt giá trị cho thanh trượt.
+     * <p>
+     * <b>Định nghĩa:</b> Cập nhật giá trị {@code value}
+     * (giới hạn trong khoảng [0.0, 1.0])
+     * và tính toán lại vị trí {@code handleX} (tọa độ X của con trỏ).
+     * <p>
+     * <b>Expected:</b> {@code value} được cập nhật.
+     * {@code handleX} được di chuyển đến vị trí
+     * tương ứng với giá trị mới.
+     *
+     * @param value Giá trị mới (từ 0.0 đến 1.0).
+     */
     public void setValue(double value) {
         this.value = Math.max(0.0, Math.min(1.0, value));
 
         this.handleX = this.trackX + (this.trackWidth * this.value);
     }
 
+    /**
+     * Lấy giá trị hiện tại của thanh trượt.
+     * <p>
+     * <b>Định nghĩa:</b> Trả về giá trị {@code value} đã lưu.
+     * <p>
+     * <b>Expected:</b> Trả về một số (double)
+     * trong khoảng [0.0, 1.0].
+     *
+     * @return Giá trị hiện tại.
+     */
     public double getValue() {
         return this.value;
     }
 
+    /**
+     * Xử lý input (kéo, thả chuột) cho thanh trượt.
+     * <p>
+     * <b>Định nghĩa:</b> Kiểm tra nếu chuột được nhấn
+     * ({@code isMousePressed})
+     * bên trong {@code bounds} để bắt đầu kéo ({@code isDragging}).
+     * Khi đang kéo, cập nhật {@code value} và {@code handleX}
+     * dựa trên vị trí chuột.
+     * <p>
+     * <b>Expected:</b> {@code value} và {@code handleX}
+     * thay đổi theo thao tác kéo chuột của người dùng.
+     * {@code isDragging} là false khi chuột được thả.
+     *
+     * @param input Nguồn cung cấp input (phím, chuột).
+     */
     public void handleInput(I_InputProvider input) {
         int mouseX = input.getMouseX();
         int mouseY = input.getMouseY();
@@ -74,6 +136,18 @@ public class Slider extends AbstractUIElement {
         }
     }
 
+    /**
+     * Vẽ (render) thanh trượt (khung, phần tô, con trỏ).
+     * <p>
+     * <b>Định nghĩa:</b> Vẽ {@code frameImage} (khung).
+     * Vẽ {@code fillImage} (phần tô) dựa trên {@code value}.
+     * Vẽ {@code handleImage} (con trỏ) tại vị trí {@code handleX}.
+     * <p>
+     * <b>Expected:</b> Thanh trượt được vẽ lên {@code gc}
+     * phản ánh đúng giá trị {@code value} hiện tại.
+     *
+     * @param gc Context (bút vẽ) của canvas.
+     */
     public void renderDefault(GraphicsContext gc) {
         gc.drawImage(frameImage, x, y, width, height);
 
