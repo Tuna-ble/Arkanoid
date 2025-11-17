@@ -22,7 +22,6 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
     protected double health;
     protected double scoreValue;
     protected boolean hasEnteredScreen;
-    protected final Image enemySprites;
 
     protected SpriteAnimation explosionAnim;
     protected enum LifeState {
@@ -39,7 +38,6 @@ public abstract class AbstractEnemy extends MovableObject implements Enemy {
         this.isActive = true;
         this.hasEnteredScreen = false;
         this.movementStrategy = initialMovementStrategy;
-        this.enemySprites = AssetManager.getInstance().getImage("enemies");
 
         Image sheet = AssetManager.getInstance().getImage("enemyExplode");
         if (sheet != null) {

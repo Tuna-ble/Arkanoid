@@ -80,7 +80,6 @@ public final class PauseState implements GameState {
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
-
     @Override
     public void handleInput(I_InputProvider inputProvider) {
         if (inputProvider == null) return;

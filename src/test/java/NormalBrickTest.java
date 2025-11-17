@@ -15,7 +15,7 @@ public class NormalBrickTest {
     @Test
     void testTakeDamageNotDestroy() {
         brick.takeDamage(1.0);
-        assertTrue(brick.isActive());
+        assertTrue(brick.isDestroyed());
     }
 
     @Test
