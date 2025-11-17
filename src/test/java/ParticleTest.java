@@ -17,8 +17,9 @@ public class ParticleTest {
     @Test
     void testUpdate() {
         double deltaTime = 1.0;
-        assertEquals(particle.getX() + 10 * deltaTime, particle.getX());
-        assertEquals(particle.getY() + 20 * deltaTime, particle.getY());
+        particle.update(deltaTime);
+        assertEquals(10 * deltaTime, particle.getX());
+        assertEquals(20 * deltaTime, particle.getY());
         assertFalse(particle.isDestroyed());
     }
 
