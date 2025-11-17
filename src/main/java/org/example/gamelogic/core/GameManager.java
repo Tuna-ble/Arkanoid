@@ -46,6 +46,11 @@ public final class GameManager {
     private List<String> backgroundKeys;
     private Random random;
 
+    /**
+     * Khởi tạo GameManager và thiết lập vòng lặp game (game loop).
+     *
+     * <p>Constructor private theo pattern singleton.
+     */
     private GameManager() {
         this.gameLoop = new AnimationTimer() {
             private long lastUpdate = 0;
@@ -73,23 +78,47 @@ public final class GameManager {
         private static final GameManager INSTANCE = new GameManager();
     }
 
+    /**
+     * Lấy instance đơn của GameManager.
+     *
+     * @return singleton GameManager
+     */
     public static GameManager getInstance() {
         return SingletonHolder.INSTANCE;
     }
 
+    /**
+     * Đăng ký provider cho input (keyboard/mouse) để GameManager có thể chuyển tiếp input tới state.
+     *
+     * @param provider implementation của I_InputProvider
+     */
     public void setInputProvider(I_InputProvider provider) {
         this.inputProvider = provider;
     }
 
+    /**
+     * Thiết lập GraphicsContext dùng để vẽ (canvas).
+     *
+     * @param gc GraphicsContext (kỳ vọng không null)
+     */
     public void setGraphicsContext(GraphicsContext gc) {
         this.gc = gc;
     }
 
+    /**
+     * Thiết lập repository chứa layout level và truyền xuống BrickManager.
+     *
+     * @param repo implementation của ILevelRepository
+     */
     public void setLevelRepository(ILevelRepository repo) {
         this.levelRepository = repo;
         this.brickManager.setLevelRepository(repo);
     }
 
+    /**
+     * Khởi tạo các thành phần con của game (managers, state, assets) và đăng ký event.
+     * Gọi khi bắt đầu ứng dụng để chuẩn bị game.
+     */
     public void init() {
         this.stateManager = new StateManager();
         this.brickManager = new BrickManager(levelRepository);
@@ -121,6 +150,11 @@ public final class GameManager {
         subscribeToEvents();
     }
 
+    /**
+     * Tạo map ánh xạ level -> background key (random từ danh sách backgroundKeys).
+     *
+     * @param numLevels số level cần khởi tạo background
+     */
     private void initializeLevelBackgrounds(int numLevels) {
         for (int i = 1; i <= numLevels; i++) {
             String randomBgKey = backgroundKeys.get(random.nextInt(backgroundKeys.size()));
@@ -130,6 +164,12 @@ public final class GameManager {
         }
     }
 
+    /**
+     * Lấy ảnh nền (Image) phù hợp cho level yêu cầu.
+     *
+     * @param levelId id level (1-based)
+     * @return Image tương ứng với level
+     */
     public Image getBackgroundForLevel(int levelId) {
         String key = levelBackgroundMap.get(levelId);
 
@@ -141,6 +181,11 @@ public final class GameManager {
         return AssetManager.getInstance().getImage(key);
     }
 
+    /**
+     * Cập nhật các thành phần game chính (state, particles, ...) theo delta time.
+     *
+     * @param deltaTime thời gian (giây) kể từ lần cập nhật trước
+     */
     public void update(double deltaTime) {
         if (stateManager != null && inputProvider != null) {
             stateManager.handleInput(inputProvider);
@@ -155,6 +200,9 @@ public final class GameManager {
         }
     }
 
+    /**
+     * Thực hiện render khung hình hiện tại bằng cách ủy quyền cho state và particle manager.
+     */
     public void render() {
         GameState currentState = stateManager.getState();
         if (currentState != null && gc != null) {
@@ -165,14 +213,23 @@ public final class GameManager {
         }
     }
 
+    /**
+     * Bắt đầu vòng lặp game (animation timer).
+     */
     public void startGameLoop() {
         gameLoop.start();
     }
 
+    /**
+     * Dừng vòng lặp game.
+     */
     public void stopGameLoop() {
         gameLoop.stop();
     }
 
+    /**
+     * Đăng ký các listener cần thiết vào EventManager (ví dụ thay đổi state).
+     */
     private void subscribeToEvents() {
         EventManager.getInstance().subscribe(
                 ChangeStateEvent.class,
@@ -180,6 +237,9 @@ public final class GameManager {
         );
     }
 
+    /**
+     * Reset trạng thái ball và paddle khi chuyển trạng thái cần dọn dẹp (ví dụ restart level).
+     */
     private void resetBallAndPaddle() {
         currentState = stateManager.getState();
         if (currentState instanceof PlayingState) {
@@ -188,6 +248,11 @@ public final class GameManager {
         }
     }
 
+    /**
+     * Xử lý yêu cầu thay đổi trạng thái từ Event (ChangeStateEvent).
+     *
+     * @param event sự kiện chứa thông tin trạng thái đích và payload (nếu có)
+     */
     public void handleStateChangeRequest(ChangeStateEvent event) {
         GameState newState = null;
         GameState currentState = stateManager.getState();
@@ -324,51 +389,107 @@ public final class GameManager {
         }
     }
 
+    /**
+     * Bắt đầu một game mới và chuyển state sang PlayingState.
+     */
     public void startNewGame() {
         GameState newPlayingState = new PlayingState(this, currentGameMode, 1, true);
         stateManager.setState(newPlayingState);
     }
 
+    /**
+     * Chuyển về Main Menu.
+     */
     public void goToMainMenu() {
         GameState mainMenuState = new MainMenuState();
         stateManager.setState(mainMenuState);
     }
 
+    /**
+     * Lấy repository dùng để nạp level.
+     *
+     * @return ILevelRepository hiện tại (có thể null)
+     */
     public ILevelRepository getLevelRepository() {
         return levelRepository;
     }
 
+    /**
+     * Lấy BrickManager quản lý gạch.
+     *
+     * @return BrickManager
+     */
     public BrickManager getBrickManager() {
         return this.brickManager;
     }
 
+    /**
+     * Lấy PowerUpManager.
+     *
+     * @return PowerUpManager
+     */
     public PowerUpManager getPowerUpManager() {
         return this.powerUpManager;
     }
 
+    /**
+     * Lấy BallManager.
+     *
+     * @return BallManager
+     */
     public BallManager getBallManager() {
         return this.ballManager;
     }
 
+    /**
+     * Lấy StateManager hiện tại.
+     *
+     * @return StateManager
+     */
     public StateManager getStateManager() {
         return this.stateManager;
     }
 
+    /**
+     * Lấy CollisionManager.
+     *
+     * @return CollisionManager
+     */
     public CollisionManager getCollisionManager() {
         return this.collisionManager;
     }
 
+    /**
+     * Lấy LaserManager.
+     *
+     * @return LaserManager
+     */
     public LaserManager getLaserManager() {
         return this.laserManager;
     }
 
+    /**
+     * Lấy ParticleManager.
+     *
+     * @return ParticleManager
+     */
     public ParticleManager getParticleManager() {
         return this.particleManager;
     }
 
+    /**
+     * Lấy EnemyManager.
+     *
+     * @return EnemyManager
+     */
     public EnemyManager getEnemyManager() {
         return this.enemyManager;
     }
 
+    /**
+     * Lấy chế độ chơi hiện tại.
+     *
+     * @return GameModeEnum hiện tại
+     */
     public GameModeEnum getCurrentGameMode() { return this.currentGameMode; }
 }

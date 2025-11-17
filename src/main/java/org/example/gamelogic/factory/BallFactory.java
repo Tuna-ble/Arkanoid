@@ -3,6 +3,7 @@ package org.example.gamelogic.factory;
 import org.example.gamelogic.entities.IBall;
 import org.example.gamelogic.registry.BallRegistry;
 
+
 public class BallFactory {
     private final BallRegistry registry;
 

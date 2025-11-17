@@ -11,6 +11,13 @@ public final class InfiniteLevelRepository implements ILevelRepository {
     private final int rows=5;
     private final int cols=10;
 
+    /**
+     * Sinh ngẫu nhiên một layout màn chơi dạng infinite mode.
+     * <br>Không đọc file — tạo level dựa trên tỉ lệ random và các loại gạch (H, E, R, N, _).
+     *
+     * @param levelNumber số màn được yêu cầu (không ảnh hưởng, vì level được sinh ngẫu nhiên)
+     * @return {@link LevelData} chứa layout được tạo ngẫu nhiên theo kích thước cố định
+     */
     @Override
     public LevelData loadLevel(int levelNumber) {
         List<String> layout=new ArrayList<>();

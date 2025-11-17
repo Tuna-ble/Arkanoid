@@ -9,6 +9,12 @@ import java.util.stream.Collectors;
 
 public final class FileLevelRepository implements ILevelRepository {
 
+    /**
+     * Tải dữ liệu màn chơi từ file văn bản theo số level.
+     *
+     * @param levelNumber số màn cần tải (ví dụ: 1, 2, 3...)
+     * @return {@link LevelData} chứa danh sách các dòng layout; trả về rỗng nếu file không tồn tại hoặc lỗi I/O
+     */
     @Override
     public LevelData loadLevel(int levelNumber) {
         String fileName = "/levels/level_" + levelNumber + ".txt";

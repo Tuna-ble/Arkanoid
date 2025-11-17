@@ -12,6 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Hỗ trợ lưu/đọc highscore cục bộ của người chơi (ghi vào file trong home directory).
+ *
+ * <p>Phương thức tĩnh tiện dụng: loadHighscores, saveNewScore, resetHighscores.
+ */
 public final class HighscoreManager {
 
     private static final String HIGHSCORE_FILE_PATH =
@@ -19,6 +24,11 @@ public final class HighscoreManager {
 
     private static final int MAX_SCORES_TO_KEEP = 3;
 
+    /**
+     * Đọc file highscore và trả về top N điểm (giới hạn bởi MAX_SCORES_TO_KEEP).
+     *
+     * @return danh sách điểm giảm dần (có thể rỗng)
+     */
     public static List<Integer> loadHighscores() {
         List<Integer> scores = new ArrayList<>();
         File scoreFile = new File(HIGHSCORE_FILE_PATH);
@@ -50,6 +60,11 @@ public final class HighscoreManager {
         return scores.subList(0, Math.min(scores.size(), MAX_SCORES_TO_KEEP));
     }
 
+    /**
+     * Lưu điểm mới một cách bất đồng bộ (ghi đè file với top N điểm).
+     *
+     * @param newScore điểm cần lưu (>=0)
+     */
     public static void saveNewScore(int newScore) {
         AsyncExecutor.runAsync(() -> {
             List<Integer> scores = loadHighscores();
@@ -68,6 +83,9 @@ public final class HighscoreManager {
         });
     }
 
+    /**
+     * Xóa file highscore (nếu tồn tại).
+     */
     public static void resetHighscores() {
         try {
             File scoreFile = new File(HIGHSCORE_FILE_PATH);

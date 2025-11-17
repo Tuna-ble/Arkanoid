@@ -13,11 +13,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Quản lý power-up: spawn khi gạch bị phá, cập nhật vị trí rớt, render và cung cấp danh sách
+ * power-up đang hoạt động.
+ */
 public final class PowerUpManager {
     private static class SingletonHolder {
         private static final PowerUpManager INSTANCE = new PowerUpManager();
     }
 
+    /**
+     * Lấy instance đơn của PowerUpManager.
+     *
+     * @return singleton PowerUpManager
+     */
     public static PowerUpManager getInstance() {
         return SingletonHolder.INSTANCE;
     }
@@ -76,11 +85,23 @@ public final class PowerUpManager {
                 GameConstants.POWERUP_HEIGHT, 0.0, 2.0, new PiercingBallStrategy()));
     }
 
+    /**
+     * Tạo một power-up ở vị trí cho trước (thường do gạch bị phá sinh ra).
+     *
+     * @param type mã loại power-up (ví dụ "E","S","M",...)
+     * @param x toạ độ x spawn
+     * @param y toạ độ y spawn
+     */
     public void spawnPowerUp(String type, double x, double y) {
         PowerUp newPowerUp = powerUpFactory.createPowerUp(type, x, y);
         activePowerUps.add(newPowerUp);
     }
 
+    /**
+     * Cập nhật trạng thái các power-up (di chuyển xuống, xử lý hết hạn) và loại bỏ power-up không còn hoạt động.
+     *
+     * @param deltaTime thời gian (giây) kể từ lần cập nhật trước
+     */
     public void update(double deltaTime) {
         Iterator<PowerUp> iterator = activePowerUps.iterator();
         while (iterator.hasNext()) {
@@ -92,16 +113,29 @@ public final class PowerUpManager {
         }
     }
 
+    /**
+     * Vẽ tất cả power-up lên canvas.
+     *
+     * @param gc GraphicsContext của canvas (kỳ vọng không null)
+     */
     public void render(GraphicsContext gc) {
         for (PowerUp powerUp : activePowerUps) {
             powerUp.render(gc);
         }
     }
 
+    /**
+     * Xóa mọi power-up đang tồn tại.
+     */
     public void clear() {
         activePowerUps.clear();
     }
 
+    /**
+     * Lấy danh sách các power-up đang hoạt động.
+     *
+     * @return danh sách PowerUp (mutable)
+     */
     public List<PowerUp> getActivePowerUps() {
         return activePowerUps;
     }

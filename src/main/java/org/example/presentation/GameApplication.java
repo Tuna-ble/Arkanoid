@@ -15,9 +15,19 @@ import org.example.data.SavedGameState;
 import org.example.gamelogic.states.GameState;
 import org.example.gamelogic.states.PlayingState;
 
-
+/**
+ * Entry point JavaFX cho game Arkanoid.
+ * <br>Khởi tạo window, input handler và game loop.
+ */
 public class GameApplication extends Application {
 
+    /**
+     * Khởi tạo và hiển thị cửa sổ game, setup input và start game loop.
+     *
+     * @param primaryStage stage chính do JavaFX cung cấp
+     * @throws Exception nếu có lỗi trong quá trình khởi tạo
+     */
+    @Override
     public void start(Stage primaryStage) throws Exception {
         GameManager gameManager = GameManager.getInstance();
 
@@ -69,6 +79,12 @@ public class GameApplication extends Application {
         gameManager.startGameLoop();
     }
 
+    /**
+     * Được gọi khi ứng dụng đóng lại.
+     * <br>Nếu đang ở PlayingState thì tự động lưu game hiện tại và dừng game loop.
+     *
+     * @throws Exception nếu có lỗi khi shutdown
+     */
     @Override
     public void stop() throws Exception {
         System.out.println("Closing the app and saving...");
@@ -97,6 +113,11 @@ public class GameApplication extends Application {
         super.stop();
     }
 
+    /**
+     * Hàm main khởi chạy ứng dụng JavaFX.
+     *
+     * @param args tham số dòng lệnh (nếu có)
+     */
     public static void main(String[] args) {
         launch(args);
     }

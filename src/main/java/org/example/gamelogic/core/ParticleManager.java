@@ -9,6 +9,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Quản lý các particle dùng cho hiệu ứng (ví dụ mảnh vụn gạch).
+ *
+ * <p>Singleton; cung cấp API để spawn, cập nhật, render và xóa particle.
+ */
 public final class ParticleManager {
 
     private final List<Particle> particles;
@@ -23,10 +28,20 @@ public final class ParticleManager {
         private static final ParticleManager INSTANCE = new ParticleManager();
     }
 
+    /**
+     * Lấy instance đơn của ParticleManager.
+     *
+     * @return singleton ParticleManager
+     */
     public static ParticleManager getInstance() {
         return SingletonHolder.INSTANCE;
     }
 
+    /**
+     * Cập nhật trạng thái tất cả particle và loại bỏ những particle đã hỏng.
+     *
+     * @param deltaTime thời gian (giây) kể từ lần cập nhật trước
+     */
     public void update(double deltaTime) {
 
         Iterator<Particle> iterator = particles.iterator();
@@ -40,6 +55,11 @@ public final class ParticleManager {
         }
     }
 
+    /**
+     * Vẽ tất cả particle lên canvas.
+     *
+     * @param gc GraphicsContext (kỳ vọng không null)
+     */
     public void render(GraphicsContext gc) {
 
         for (Particle p : particles) {
@@ -47,6 +67,13 @@ public final class ParticleManager {
         }
     }
 
+    /**
+     * Sinh hiệu ứng mảnh vụn khi một viên gạch bị phá.
+     *
+     * @param x toạ độ x trung tâm vụn
+     * @param y toạ độ y trung tâm vụn
+     * @param color màu của mảnh vụn
+     */
     public void spawnBrickDebris(double x, double y, Color color) {
         int particleCount = 20;
         double particleSize = 4;
@@ -70,6 +97,9 @@ public final class ParticleManager {
     }
 
 
+    /**
+     * Xóa tất cả particle.
+     */
     public void clear() {
         particles.clear();
     }

@@ -15,6 +15,11 @@ import org.example.gamelogic.events.PowerUpCollectedEvent;
 
 
 
+/**
+ * Quản lý âm thanh và nhạc nền của game: phát SFX, lặp nhạc, dừng nhạc và cập nhật volume.
+ *
+ * <p>Singleton; lắng nghe các sự kiện game để phát âm thanh phù hợp.
+ */
 public final class SoundManager {
     private AssetManager assetManager;
     private Clip currentMusicClip = null;
@@ -23,6 +28,11 @@ public final class SoundManager {
         private static final SoundManager INSTANCE = new SoundManager();
     }
 
+    /**
+     * Lấy instance đơn của SoundManager.
+     *
+     * @return singleton SoundManager
+     */
     public static SoundManager getInstance() {
         return SingletonHolder.INSTANCE;
     }
@@ -33,6 +43,9 @@ public final class SoundManager {
         subscribeToEvents();
     }
 
+    /**
+     * Đăng ký các listener cho sự kiện liên quan tới âm thanh.
+     */
     public void subscribeToEvents() {
         EventManager.getInstance().subscribe(
                 BrickDestroyedEvent.class,
@@ -75,6 +88,24 @@ public final class SoundManager {
         }
     }
 
+    /**
+     * Dừng một sound cụ thể nếu đang chạy.
+     *
+     * @param soundName tên asset âm thanh
+     */
+    private void stopSound(String soundName) {
+        Clip clip = assetManager.getSound(soundName);
+        if (clip != null && clip.isRunning()) {
+            clip.stop();
+            clip.setFramePosition(0);
+        }
+    }
+
+    /**
+     * Phát một hiệu ứng âm thanh (SFX) theo tên asset nếu SFX đang bật.
+     *
+     * @param name tên âm thanh (khớp với assets)
+     */
     public void playSound(String name) {
         if (!SettingsManager.getInstance().isSfxEnabled()) return;
 
@@ -90,6 +121,11 @@ public final class SoundManager {
         }
     }
 
+    /**
+     * Lặp nhạc nền theo tên asset (dừng nhạc trước khi lặp).
+     *
+     * @param name tên track nhạc
+     */
     public void loopMusic(String name) {
         stopMusic();
 
@@ -106,11 +142,17 @@ public final class SoundManager {
         }
     }
 
+    /**
+     * Phát track được chọn trong settings.
+     */
     public void playSelectedMusic() {
         String musicName = SettingsManager.getInstance().getSelectedMusic();
         loopMusic(musicName);
     }
 
+    /**
+     * Dừng nhạc nền hiện tại (nếu có).
+     */
     public void stopMusic() {
         if (currentMusicClip != null && currentMusicClip.isRunning()) {
             currentMusicClip.stop();
@@ -119,6 +161,9 @@ public final class SoundManager {
         currentMusicClip = null;
     }
 
+    /**
+     * Cập nhật volume cho music hiện tại theo settings và dừng/tiếp tục nếu cần.
+     */
     public void updateAllVolumes() {
         double musicVolume = SettingsManager.getInstance().getMusicVolume();
 
@@ -133,33 +178,50 @@ public final class SoundManager {
         }
     }
 
+    /**
+     * Xử lý event khi gạch bị phá: phát hiệu ứng phù hợp.
+     *
+     * @param event sự kiện BrickDestroyedEvent
+     */
     public void onBrickDestroyed(BrickDestroyedEvent event) {
         stopSound("brick_hit");
         playSound("brick_destroyed");
     }
 
-    private void stopSound(String soundName) {
-        Clip clip = assetManager.getSound(soundName);
-        if (clip != null && clip.isRunning()) {
-            clip.stop();
-            clip.setFramePosition(0);
-        }
-    }
-
+    /**
+     * Xử lý event khi paddle bị bóng chạm: phát SFX.
+     *
+     * @param event BallHitPaddleEvent
+     */
     public void onPaddleHit(BallHitPaddleEvent event) {
         playSound("paddle_hit");
     }
 
+    /**
+     * Xử lý event khi game over: dừng nhạc và phát SFX mất bóng.
+     *
+     * @param event GameOverEvent
+     */
     public void onGameOver(GameOverEvent event) {
         stopMusic();
         playSound("ball_lost");
     }
 
+    /**
+     * Xử lý event khi level hoàn thành: dừng nhạc và phát SFX chiến thắng.
+     *
+     * @param event LevelCompletedEvent
+     */
     public void onLevelCompleted(LevelCompletedEvent event) {
         stopMusic();
         playSound("victory");
     }
 
+    /**
+     * Xử lý event khi một viên gạch bị bóng chạm/đập: phát SFX tương ứng theo loại gạch.
+     *
+     * @param event BallHitBrickEvent chứa viên gạch bị tác động
+     */
     private void onBallHitBrick(BallHitBrickEvent event) {
 
         if (event == null || event.getBrick() == null) {
@@ -179,6 +241,12 @@ public final class SoundManager {
         }
 
     }
+
+    /**
+     * Xử lý khi người chơi nhặt power-up: phát hiệu ứng âm thanh.
+     *
+     * @param event PowerUpCollectedEvent
+     */
     private void onPowerUpCollected(PowerUpCollectedEvent event) {
         playSound("powerup");
     }

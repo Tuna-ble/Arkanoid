@@ -20,6 +20,10 @@ public class AssetManager {
 
     private boolean resourcesPreloaded = false;
 
+    /**
+     * Khởi tạo AssetManager và load toàn bộ tài nguyên mặc định.
+     * <br>Input: không có (chỉ dùng nội bộ). Output: cache nội bộ được điền.
+     */
     private AssetManager() {
         loadAssets();
     }
@@ -28,10 +32,20 @@ public class AssetManager {
         private static final AssetManager INSTANCE = new AssetManager();
     }
 
+    /**
+     * Lấy instance singleton của AssetManager.
+     *
+     * @return đối tượng AssetManager dùng chung trong toàn bộ game
+     */
     public static AssetManager getInstance() {
         return SingletonHolder.INSTANCE;
     }
 
+
+    /**
+     * Load tất cả âm thanh, hình ảnh và font mặc định vào cache.
+     * <br>Input: không có. Output: các map sounds/images/fontFamilies được cập nhật.
+     */
     public void loadAssets() {
         try {
             loadSound("brick_destroyed", "/sounds/brick_destroyed.wav");
@@ -142,6 +156,13 @@ public class AssetManager {
         }
     }
 
+    /**
+     * Load một file âm thanh từ resource và lưu vào map {@code sounds}.
+     *
+     * @param name key dùng để truy cập âm thanh
+     * @param path đường dẫn trong classpath tới file âm thanh
+     * @throws Exception nếu không tìm thấy resource hoặc lỗi khi tạo Clip
+     */
     private void loadSound(String name, String path) throws Exception {
         InputStream audioSrc = getClass().getResourceAsStream(path);
         if (audioSrc == null) {
@@ -156,6 +177,14 @@ public class AssetManager {
             sounds.put(name, clip);
         }
     }
+
+    /**
+     * Load một file hình ảnh từ resource và lưu vào map {@code images}.
+     *
+     * @param name key dùng để truy cập ảnh
+     * @param path đường dẫn trong classpath tới file ảnh
+     * @throws Exception nếu không tìm thấy resource hoặc lỗi khi đọc ảnh
+     */
     private void loadImage(String name, String path) throws Exception {
         InputStream imageStream = getClass().getResourceAsStream(path);
         if (imageStream == null) {
@@ -168,6 +197,12 @@ public class AssetManager {
         }
     }
 
+    /**
+     * Lấy một âm thanh đã được cache.
+     *
+     * @param name key của âm thanh cần lấy
+     * @return {@link Clip} tương ứng, hoặc {@code null} nếu không tồn tại
+     */
     public Clip getSound(String name) {
         Clip clip = sounds.get(name);
         if (clip == null) {
@@ -176,6 +211,12 @@ public class AssetManager {
         return clip;
     }
 
+    /**
+     * Lấy một hình ảnh đã được cache.
+     *
+     * @param name key của ảnh cần lấy
+     * @return {@link Image} tương ứng, hoặc {@code null} nếu không tồn tại
+     */
     public Image getImage(String name) {
         Image img = images.get(name);
         if (img == null) {
@@ -184,6 +225,13 @@ public class AssetManager {
         return img;
     }
 
+    /**
+     * Load một font từ resource và lưu lại family name vào {@code fontFamilies}.
+     *
+     * @param name key của font
+     * @param path đường dẫn resource tới file font
+     * @throws Exception nếu không tìm thấy file hoặc lỗi khi load font
+     */
     private void loadFont(String name, String path) throws Exception {
         try (InputStream fontStream = getClass().getResourceAsStream(path)) {
             if (fontStream == null) {
@@ -201,10 +249,23 @@ public class AssetManager {
         }
     }
 
+    /**
+     * Cache trực tiếp một đối tượng {@link Font} với key cho trước.
+     *
+     * @param name key của font
+     * @param font đối tượng font cần cache
+     */
     public void cacheFont(String name, Font font) {
         fonts.put(name, font);
     }
 
+    /**
+     * Tạo và trả về font theo family đã load trước đó.
+     *
+     * @param name key của font (đã load bằng {@link #loadFont(String, String)})
+     * @param size kích thước font mong muốn
+     * @return font với family tương ứng; nếu không có sẽ trả về Arial với size cho trước
+     */
     public Font getFont(String name, double size) {
         String familyName = fontFamilies.get(name);
 
@@ -216,10 +277,22 @@ public class AssetManager {
         }
     }
 
+    /**
+     * Cache một {@link Effect} để tái sử dụng.
+     *
+     * @param name   key cho effect
+     * @param effect effect cần cache
+     */
     public void cacheEffect(String name, Effect effect) {
         effects.put(name, effect);
     }
 
+    /**
+     * Lấy một effect đã được cache.
+     *
+     * @param name key của effect cần lấy
+     * @return {@link Effect} tương ứng, hoặc {@code null} nếu không tồn tại
+     */
     public Effect getEffect(String name) {
         Effect effect = effects.get(name);
         if (effect == null) {
@@ -228,10 +301,22 @@ public class AssetManager {
         return effect;
     }
 
+    /**
+     * Cache một {@link Paint} (thường là gradient) để tái sử dụng.
+     *
+     * @param name     key cho gradient
+     * @param gradient đối tượng Paint cần cache
+     */
     public void cacheGradient(String name, Paint gradient) {
         gradients.put(name, gradient);
     }
 
+    /**
+     * Lấy một gradient đã được cache.
+     *
+     * @param name key của gradient
+     * @return {@link Paint} tương ứng, hoặc {@code null} nếu không tồn tại
+     */
     public Paint getGradient(String name) {
         Paint gradient = gradients.get(name);
         if (gradient == null) {
@@ -240,6 +325,10 @@ public class AssetManager {
         return gradient;
     }
 
+    /**
+     * Load toàn bộ tài nguyên và cache một số font hay dùng nếu chưa preload.
+     * <br>Input: không có. Output: tài nguyên đảm bảo đã sẵn sàng dùng.
+     */
     public void preloadResources() {
         if (resourcesPreloaded) return;
 
@@ -254,9 +343,11 @@ public class AssetManager {
     }
 
     /**
-     * Public wrapper to load an image into the internal cache. Safe to call
-     * from initialization code. If loading fails it will throw an exception
-     * to the caller so they can decide how to handle it.
+     * Public wrapper để load thêm một ảnh vào cache trong runtime.
+     *
+     * @param name key cho ảnh
+     * @param path đường dẫn resource tới file ảnh
+     * @throws Exception nếu không tìm thấy hoặc lỗi khi load ảnh
      */
     public synchronized void loadImageResource(String name, String path) throws Exception {
         loadImage(name, path);
