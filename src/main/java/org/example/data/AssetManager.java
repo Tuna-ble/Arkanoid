@@ -143,6 +143,7 @@ public class AssetManager {
             loadImage("bg3", "/images/background3.png");
             loadImage("bossBackground", "/images/bossBackground.png");
             loadImage("infiniteBackground", "/images/infiniteBackground.png");
+            loadImage("confetti", "/images/confetti.gif");
 
         } catch (Exception e) {
             System.err.println("Không thể tải file hình ảnh: " + e.getMessage());

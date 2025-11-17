@@ -44,6 +44,7 @@ public final class VictoryState implements GameState {
     );
 
     private Image victory;
+    private final Image confettiGif;
 
     private double elapsedTime = 0.0;
     private final double STAR_ANIM_START_TIME = 0.5;
@@ -70,6 +71,15 @@ public final class VictoryState implements GameState {
             ProgressManager.saveProgress(this.levelCompleted, this.starsAwarded);
         }
 
+        AssetManager am = AssetManager.getInstance();
+        titleFont = am.getFont("Anxel", 70);
+        starFont = am.getFont("Anxel", 60);
+        scoreFont = am.getFont("Anxel", 40);
+        this.confettiGif = am.getImage("confetti");
+
+        final Image normalImage = am.getImage("button");
+        final Image hoveredImage = am.getImage("hoveredButton");
+
         double buttonWidth = 180;
         double buttonSpacing = (GameConstants.SCREEN_WIDTH - (buttonWidth * 3)) / 4;
         double buttonY = GameConstants.SCREEN_HEIGHT - GameConstants.UI_BUTTON_HEIGHT * 2 - 80;
@@ -78,22 +88,21 @@ public final class VictoryState implements GameState {
         double quitX = restartX;
         double nextX = restartX + buttonWidth + buttonSpacing;
 
-        AssetManager am = AssetManager.getInstance();
-        titleFont = am.getFont("Anxel", 70);
-        starFont = am.getFont("Anxel", 60);
-        scoreFont = am.getFont("Anxel", 40);
-
-        final Image normalImage = am.getImage("button");
-        final Image hoveredImage = am.getImage("hoveredButton");
-        this.quitButton = new Button(quitX, buttonY + GameConstants.UI_BUTTON_HEIGHT +
-                GameConstants.UI_BUTTON_PADDING, buttonWidth, GameConstants.UI_BUTTON_HEIGHT,
-                normalImage, hoveredImage, "Quit");
         this.restartButton = new Button(restartX, buttonY, buttonWidth,
                 GameConstants.UI_BUTTON_HEIGHT, normalImage, hoveredImage, "Restart");
         this.menuButton = new Button(menuX, buttonY, buttonWidth,
                 GameConstants.UI_BUTTON_HEIGHT, normalImage, hoveredImage, "Menu");
         this.nextButton = new Button(nextX, buttonY, buttonWidth,
                 GameConstants.UI_BUTTON_HEIGHT, normalImage, hoveredImage, "Next Level");
+
+        if (levelCompleted < 5) {
+            this.quitButton = new Button(quitX, buttonY + GameConstants.UI_BUTTON_HEIGHT +
+                    GameConstants.UI_BUTTON_PADDING, buttonWidth, GameConstants.UI_BUTTON_HEIGHT,
+                    normalImage, hoveredImage, "Quit");
+        } else {
+            this.quitButton = new Button(nextX, buttonY, buttonWidth, GameConstants.UI_BUTTON_HEIGHT,
+                    normalImage, hoveredImage, "Quit");
+        }
 
         victory = AssetManager.getInstance().getImage("victory");
     }
@@ -106,8 +115,10 @@ public final class VictoryState implements GameState {
     private void updateButtons(I_InputProvider inputProvider) {
         quitButton.handleInput(inputProvider);
         menuButton.handleInput(inputProvider);
-        nextButton.handleInput(inputProvider);
         restartButton.handleInput(inputProvider);
+        if (levelCompleted < 5) {
+            nextButton.handleInput(inputProvider);
+        }
     }
 
     @Override
@@ -197,6 +208,7 @@ public final class VictoryState implements GameState {
                 gc.restore();
             }
         }
+        gc.drawImage(confettiGif, 0, 0, GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
     }
 
     @Override
